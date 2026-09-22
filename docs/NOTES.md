@@ -9,6 +9,8 @@
 | NOTE-05 | 28.7 | Không thể xác minh quyền sử dụng/PII/near-duplicate chỉ bằng kiểm tra trường metadata. | Validator ban đầu chỉ kiểm bất biến cấu trúc; quyền và similarity semantic phải là gate riêng, không đánh đồng với đạt publish. |
 | NOTE-06 | 21, D-06 | Chưa có SDK 10 trên PATH, provider, credential, budget và môi trường PostgreSQL. | Dùng SDK 10 riêng trong workspace; chưa gọi model mất phí. Provider và hạ tầng là mốc tiếp theo. |
 | NOTE-07 | 28.10 | Any state -> terminal chưa rõ việc phục hồi hoặc sửa item rejected/quarantined. | Không hồi sinh revision cũ; sửa tạo revision mới ở Generated, không kế thừa bằng chứng. |
+| NOTE-08 | 28.6, FR-79 | SRS chỉ nêu `budget` nhưng chưa chốt đơn vị, currency, cách chia budget cho batch nhỏ hơn quota hoặc làm tròn. | Domain dùng decimal tối đa 6 chữ số thập phân và phân bổ tỷ lệ theo quota; cần chốt với CostLedger trước triển khai thanh toán thật. |
+| NOTE-09 | 28.6 | `allowedVocabulary` bắt buộc nhưng không nói danh sách rỗng có nghĩa là cấm hết hay không giới hạn. | Cho phép danh sách rỗng với nghĩa không có allowlist; `forbiddenTopics` rỗng nghĩa không bổ sung cấm ngoài policy toàn cục. |
 
 ## Quyết định kỹ thuật
 
@@ -23,3 +25,4 @@
 - Hash của blind input giúp phát hiện kết quả gắn sai payload; không tự chứng minh provider không thấy key. Cần adapter tách context và lưu invocation thực tế.
 - Domain role check chưa phải authentication/RBAC có scope; API nghiệp vụ chưa mở.
 - Liveness `/health` chưa phải readiness của DB/provider.
+- Từ M03, test mới được hoãn theo yêu cầu người dùng. Build vẫn chạy; các invariant mới chưa được coi là nghiệm thu cho tới khi có test sau.

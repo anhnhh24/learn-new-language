@@ -29,10 +29,21 @@
 - TC-73, TC-75, TC-76, TC-79, TC-80 được kiểm ở mức domain/DTO; chưa coi là nghiệm thu E2E của FR.
 - Fixture chỉ dùng kiểm thử kỹ thuật; chưa kiểm định học thuật, không dùng cho learner.
 
+## M03 — Blueprint và generation job domain (hoàn tất phần domain)
+
+- `ContentBlueprintVersion` chứa profile, Part, taxonomy/constraint, quota, budget, route và policy version.
+- Blueprint chỉ dùng để sinh câu sau khi Admin publish; archive chặn job mới, phiên bản cũ vẫn giữ để audit.
+- Quota Part 5 bị giới hạn tối đa 10 candidate/job; budget reserve tính theo quota yêu cầu trước khi provider chạy.
+- `GenerationJob` giữ input hash, idempotency scope/key, route, reservation, checkpoint tăng đơn điệu, transition và domain event.
+- Kill switch chặn `Start`; timeout chưa rõ chi phí chuyển sang `AwaitingCostReconciliation`.
+- Mới có repository/budget interface. Transactional outbox, unique constraint và tranh chấp budget đồng thời cần làm ở Infrastructure.
+
+Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ chạy build để bắt lỗi biên dịch; test chi tiết và integration test sẽ bổ sung sau.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 
-1. Blueprint catalog/schema đầy đủ và taxonomy/grammar rule catalog; bind provenance từ server.
-2. PostgreSQL, migration, transactional outbox, generation job idempotent, quota/budget.
+1. Blueprint catalog/schema persistence và taxonomy/grammar rule catalog; bind provenance từ server.
+2. PostgreSQL, migration, transactional outbox, unique idempotency constraint và budget ledger đồng thời.
 3. Provider adapters, hai solver, critic, perturbation, semantic similarity và rights gates thực tế.
 4. Authentication/authorization có scope, admin UI và React learner UI.
 5. Beta form gate/serving, attempt snapshot/autosave/submit, reports, telemetry và quarantine xuyên form.
