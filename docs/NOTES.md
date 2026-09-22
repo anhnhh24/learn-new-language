@@ -1,0 +1,17 @@
+﻿# Điểm chưa hợp lý / cần làm rõ
+
+| ID | Tham chiếu | Vấn đề | Hướng xử lý hiện tại |
+|---|---|---|---|
+| NOTE-01 | 27.3 FR-74, 28.4 | Part 7 ghi R1 ở FR-74 nhưng R0A ở 28.4 và gate pilot. | Theo lát cắt 28.4: Part 7 direct-evidence thuộc R0A; làm sau nền Part 5. |
+| NOTE-02 | 28.3, 28.8 | L1Internal chưa có trong bảng tier; ngoại lệ một provider cần PO nhưng chưa có cấu trúc risk approval. | Không triển khai override; thiếu đa dạng provider thì chỉ giữ nội bộ. |
+| NOTE-03 | 28.5, 28.14, UC-11 | Form gate cần item L2 nhưng L2 lại đòi form gate; dễ tạo vòng phụ thuộc. | Tách BetaReady của item khỏi BetaActive; form composer cần tạo quyết định và snapshot trong transaction ở mốc sau. |
+| NOTE-04 | 28.11 | Chưa định nghĩa N theo population, ability band, xử lý repeated responses, mẫu tối thiểu nhóm năng lực cao. | Chưa tự promote L2D; cần policy và test thống kê riêng. |
+| NOTE-05 | 28.7 | Không thể xác minh quyền sử dụng/PII/near-duplicate chỉ bằng kiểm tra trường metadata. | Validator ban đầu chỉ kiểm bất biến cấu trúc; quyền và similarity semantic phải là gate riêng, không đánh đồng với đạt publish. |
+| NOTE-06 | 21, D-06 | Chưa có SDK 10 trên PATH, provider, credential, budget và môi trường PostgreSQL. | Dùng SDK 10 riêng trong workspace; chưa gọi model mất phí. Provider và hạ tầng là mốc tiếp theo. |
+| NOTE-07 | 28.10 | Any state -> terminal chưa rõ việc phục hồi hoặc sửa item rejected/quarantined. | Không hồi sinh revision cũ; sửa tạo revision mới ở Generated, không kế thừa bằng chứng. |
+
+## Quyết định kỹ thuật
+
+- .NET 10 LTS cho code mới. Kiểm tra ngày 2026-09-23 tại https://dotnet.microsoft.com/en-us/platform/support/policy (support tới tháng 11/2028).
+- SDK tải từ release metadata chính thức và đối chiếu SHA-512; `.tools` không commit.
+- Không mở endpoint nhận cờ `gatePassed` từ client. Kết quả solver/gate phải đến từ worker tin cậy và gắn revision/policy trước khi có API publish.
