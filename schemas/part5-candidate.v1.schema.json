@@ -1,0 +1,47 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:toeic:part5-candidate:v1",
+  "title": "Part 5 candidate v1 (internal, never learner response)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["Stem", "Options", "ProposedKey", "RuleId", "AnswerDerivation", "FamilyId", "Provenance"],
+  "properties": {
+    "Stem": {"type": "string", "minLength": 1, "maxLength": 500},
+    "Options": {
+      "type": "array", "minItems": 4, "maxItems": 4,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["StableId", "Text", "Justification"],
+        "properties": {
+          "StableId": {"type": "string", "minLength": 1},
+          "Text": {"type": "string", "minLength": 1, "maxLength": 120},
+          "Justification": {"type": "string", "minLength": 1, "maxLength": 2000}
+        }
+      }
+    },
+    "ProposedKey": {"type": "string", "minLength": 1},
+    "RuleId": {"type": "string", "minLength": 1},
+    "AnswerDerivation": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "FamilyId": {"type": "string", "minLength": 1},
+    "Provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ContributorId", "BlueprintVersion", "PolicyVersion", "RightsReference", "Generator"],
+      "properties": {
+        "ContributorId": {"type": "string", "minLength": 1},
+        "BlueprintVersion": {"type": "string", "minLength": 1},
+        "PolicyVersion": {"type": "string", "minLength": 1},
+        "RightsReference": {"type": "string", "minLength": 1},
+        "Generator": {
+          "type": "object", "additionalProperties": false,
+          "required": ["Provider", "Family", "Model", "PromptVersion"],
+          "properties": {
+            "Provider": {"type": "string", "minLength": 1},
+            "Family": {"type": "string", "minLength": 1},
+            "Model": {"type": "string", "minLength": 1},
+            "PromptVersion": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    }
+  }
+}

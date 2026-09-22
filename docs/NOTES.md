@@ -15,3 +15,11 @@
 - .NET 10 LTS cho code mới. Kiểm tra ngày 2026-09-23 tại https://dotnet.microsoft.com/en-us/platform/support/policy (support tới tháng 11/2028).
 - SDK tải từ release metadata chính thức và đối chiếu SHA-512; `.tools` không commit.
 - Không mở endpoint nhận cờ `gatePassed` từ client. Kết quả solver/gate phải đến từ worker tin cậy và gắn revision/policy trước khi có API publish.
+
+## Giới hạn triển khai đợt đầu
+
+- Schema v1 dùng PascalCase khớp DTO .NET; adapter phải dùng thống nhất. Chưa khóa schema blueprint đầy đủ, chưa có catalog nội dung production.
+- Exact family collision không thay thế semantic near-duplicate detection.
+- Hash của blind input giúp phát hiện kết quả gắn sai payload; không tự chứng minh provider không thấy key. Cần adapter tách context và lưu invocation thực tế.
+- Domain role check chưa phải authentication/RBAC có scope; API nghiệp vụ chưa mở.
+- Liveness `/health` chưa phải readiness của DB/provider.
