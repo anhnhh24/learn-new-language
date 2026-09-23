@@ -7,8 +7,8 @@ using Toeic.Domain.Content;
 public sealed record ItemExposure(Guid EventId, Guid AttemptId, Guid ItemRevisionId,
     string LearnerHash, string FormVersion, DateTimeOffset ExposedAt);
 public sealed record ItemResponse(Guid EventId, Guid AttemptId, Guid ItemRevisionId,
-    string LearnerHash, string SelectedOptionId, bool Correct, long ResponseTimeMs,
-    string AbilityBand, DateTimeOffset RespondedAt);
+    string LearnerHash, string FormVersion, string SelectedOptionId, bool Correct, bool Valid,
+    long ResponseTimeMs, string AbilityBand, DateTimeOffset RespondedAt);
 public sealed record LearnerIssueReport(Guid Id, Guid ItemRevisionId, string ReporterHash,
     string Category, string? Comment, DateTimeOffset ReportedAt);
 
