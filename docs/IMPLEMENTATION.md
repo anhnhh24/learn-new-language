@@ -65,11 +65,26 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 - Account, one-time token, session revoke, onboarding profile và permission mặc định deny.
 - Password hashing, email provider, rate limit, MFA và auth API còn ở application/infrastructure.
 
+## M09 — Application orchestration (hoàn tất contracts/coordinator)
+
+- Atomic get-or-add generation job trước budget reservation; replay khác input bị conflict.
+- Transaction boundary và outbox writer bắt buộc; dispatcher có exponential backoff/dead-letter.
+
+## M10 — API pipeline (hoàn tất baseline)
+
+- Correlation ID được lọc, security headers và error JSON an toàn, không trả stack/vendor error.
+- Chưa mở endpoint dữ liệu khi authentication/persistence chưa hoàn chỉnh.
+
+## M11 — Part 7 source-first (hoàn tất validator cấu trúc)
+
+- Stimulus version bất biến, source hash, evidence offset/quote và key/options theo group 2–5 câu.
+- Chưa có generator/solver/critic semantic thật nên chưa câu nào được lên Beta.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 
-1. Application services, repository mapping, migration runner, password/email/MFA và auth endpoints.
+1. Repository mapping, migration runner, password/email/MFA và auth endpoints.
 2. Generation Worker, provider adapters, hai solver, critic, perturbation, similarity và rights gates.
-3. Beta serving/report/exposure/quarantine, Part 7 source-first và form composer.
+3. Beta serving/report/exposure/quarantine và Reading form composer.
 4. Course/lesson CMS, import DOCX/PDF text và learner APIs cho Learning/Assessment.
 5. React learner/admin UI, notification, data export/delete, observability và backup/restore.
 6. Test backlog đã hoãn: domain, integration concurrency, contract, E2E và release gates.

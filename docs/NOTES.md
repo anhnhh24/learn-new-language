@@ -14,6 +14,7 @@
 | NOTE-10 | FR-24 | Attempt domain hiện có một deadline chung; TOEIC full mock cần deadline riêng Listening/Reading và khóa section. | Dùng cho R0A Reading practice; chưa mở full simulation trước khi bổ sung section clock. |
 | NOTE-11 | FR-40–41 | Refund callback có thể đến trước paid callback nhưng chưa có inbox/reconciliation service để giữ event out-of-order. | Commerce giữ PendingIntegration; Infrastructure phải lưu inbox trước khi gọi aggregate. |
 | NOTE-12 | FR-01–03 | Domain identity không tự giải quyết rate limit, MFA, password hashing parameters hoặc email anti-enumeration. | Chỉ mở auth API sau khi application/infrastructure và audit được nối đầy đủ. |
+| NOTE-13 | 28.7–28.9 | Part 7 validator chỉ chứng minh hash/offset/quote và cấu trúc; không chứng minh passage tự nhiên, distractor hợp lý hoặc câu không cần kiến thức ngoài. | Giữ nội bộ tới khi hai solver, critic, perturbation và similarity runner đều có invocation audit thật. |
 
 ## Quyết định kỹ thuật
 
