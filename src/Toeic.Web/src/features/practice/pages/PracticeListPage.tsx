@@ -58,6 +58,82 @@ export function PracticeListPage() {
         </div>
       </div>
 
+      {/* Topic & Grammar Mini-Drills (UI-07, FR-10, FR-21) */}
+      <section style={{ marginBottom: '32px' }} aria-labelledby="drills-heading">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
+          <div>
+            <h2 id="drills-heading" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-ink-primary)' }}>
+              Luyện tập Chuyên đề & Ngữ pháp (Mini-Drills UI-07)
+            </h2>
+            <p style={{ fontSize: '13px', color: 'var(--color-ink-secondary)', margin: 0 }}>
+              Bài tập 5–10 câu có phản hồi tức thì và giải thích chi tiết từng câu để củng cố điểm yếu nhanh chóng.
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+          <div style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-primary)' }}>PART 5 • NGỮ PHÁP</span>
+                <TierBadge tier="BetaPractice" />
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--color-ink-primary)', marginBottom: '6px' }}>
+                Giới từ & Rút gọn Mệnh đề phân từ
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--color-ink-secondary)', marginBottom: '12px' }}>
+                5 câu hỏi phân biệt before/prior, when/while/during và mệnh đề phân từ trong ngữ cảnh văn bản công sở.
+              </p>
+            </div>
+            <Button variant="secondary" size="sm" onClick={() => navigate('/learn/quiz/part5-grammar')}>
+              Bắt đầu luyện tập tức thì
+            </Button>
+          </div>
+
+          <div style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-primary)' }}>PART 5 • TỪ LOẠI</span>
+                <TierBadge tier="DataValidatedPractice" />
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--color-ink-primary)', marginBottom: '6px' }}>
+                Hòa hợp Chủ vị & Hậu tố Từ loại
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--color-ink-secondary)', marginBottom: '12px' }}>
+                5 câu hỏi nhận diện cấu trúc tương quan (Neither... nor...), danh từ trừu tượng và trạng từ bổ nghĩa.
+              </p>
+            </div>
+            <Button variant="secondary" size="sm" onClick={() => navigate('/learn/quiz/part5-wordforms')}>
+              Bắt đầu luyện tập tức thì
+            </Button>
+          </div>
+
+          <div style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-primary)' }}>PART 7 • ĐỌC HIỂU</span>
+                <TierBadge tier="BetaPractice" />
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--color-ink-primary)', marginBottom: '6px' }}>
+                Kỹ năng Quét thông tin E-mail & Đơn hàng
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--color-ink-secondary)', marginBottom: '12px' }}>
+                Đoạn văn đơn 4 câu hỏi định vị thông tin chi tiết và suy luận mục đích người gửi.
+              </p>
+            </div>
+            <Button variant="secondary" size="sm" onClick={() => navigate('/learn/quiz/part7-single-passage')}>
+              Bắt đầu luyện tập tức thì
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <div style={{ marginBottom: '16px' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-ink-primary)' }}>
+          Đề thi trọn vẹn & Đề luyện từng Part (Full Simulation & Part Tests)
+        </h2>
+      </div>
+
       <div className={styles.formsGrid}>
         {forms.map((form) => (
           <div key={form.id} className={styles.formCard}>

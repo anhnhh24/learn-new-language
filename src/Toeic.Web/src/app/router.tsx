@@ -22,6 +22,7 @@ import { CourseDetailPage } from '../features/learning/pages/CourseDetailPage';
 import { PracticeListPage } from '../features/practice/pages/PracticeListPage';
 import { ExamRoomPage } from '../features/practice/pages/ExamRoomPage';
 import { ExamResultPage } from '../features/practice/pages/ExamResultPage';
+import { QuizRunnerPage } from '../features/practice/pages/QuizRunnerPage';
 
 // Review Pages
 import { ErrorNotebookPage } from '../features/review/pages/ErrorNotebookPage';
@@ -78,6 +79,7 @@ export const router = createBrowserRouter([
       { path: 'lesson/:id', element: <LessonPage /> },
       { path: 'practice', element: <PracticeListPage /> },
       { path: 'practice/:attemptId/result', element: <ExamResultPage /> },
+      { path: 'quiz/:quizId', element: <QuizRunnerPage /> },
       { path: 'errors', element: <ErrorNotebookPage /> },
       { path: 'flashcards', element: <FlashcardPage /> },
       { path: 'dashboard', element: <DashboardPage /> },
