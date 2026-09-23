@@ -121,10 +121,11 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session)
             return new(form, form.ExamProfileVersion, form.AttemptDuration, []);
 
         await using var itemCommand = CreateCommand("""
-            select qr.id, qr.family_id, qr.part, qr.content_json::text,
-                   qr.content_hash, qr.state
+            select qn.id, qr.family_id, qr.part, qr.content_json::text,
+                   qr.content_hash, qr.state, qn.stable_id
             from content.form_questions fq
-            join content.question_revisions qr on qr.id = fq.question_revision_id
+            join content.question_nodes qn on qn.id = fq.question_revision_id
+            join content.question_revisions qr on qr.id = qn.source_revision_id
             where fq.form_version_id = @form_id
             order by fq.question_order;
             """);
@@ -134,23 +135,46 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session)
         while (await itemReader.ReadAsync(cancellationToken))
         {
             var part = Enum.Parse<ToeicPart>(itemReader.GetString(2));
-            if (part != ToeicPart.Part5)
-                throw new DomainException("FORM_CONTENT_UNSUPPORTED");
             if (itemReader.GetString(5) is not ("BetaActive" or "DataValidatedPractice"))
                 throw new DomainException("FORM_ITEM_NOT_AVAILABLE");
             var familyId = itemReader.GetString(1);
-            var content = JsonSerializer.Deserialize<Part5Content>(
-                itemReader.GetString(3), JsonOptions)
-                ?? throw new DomainException("FORM_CONTENT_CORRUPT");
-            var options = content.Options.Select(option =>
-                new AttemptOption(option.StableId, option.Text)).ToImmutableArray();
-            if (!string.Equals(content.FamilyId, familyId, StringComparison.Ordinal) ||
-                !string.Equals(ContentHash.Of(content), itemReader.GetString(4),
-                    StringComparison.Ordinal))
-                throw new DomainException("FORM_CONTENT_CORRUPT");
-            items.Add(new AttemptItemSnapshot(itemReader.GetGuid(0),
-                StableFamilyId(familyId), "Part5", content.Stem, options,
-                [content.ProposedKey], 1m));
+            var contentJson = itemReader.GetString(3);
+            var contentHash = itemReader.GetString(4);
+            var questionNodeId = itemReader.GetGuid(0);
+            switch (part)
+            {
+                case ToeicPart.Part5:
+                {
+                    var content = JsonSerializer.Deserialize<Part5Content>(contentJson, JsonOptions)
+                        ?? throw new DomainException("FORM_CONTENT_CORRUPT");
+                    EnsureContentIdentity(content.FamilyId, familyId, content, contentHash);
+                    var options = content.Options.Select(option =>
+                        new AttemptOption(option.StableId, option.Text)).ToImmutableArray();
+                    items.Add(new AttemptItemSnapshot(questionNodeId, StableFamilyId(familyId),
+                        "Part5", content.Stem, options, [content.ProposedKey], 1m));
+                    break;
+                }
+                case ToeicPart.Part7DirectEvidence:
+                {
+                    var content = JsonSerializer.Deserialize<Part7GroupContent>(
+                        contentJson, JsonOptions) ?? throw new DomainException("FORM_CONTENT_CORRUPT");
+                    EnsureContentIdentity(content.FamilyId, familyId, content, contentHash);
+                    var stableId = itemReader.GetString(6);
+                    var matches = content.Questions.Where(question =>
+                        string.Equals(question.StableId, stableId, StringComparison.Ordinal)).ToArray();
+                    if (matches.Length != 1)
+                        throw new DomainException("FORM_CONTENT_CORRUPT");
+                    var question = matches[0];
+                    var options = question.Options.Select(option =>
+                        new AttemptOption(option.StableId, option.Text)).ToImmutableArray();
+                    items.Add(new AttemptItemSnapshot(questionNodeId, StableFamilyId(familyId),
+                        "Part7", question.Prompt, options, [question.ProposedKey], 1m,
+                        content.Stimulus.Text));
+                    break;
+                }
+                default:
+                    throw new DomainException("FORM_CONTENT_UNSUPPORTED");
+            }
         }
         return new(form, form.ExamProfileVersion, form.AttemptDuration, items.ToImmutable());
     }
@@ -201,6 +225,13 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session)
         command.Parameters.Add(parameter);
     }
 
+    private static void EnsureContentIdentity<T>(string contentFamilyId, string storedFamilyId,
+        T content, string storedHash)
+    {
+        if (!string.Equals(contentFamilyId, storedFamilyId, StringComparison.Ordinal) ||
+            !string.Equals(ContentHash.Of(content), storedHash, StringComparison.Ordinal))
+            throw new DomainException("FORM_CONTENT_CORRUPT");
+    }
 
     private static Guid StableFamilyId(string familyId)
     {
@@ -238,13 +269,20 @@ internal sealed class PostgresFormCandidateStore(IPostgresSession session) : IFo
         command.CommandText = $"""
             select qr.id, qr.family_id, qr.part, qr.tier, qr.state,
                    qr.provenance_json::text,
-                   coalesce(exp.exposure_count, 0) as exposure_count
+                   coalesce(exp.exposure_count, 0) as exposure_count,
+                   nodes.question_revision_ids
             from content.question_revisions qr
             left join lateral (
                 select count(*)::int as exposure_count
                 from assessment.item_exposures ie
-                where ie.item_revision_id = qr.id
+                join content.question_nodes qn on qn.id = ie.item_revision_id
+                where qn.source_revision_id = qr.id
             ) exp on true
+            left join lateral (
+                select array_agg(qn.id order by qn.question_order) as question_revision_ids
+                from content.question_nodes qn
+                where qn.source_revision_id = qr.id
+            ) nodes on true
             where qr.id in ({string.Join(", ", parameters)});
             """;
 
@@ -263,8 +301,9 @@ internal sealed class PostgresFormCandidateStore(IPostgresSession session) : IFo
                 ?? throw new DomainException("PROVENANCE_CORRUPT");
             var exposureCount = reader.GetInt32(6);
 
-            // For Part 5, each revision is a single question
-            var questionRevisionIds = ImmutableArray.Create(revisionId);
+            if (reader.IsDBNull(7))
+                throw new DomainException("QUESTION_NODES_MISSING");
+            var questionRevisionIds = reader.GetFieldValue<Guid[]>(7).ToImmutableArray();
 
             results.Add(new FormItemCandidate(revisionId, familyId, part, tier, state,
                 questionRevisionIds, exposureCount, provenance.RightsReference,
@@ -296,12 +335,14 @@ internal sealed class PostgresFormCandidateStore(IPostgresSession session) : IFo
         DateTimeOffset quarantinedAt, CancellationToken cancellationToken)
     {
         await using var updateCommand = CreateCommand("""
-            update content.question_revisions
+            update content.question_revisions qr
             set state = 'Quarantined'
-            where id = @id;
+            from content.question_nodes qn
+            where qn.id = @id and qr.id = qn.source_revision_id;
             """);
         Add(updateCommand, "@id", revisionId);
-        await updateCommand.ExecuteNonQueryAsync(cancellationToken);
+        if (await updateCommand.ExecuteNonQueryAsync(cancellationToken) == 0)
+            throw new DomainException("FORM_ITEM_NOT_FOUND");
 
         await using var decisionCommand = CreateCommand("""
             insert into assessment.quarantine_decisions

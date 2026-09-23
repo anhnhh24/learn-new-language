@@ -18,9 +18,9 @@ internal sealed class PostgresAttemptStore(IPostgresSession session) : IAttemptS
         if (!Guid.TryParse(attempt.LearnerId, out var learnerId))
             throw new DomainException("LEARNER_ID_INVALID");
 
-        var document = new AttemptSnapshotDocument(1, attempt.Items.Select(item =>
+        var document = new AttemptSnapshotDocument(2, attempt.Items.Select(item =>
             new AttemptItemDocument(item.QuestionRevisionId, item.QuestionFamilyId,
-                item.Section, item.Prompt, item.Options,
+                item.Section, item.Stimulus, item.Prompt, item.Options,
                 item.CorrectOptionIds.Order(StringComparer.Ordinal).ToImmutableArray(),
                 item.MaxScore)).ToImmutableArray());
         await using var command = CreateCommand("""
@@ -90,7 +90,7 @@ internal sealed class PostgresAttemptStore(IPostgresSession session) : IAttemptS
     private sealed record AttemptSnapshotDocument(int SchemaVersion,
         ImmutableArray<AttemptItemDocument> Items);
     private sealed record AttemptItemDocument(Guid QuestionRevisionId, Guid QuestionFamilyId,
-        string Section, string Prompt, ImmutableArray<AttemptOption> Options,
+        string Section, string? Stimulus, string Prompt, ImmutableArray<AttemptOption> Options,
         ImmutableArray<string> CorrectOptionIds, decimal MaxScore);
 }
 

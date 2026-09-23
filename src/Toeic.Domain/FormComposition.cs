@@ -74,7 +74,8 @@ public sealed class BetaFormVersion
     {
         RequireWorker(actor);
         RequireState(FormState.Active);
-        if (itemRevisionId == Guid.Empty || !Items.Any(item => item.RevisionId == itemRevisionId))
+        if (itemRevisionId == Guid.Empty ||
+            !Items.Any(item => item.QuestionRevisionIds.Contains(itemRevisionId)))
             throw new DomainException("FORM_ITEM_NOT_FOUND");
         Move(FormState.Degraded, reason, itemRevisionId, actor, clock);
     }

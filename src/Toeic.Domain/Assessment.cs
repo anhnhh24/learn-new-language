@@ -19,6 +19,7 @@ public sealed class AttemptItemSnapshot
     public Guid QuestionRevisionId { get; }
     public Guid QuestionFamilyId { get; }
     public string Section { get; }
+    public string? Stimulus { get; }
     public string Prompt { get; }
     public ImmutableArray<AttemptOption> Options { get; }
     public decimal MaxScore { get; }
@@ -26,7 +27,7 @@ public sealed class AttemptItemSnapshot
 
     public AttemptItemSnapshot(Guid questionRevisionId, Guid questionFamilyId, string section,
         string prompt, ImmutableArray<AttemptOption> options, IEnumerable<string> correctOptionIds,
-        decimal maxScore)
+        decimal maxScore, string? stimulus = null)
     {
         if (questionRevisionId == Guid.Empty || questionFamilyId == Guid.Empty)
             throw new DomainException("QUESTION_SNAPSHOT_ID_REQUIRED");
@@ -34,6 +35,8 @@ public sealed class AttemptItemSnapshot
             throw new DomainException("QUESTION_SNAPSHOT_CONTENT_REQUIRED");
         if (options.IsDefaultOrEmpty || options.Any(option => string.IsNullOrWhiteSpace(option.StableId)))
             throw new DomainException("QUESTION_SNAPSHOT_OPTIONS_INVALID");
+        if (stimulus?.Length > 6000)
+            throw new DomainException("QUESTION_SNAPSHOT_STIMULUS_INVALID");
 
         var optionIds = options.Select(option => option.StableId).ToImmutableHashSet(StringComparer.Ordinal);
         var keys = correctOptionIds?.ToImmutableHashSet(StringComparer.Ordinal) ?? [];
@@ -43,6 +46,7 @@ public sealed class AttemptItemSnapshot
         QuestionRevisionId = questionRevisionId;
         QuestionFamilyId = questionFamilyId;
         Section = section.Trim();
+        Stimulus = string.IsNullOrWhiteSpace(stimulus) ? null : stimulus;
         Prompt = prompt;
         Options = options;
         this.correctOptionIds = keys;

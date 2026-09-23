@@ -168,12 +168,20 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
   - UI-18: Báo lỗi câu hỏi và hỗ trợ học viên (/learn/support).
 - Tầng API client (src/lib/api/) hỗ trợ kết nối VITE_API_BASE_URL với fallback mock fixtures chuẩn nghiệp vụ SRS phục vụ kiểm thử giao diện độc lập.
 
+## M22 — Part 7 question-node persistence và beta materialization (hoàn tất backend)
+
+- Migration 003_question_nodes.sql tách source revision của cả passage/group khỏi ID ổn định của từng câu; dữ liệu Part 5 cũ được backfill không đổi ID.
+- Form composition lấy đúng số question node theo thứ tự trong group; exposure, response, report, statistics và quarantine đều tham chiếu ID từng câu.
+- Reader kiểm source state, family và content hash, rồi ánh xạ stable_id sang đúng câu Part 7; attempt snapshot lưu passage ở Stimulus và không phát rationale/provenance.
+- Quarantine một question node khóa source group và chuyển mọi form Active chứa câu đó sang Degraded.
+- Writer PostgreSQL từ chối ID trùng, stable ID trùng sau normalize và thứ tự không liên tục; caller phải lưu source revision và nodes trong cùng application transaction.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 2. Operations quality dashboard và công cụ kiểm soát quarantine.
 3. Password/email/MFA, auth endpoints và secret manager.
 4. Course/lesson CMS, import DOCX/PDF text và learner APIs cho Learning/Assessment.
-5. React learner/admin UI, notification, data export/delete, observability và backup/restore.
+5. Notification, data export/delete, observability và backup/restore.
 6. Test backlog đã hoãn: domain, integration concurrency, contract, E2E và release gates.
 
 Các actor trong domain phải do authentication/worker tin cậy cung cấp khi tích hợp, không nhận từ request body. Chưa có persistence/concurrency control, provider invocation thật hoặc chữ ký invocation. Không đánh dấu toàn bộ P0/R0A hoặc FR-79–90 hoàn tất.

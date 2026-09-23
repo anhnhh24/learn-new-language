@@ -60,6 +60,7 @@ public static class PostgresServiceCollectionExtensions
         services.AddScoped<IBetaFormReader>(provider =>
             provider.GetRequiredService<PostgresFormVersionStore>());
         services.AddScoped<IFormCandidateStore, PostgresFormCandidateStore>();
+        services.AddScoped<IQuestionNodeStore, PostgresQuestionNodeStore>();
         services.AddSingleton<IBetaServingControl>(
             new ConfiguredBetaServingControl(betaServingEnabled));
         services.AddScoped<BetaServingService>();
