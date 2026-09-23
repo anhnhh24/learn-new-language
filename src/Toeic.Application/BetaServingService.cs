@@ -124,7 +124,7 @@ public sealed class BetaServingService(IApplicationTransaction transaction,
     }
 }
 
-public sealed class LearnerIssueReportService(IAttemptStore attempts,
+public sealed class LearnerIssueReportService(IApplicationTransaction transaction, IAttemptStore attempts,
     IItemTelemetryStore telemetry, ILearnerAnalyticsPseudonymizer pseudonymizer,
     TimeProvider clock)
 {
@@ -132,7 +132,7 @@ public sealed class LearnerIssueReportService(IAttemptStore attempts,
         ImmutableHashSet.Create(StringComparer.Ordinal, "WRONG_KEY", "AMBIGUOUS",
             "EXPLANATION", "TYPO", "TECHNICAL");
 
-    public async Task<ReportIssueReceipt> ReportAsync(ReportIssueCommand command, Actor learner,
+    public Task<ReportIssueReceipt> ReportAsync(ReportIssueCommand command, Actor learner,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(command);
@@ -144,18 +144,21 @@ public sealed class LearnerIssueReportService(IAttemptStore attempts,
             category is null || !AllowedCategories.Contains(category) ||
             command.Comment?.Length > 2000)
             throw new DomainException("ISSUE_REPORT_INVALID");
-        if (!await attempts.IsOwnedExposedItemAsync(command.AttemptId, learner.Id,
-                command.ItemRevisionId, cancellationToken))
-            throw new DomainException("ATTEMPT_NOT_FOUND");
-        var learnerHash = pseudonymizer.Pseudonymize(learner.Id);
-        if (string.IsNullOrWhiteSpace(learnerHash))
-            throw new DomainException("ANALYTICS_PSEUDONYM_INVALID");
+        return transaction.ExecuteAsync(async ct =>
+        {
+            if (!await attempts.IsOwnedExposedItemAsync(command.AttemptId, learner.Id,
+                    command.ItemRevisionId, ct))
+                throw new DomainException("ATTEMPT_NOT_FOUND");
+            var learnerHash = pseudonymizer.Pseudonymize(learner.Id);
+            if (string.IsNullOrWhiteSpace(learnerHash))
+                throw new DomainException("ANALYTICS_PSEUDONYM_INVALID");
 
-        var report = new LearnerIssueReport(Guid.NewGuid(), command.ItemRevisionId,
-            learnerHash, category,
-            string.IsNullOrWhiteSpace(command.Comment) ? null : command.Comment.Trim(),
-            clock.GetUtcNow());
-        var result = await telemetry.AppendReportAsync(report, cancellationToken);
-        return new(result.ReportId, !result.Inserted);
+            var report = new LearnerIssueReport(Guid.NewGuid(), command.ItemRevisionId,
+                learnerHash, category,
+                string.IsNullOrWhiteSpace(command.Comment) ? null : command.Comment.Trim(),
+                clock.GetUtcNow());
+            var result = await telemetry.AppendReportAsync(report, ct);
+            return new ReportIssueReceipt(result.ReportId, !result.Inserted);
+        }, cancellationToken);
     }
 }

@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
+using Toeic.Application;
+using Toeic.Domain.Analytics;
 using Toeic.Domain.Content;
 
 namespace Toeic.Infrastructure.Persistence;
@@ -32,6 +34,12 @@ public static class PostgresServiceCollectionExtensions
         services.AddSingleton(provider => new PostgresMigrationRunner(
             provider.GetRequiredService<IDbConnectionFactory>(), migrationDirectory,
             TimeProvider.System));
+        services.AddScoped<PostgresApplicationTransaction>();
+        services.AddScoped<IApplicationTransaction>(provider =>
+            provider.GetRequiredService<PostgresApplicationTransaction>());
+        services.AddScoped<IPostgresSession>(provider =>
+            provider.GetRequiredService<PostgresApplicationTransaction>());
+        services.AddScoped<IItemTelemetryStore, PostgresItemTelemetryStore>();
         if (runMigrationsOnStartup)
             services.AddHostedService<PostgresMigrationHostedService>();
         return services;
