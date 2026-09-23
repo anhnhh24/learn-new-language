@@ -147,6 +147,27 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 - Payload hash được kiểm trước handler; payload sai bị dead-letter với safe error code.
 - Retry lưu attempts, next retry và last error code; lỗi thiếu handler hoặc quá số lần retry được dead-letter.
 
+## M21 — Toeic.Web React + TypeScript Frontend (hoàn tất bộ giao diện theo UI_GUIDE và SRS v3.3)
+
+- Khởi tạo kiến trúc Vite + React 18 + TypeScript strict mode, Scoped CSS Modules và hệ thống Semantic Design Tokens (tokens.css, reset.css, global.css).
+- Tuân thủ nghiêm ngặt định hướng thẩm mỹ "Editorial - Calm - Distinctive": nền sáng ngà (#f7f7f4), màu thương hiệu teal trầm (#176b63), tỷ lệ tương phản cao WCAG 2.2 AA; không dùng gradient tím/xanh phát sáng toàn màn hình hay glassmorphism lạm dụng.
+- Hoàn thiện đầy đủ các màn hình được đặc tả trong SRS Mục 6.2 và README:
+  - UI-01: Catalog khóa học và Chi tiết khóa học (/learn/courses, /learn/courses/:id).
+  - UI-02: Đăng nhập, Đăng ký, Xác minh Email và Quên mật khẩu an toàn (/auth/login, /auth/register, /auth/verify-email, /auth/forgot-password).
+  - UI-03: Onboarding khảo sát mục tiêu và Bài chẩn đoán định hướng 24 câu (/auth/onboarding, /auth/placement).
+  - UI-04: Màn hình Hôm nay (/learn/today) với thẻ hành động chính tiếp theo, hàng đợi ôn tập đến hạn, không áp lực streak tiêu cực.
+  - UI-05: Lộ trình học tập (/learn/roadmap) theo tuần và theo module kiến thức.
+  - UI-06 & UI-07: Bài học đa phương tiện (/learn/lesson/:id) hỗ trợ đọc dạng trang, đánh dấu đã đọc, audio có điều khiển tốc độ và transcript (ghi nhận Assisted), interactive mini-check với phản hồi tức thì.
+  - UI-08: Sổ lỗi sai (/learn/errors) lọc theo tag, trạng thái Open/Improving/Resolved/Ignored, luyện câu tương đương.
+  - UI-09: Ôn tập Flashcard (/learn/flashcards) theo thuật toán lặp ngắt quãng Spaced Repetition (Quên / Khó / Nhớ / Dễ).
+  - UI-10: Phòng thi TOEIC (/learn/practice/:attemptId) tập trung, đồng bộ server deadline countdown, autosave state machine (Debounce + ACK timestamp), lưu draft cục bộ khi mất kết nối mạng, hiển thị bài đọc Part 7 chia đôi màn hình (stimulus + questions) và lưới điều hướng 1-100 câu.
+  - UI-11: Kết quả thi TOEIC (/learn/practice/:attemptId/result) với điểm thô (raw score), thời gian làm, phân tích theo Part/Tag, xem lại từng câu kèm bằng chứng trích xuất từ bài đọc và ghi chú tier rõ ràng.
+  - UI-13: Thống kê & Dashboard (/learn/dashboard) tỷ lệ hoàn thành, độ chính xác quiz lần đầu, chỉ báo kiến thức có giải thích thiếu dữ liệu.
+  - UI-14: Tài khoản & Quyền riêng tư (/learn/account) quản lý giờ yên tĩnh (21:00 - 08:00), yêu cầu xuất dữ liệu (export 24h) và hủy tài khoản (7-day window) theo FR-16/18.
+  - UI-15: Quality Dashboard & Console quản trị Controlled AI Item Factory (/admin/quality, /admin/jobs, /admin/quarantine, /admin/blueprints) kiểm soát candidate, dual-solver consensus, critic blocking findings và điều khiển cách ly.
+  - UI-18: Báo lỗi câu hỏi và hỗ trợ học viên (/learn/support).
+- Tầng API client (src/lib/api/) hỗ trợ kết nối VITE_API_BASE_URL với fallback mock fixtures chuẩn nghiệp vụ SRS phục vụ kiểm thử giao diện độc lập.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 2. Operations quality dashboard và công cụ kiểm soát quarantine.
