@@ -114,6 +114,32 @@ public sealed class CandidateRevision
         Move(CandidateState.BetaActive, $"BETA_FORM:{formVersion.Trim()}",
             Content.Provenance.PolicyVersion, actor, clock);
     }
+
+    public void ApplyStatisticalDecision(Analytics.StatisticalDecision decision,
+        Actor actor, TimeProvider clock)
+    {
+        RequireActor(actor, ActorType.SystemWorker);
+        RequireState(CandidateState.BetaActive);
+        ArgumentNullException.ThrowIfNull(decision);
+        if (decision.ItemRevisionId != Id ||
+            decision.PolicyVersion != Content.Provenance.PolicyVersion ||
+            decision.SnapshotId == Guid.Empty || string.IsNullOrWhiteSpace(decision.ReasonCode))
+            throw new DomainException("STATISTICAL_DECISION_INVALID");
+
+        switch (decision.Action)
+        {
+            case Analytics.StatisticalAction.KeepBeta:
+                return;
+            case Analytics.StatisticalAction.PromoteDataValidated:
+                Move(CandidateState.DataValidatedPractice, decision.ReasonCode,
+                    decision.PolicyVersion, actor, clock);
+                return;
+            case Analytics.StatisticalAction.Quarantine:
+                Move(CandidateState.Quarantined, decision.ReasonCode, decision.PolicyVersion, actor, clock);
+                return;
+            default: throw new DomainException("STATISTICAL_DECISION_INVALID");
+        }
+    }
     public void Quarantine(string reason, Actor actor, TimeProvider clock)
     {
         RequireActor(actor, ActorType.Admin, ActorType.SystemWorker);
