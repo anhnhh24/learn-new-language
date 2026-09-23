@@ -18,6 +18,7 @@
 | NOTE-14 | 28.9, 28.11, FR-85 | Part 7 cần quarantine theo question nhưng phát hành theo group nguyên khối. | Form snapshot lưu cả group revision và danh sách question revision; một question bị quarantine làm cả form chứa group chuyển Degraded. |
 | NOTE-15 | FR-84, NFR privacy | SRS yêu cầu learnerHash nhưng chưa chốt rotation, key custody và khoảng liên kết pseudonym. | Đã dùng HMAC-SHA256 với key runtime tối thiểu 256 bit; chưa bật production trước khi có secret manager, key version và rotation policy. |
 | NOTE-16 | Thiết kế kỹ thuật | Reconstitute Aggregate Root (như GenerationJob, Blueprint) từ DB row có thể kích hoạt domain logic validation (VD: Publish state checks) nếu dùng public constructor/methods. | Dùng pattern "trusted reconstitution" với internal methods và init properties để repository dựng lại state mà không chạy domain checks (vì data trong DB đã hợp lệ lúc lưu). |
+| NOTE-17 | 28.9, FR-85, UC-11 | Schema hiện có một revision cho Part 7 group nhưng attempt telemetry cần ID ổn định cho từng question trong group. | Không suy diễn ID từ vị trí/stableId; reader hiện chỉ phục vụ Part 5 và chặn Part 7 bằng `FORM_CONTENT_UNSUPPORTED` tới khi bổ sung entity/version mapping rõ ràng. |
 
 ## Quyết định kỹ thuật
 

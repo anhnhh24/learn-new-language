@@ -129,8 +129,17 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 - Triển khai `PostgresFormStores` (`IFormVersionStore`, `IFormCandidateStore`) hỗ trợ lấy dữ liệu item kết hợp exposure count từ telemetry.
 - Bổ sung pattern "trusted reconstitution" trong Domain để khôi phục AggregateRoot từ CSDL (như `GenerationJob.Reconstitute` và dùng internal constructor access).
 
-## Các mốc kế tiếp (chưa hoàn thành)
+## M19 — Guarded Part 5 Beta materialization (hoàn tất backend reader)
 
+- Form lưu exam profile và attempt duration trong immutable snapshot hash, không lấy hằng số ẩn từ Infrastructure.
+- Reader khóa form bằng PostgreSQL shared row lock trong transaction tạo attempt.
+- Trước khi materialize, reader kiểm form Active, item tier/state, family và content hash; learner snapshot loại justification/provenance.
+- Question order là duy nhất toàn form, không reset theo item.
+- Beta serving mặc định tắt; startup fail fast nếu bật mà thiếu PostgreSQL hoặc HMAC key.
+- Part 7 serving tiếp tục đóng cho tới khi chốt mapping group revision sang từng question revision.
+
+
+## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 2. Operations quality dashboard và công cụ kiểm soát quarantine.
 3. Password/email/MFA, auth endpoints và secret manager.
