@@ -52,6 +52,7 @@ public static class PostgresServiceCollectionExtensions
             provider.GetRequiredService<PostgresGenerationJobStore>());
         services.AddScoped<IOutboxStore>(provider =>
             provider.GetRequiredService<PostgresGenerationJobStore>());
+        services.AddScoped<OutboxDispatcher>();
         services.AddScoped<IIdempotencyReceiptStore, PostgresIdempotencyStore>();
         services.AddScoped<PostgresFormVersionStore>();
         services.AddScoped<IFormVersionStore>(provider =>
