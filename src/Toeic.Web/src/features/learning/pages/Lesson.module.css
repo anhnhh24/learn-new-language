@@ -1,9 +1,10 @@
-.utilityBar{display:flex;align-items:center;justify-content:space-between;max-width:1120px;margin:0 auto var(--space-6);padding-bottom:var(--space-3);border-bottom:1px solid var(--color-border-subtle)}
+.lessonPage{width:100%;min-height:calc(100vh - 72px);padding:0 clamp(20px,4vw,64px) var(--space-8)}
+.utilityBar{display:flex;align-items:center;justify-content:space-between;width:100%;margin:0 0 var(--space-6);padding-bottom:var(--space-3);border-bottom:1px solid var(--color-border-subtle)}
 .backButton,.bookmarkButton{min-height:44px;display:inline-flex;align-items:center;gap:var(--space-2);padding:0 var(--space-2);border:0;background:transparent;color:var(--color-text-secondary);font:inherit;font-size:var(--font-size-sm);cursor:pointer}
 .backButton:hover,.bookmarkButton:hover{color:var(--color-text)}
 .bookmarkButton{border-radius:var(--radius-sm)}
 .bookmarkActive{color:var(--color-primary);background:var(--color-primary-subtle)}
-.lessonGrid{display:grid;grid-template-columns:232px minmax(0,720px);justify-content:center;align-items:start;gap:clamp(36px,6vw,72px);max-width:1120px;margin:0 auto}
+.lessonGrid{display:grid;grid-template-columns:clamp(220px,18vw,280px) minmax(0,820px) minmax(24px,1fr);align-items:start;gap:clamp(32px,4vw,64px);width:100%;margin:0}
 .lessonRail{position:sticky;top:var(--space-6);padding-right:var(--space-5);border-right:1px solid var(--color-border-subtle)}
 .railSummary{display:flex;flex-direction:column;gap:4px;margin-bottom:var(--space-2);font-size:var(--font-size-xs);color:var(--color-text-muted)}
 .railSummary strong{color:var(--color-text);font-size:var(--font-size-sm)}
@@ -103,6 +104,7 @@
 .emptyState p:not(.eyebrow){margin:var(--space-4) 0 var(--space-5);color:var(--color-text-secondary);line-height:1.6}
 .srOnly{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 .backButton:focus-visible,.bookmarkButton:focus-visible,.stepButton:focus-visible,.selfCheckItem:focus-visible,.markReadButton:focus-visible,.extension summary:focus-visible{outline:3px solid var(--color-primary-subtle);outline-offset:2px}
+@media(max-width:1100px){.lessonGrid{grid-template-columns:220px minmax(0,820px);justify-content:center}}
 @media(max-width:900px){.lessonGrid{grid-template-columns:1fr;gap:var(--space-6);max-width:720px}.lessonRail{position:static;padding:0 0 var(--space-4);border-right:0;border-bottom:1px solid var(--color-border-subtle)}.stepNavigation{display:grid;grid-template-columns:repeat(3,1fr)}.lessonMeta{flex-direction:row;flex-wrap:wrap}}
-@media(max-width:640px){.utilityBar{margin-bottom:var(--space-4)}.stepNavigation{grid-template-columns:1fr}.stepButton{min-height:52px}.stepButton small{display:none}.lessonHeader h1,.checkpointHeader h1,.emptyState h1{font-size:2.15rem}.intro{font-size:var(--font-size-base)}.example>div{grid-template-columns:1fr}.quizCallout,.checkpointAction{align-items:stretch;flex-direction:column}.lessonFooter{grid-template-columns:1fr 1fr}.lessonFooter .markReadButton{grid-column:1/-1;grid-row:1;justify-self:center}.checkpointFacts{grid-template-columns:1fr}.checkpointFacts>div,.checkpointFacts>div:first-child{padding:var(--space-4) 0;border-right:0;border-bottom:1px solid var(--color-border-subtle)}.checkpointFacts>div:last-child{border-bottom:0}.checkpointColumns{grid-template-columns:1fr}}
+@media(max-width:640px){.lessonPage{padding-right:var(--space-4);padding-left:var(--space-4)}.utilityBar{margin-bottom:var(--space-4)}.stepNavigation{grid-template-columns:1fr}.stepButton{min-height:52px}.stepButton small{display:none}.lessonHeader h1,.checkpointHeader h1,.emptyState h1{font-size:2.15rem}.intro{font-size:var(--font-size-base)}.example>div{grid-template-columns:1fr}.quizCallout,.checkpointAction{align-items:stretch;flex-direction:column}.lessonFooter{grid-template-columns:1fr 1fr}.lessonFooter .markReadButton{grid-column:1/-1;grid-row:1;justify-self:center}.checkpointFacts{grid-template-columns:1fr}.checkpointFacts>div,.checkpointFacts>div:first-child{padding:var(--space-4) 0;border-right:0;border-bottom:1px solid var(--color-border-subtle)}.checkpointFacts>div:last-child{border-bottom:0}.checkpointColumns{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.progressTrack span{transition:none}}

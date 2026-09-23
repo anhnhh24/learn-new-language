@@ -70,7 +70,7 @@ export function LessonPage() {
 
   if (checkpoint) {
     return (
-      <div className="content-container">
+      <div className={styles.lessonPage}>
         <div className={styles.utilityBar}>
           <button type="button" onClick={() => navigate('/learn/roadmap')} className={styles.backButton}>
             <ArrowLeft size={17} aria-hidden="true" />
@@ -142,7 +142,7 @@ export function LessonPage() {
 
   if (!topic) {
     return (
-      <div className="content-container">
+      <div className={styles.lessonPage}>
         <main className={styles.emptyState}>
           <p className={styles.eyebrow}>Không tìm thấy bài học</p>
           <h1>Đường dẫn này chưa có nội dung</h1>
@@ -165,7 +165,7 @@ export function LessonPage() {
   const currentStepDone = completedSteps.has(currentStep);
 
   return (
-    <div className="content-container">
+    <div className={styles.lessonPage}>
       <div className={styles.utilityBar}>
         <button type="button" onClick={() => navigate('/learn/roadmap')} className={styles.backButton}>
           <ArrowLeft size={17} aria-hidden="true" />
