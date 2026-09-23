@@ -40,6 +40,8 @@ public static class PostgresServiceCollectionExtensions
         services.AddScoped<IPostgresSession>(provider =>
             provider.GetRequiredService<PostgresApplicationTransaction>());
         services.AddScoped<IItemTelemetryStore, PostgresItemTelemetryStore>();
+        services.AddHealthChecks()
+            .AddCheck<PostgresHealthCheck>("postgres", tags: ["ready"]);
         if (runMigrationsOnStartup)
             services.AddHostedService<PostgresMigrationHostedService>();
         return services;

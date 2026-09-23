@@ -1,4 +1,5 @@
 using Toeic.Api;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Toeic.Infrastructure.Persistence;
 using Toeic.Infrastructure.Security;
 
@@ -24,4 +25,9 @@ var app = builder.Build();
 app.UseToeicApiPipeline();
 app.MapHealthChecks("/health");
 app.MapPlatformStatus(persistenceConfigured, analyticsPseudonymConfigured);
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false
+});
+app.MapHealthChecks("/health/ready");
 app.Run();
