@@ -26,7 +26,6 @@ create table content.form_questions (
     foreign key (form_version_id, item_revision_id) references content.form_items(form_version_id, item_revision_id)
 );
 
-create table assessment.item_exposures (
 create table assessment.start_attempt_receipts (
     learner_id uuid not null references identity_data.users(id),
     client_operation_id uuid not null,
@@ -38,6 +37,7 @@ create table assessment.start_attempt_receipts (
     unique (attempt_id)
 );
 
+create table assessment.item_exposures (
     event_id uuid primary key,
     attempt_id uuid not null references assessment.attempts(id),
     item_revision_id uuid not null references content.question_revisions(id),
