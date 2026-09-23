@@ -1,6 +1,7 @@
 ﻿<Solution>
   <Folder Name="/src/">
     <Project Path="src/Toeic.Domain/Toeic.Domain.csproj" />
+    <Project Path="src/Toeic.Application/Toeic.Application.csproj" />
     <Project Path="src/Toeic.Api/Toeic.Api.csproj" />
   </Folder>
   <Folder Name="/tests/">
