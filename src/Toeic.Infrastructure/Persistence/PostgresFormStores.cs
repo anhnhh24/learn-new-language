@@ -12,7 +12,8 @@ namespace Toeic.Infrastructure.Persistence;
 internal sealed record PersistedProvenance(string ContributorId, string BlueprintVersion,
     string PolicyVersion, string RightsReference);
 
-internal sealed class PostgresFormVersionStore(IPostgresSession session) : IFormVersionStore
+internal sealed class PostgresFormVersionStore(IPostgresSession session)
+    : IFormVersionStore, IBetaFormReader
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -47,6 +48,7 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session) : IForm
         }
 
         // Insert form items and questions
+        var questionOrder = 0;
         foreach (var item in form.Items)
         {
             await using var itemCommand = CreateCommand("""
@@ -59,7 +61,6 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session) : IForm
             Add(itemCommand, "@item_order", item.Position);
             await itemCommand.ExecuteNonQueryAsync(cancellationToken);
 
-            var questionOrder = 0;
             foreach (var questionId in item.QuestionRevisionIds)
             {
                 questionOrder++;
@@ -96,6 +97,62 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session) : IForm
             results.Add(MapForm(reader));
         }
         return results;
+    }
+
+    public async Task<BetaFormMaterialization?> FindForServingAsync(Guid formId,
+        CancellationToken cancellationToken)
+    {
+        if (formId == Guid.Empty) return null;
+        await using var formCommand = CreateCommand("""
+            select id, version, tier, state, snapshot_json::text, policy_version,
+                   exam_profile_version, attempt_duration_seconds
+            from content.form_versions
+            where id = @id
+            for share;
+            """);
+        Add(formCommand, "@id", formId);
+        BetaFormVersion form;
+        await using (var reader = await formCommand.ExecuteReaderAsync(cancellationToken))
+        {
+            if (!await reader.ReadAsync(cancellationToken)) return null;
+            form = MapForm(reader);
+        }
+        if (form.State != FormState.Active)
+            return new(form, form.ExamProfileVersion, form.AttemptDuration, []);
+
+        await using var itemCommand = CreateCommand("""
+            select qr.id, qr.family_id, qr.part, qr.content_json::text,
+                   qr.content_hash, qr.state
+            from content.form_questions fq
+            join content.question_revisions qr on qr.id = fq.question_revision_id
+            where fq.form_version_id = @form_id
+            order by fq.question_order;
+            """);
+        Add(itemCommand, "@form_id", formId);
+        await using var itemReader = await itemCommand.ExecuteReaderAsync(cancellationToken);
+        var items = ImmutableArray.CreateBuilder<AttemptItemSnapshot>();
+        while (await itemReader.ReadAsync(cancellationToken))
+        {
+            var part = Enum.Parse<ToeicPart>(itemReader.GetString(2));
+            if (part != ToeicPart.Part5)
+                throw new DomainException("FORM_CONTENT_UNSUPPORTED");
+            if (itemReader.GetString(5) is not ("BetaActive" or "DataValidatedPractice"))
+                throw new DomainException("FORM_ITEM_NOT_AVAILABLE");
+            var familyId = itemReader.GetString(1);
+            var content = JsonSerializer.Deserialize<Part5Content>(
+                itemReader.GetString(3), JsonOptions)
+                ?? throw new DomainException("FORM_CONTENT_CORRUPT");
+            var options = content.Options.Select(option =>
+                new AttemptOption(option.StableId, option.Text)).ToImmutableArray();
+            if (!string.Equals(content.FamilyId, familyId, StringComparison.Ordinal) ||
+                !string.Equals(ContentHash.Of(content), itemReader.GetString(4),
+                    StringComparison.Ordinal))
+                throw new DomainException("FORM_CONTENT_CORRUPT");
+            items.Add(new AttemptItemSnapshot(itemReader.GetGuid(0),
+                StableFamilyId(familyId), "Part5", content.Stem, options,
+                [content.ProposedKey], 1m));
+        }
+        return new(form, form.ExamProfileVersion, form.AttemptDuration, items.ToImmutable());
     }
 
     public async Task SaveAsync(BetaFormVersion form, CancellationToken cancellationToken)
@@ -144,6 +201,14 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session) : IForm
         command.Parameters.Add(parameter);
     }
 
+
+    private static Guid StableFamilyId(string familyId)
+    {
+        if (Guid.TryParse(familyId, out var parsed)) return parsed;
+        var hash = System.Security.Cryptography.SHA256.HashData(
+            System.Text.Encoding.UTF8.GetBytes($"toeic-family:v1:{familyId}"));
+        return new Guid(hash.AsSpan(0, 16));
+    }
     private sealed record FormSnapshotDocument(string SnapshotHash,
         ImmutableArray<FormItemSnapshot> Items);
 }

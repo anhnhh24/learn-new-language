@@ -10,7 +10,8 @@ namespace Toeic.Infrastructure.Persistence;
 public static class PostgresServiceCollectionExtensions
 {
     public static IServiceCollection AddToeicPostgres(this IServiceCollection services,
-        string connectionString, string migrationDirectory, bool runMigrationsOnStartup)
+        string connectionString, string migrationDirectory, bool runMigrationsOnStartup,
+        bool betaServingEnabled)
     {
         ArgumentNullException.ThrowIfNull(services);
         if (string.IsNullOrWhiteSpace(connectionString))
@@ -34,6 +35,7 @@ public static class PostgresServiceCollectionExtensions
         services.AddSingleton(provider => new PostgresMigrationRunner(
             provider.GetRequiredService<IDbConnectionFactory>(), migrationDirectory,
             TimeProvider.System));
+        services.AddSingleton(TimeProvider.System);
         services.AddScoped<PostgresApplicationTransaction>();
         services.AddScoped<IApplicationTransaction>(provider =>
             provider.GetRequiredService<PostgresApplicationTransaction>());
@@ -51,8 +53,18 @@ public static class PostgresServiceCollectionExtensions
         services.AddScoped<IOutboxStore>(provider =>
             provider.GetRequiredService<PostgresGenerationJobStore>());
         services.AddScoped<IIdempotencyReceiptStore, PostgresIdempotencyStore>();
-        services.AddScoped<IFormVersionStore, PostgresFormVersionStore>();
+        services.AddScoped<PostgresFormVersionStore>();
+        services.AddScoped<IFormVersionStore>(provider =>
+            provider.GetRequiredService<PostgresFormVersionStore>());
+        services.AddScoped<IBetaFormReader>(provider =>
+            provider.GetRequiredService<PostgresFormVersionStore>());
         services.AddScoped<IFormCandidateStore, PostgresFormCandidateStore>();
+        services.AddSingleton<IBetaServingControl>(
+            new ConfiguredBetaServingControl(betaServingEnabled));
+        services.AddScoped<BetaServingService>();
+        services.AddScoped<LearnerIssueReportService>();
+        services.AddScoped<FormCompositionService>();
+        services.AddScoped<AutoQuarantineService>();
         services.AddHealthChecks()
             .AddCheck<PostgresHealthCheck>("postgres", tags: ["ready"]);
         if (runMigrationsOnStartup)
