@@ -13,6 +13,7 @@ public sealed class GenerationJobCoordinator(
     IAtomicGenerationJobStore jobs,
     IBudgetReservationService budgets,
     IOutboxWriter outbox,
+    IAuditWriter audit,
     TimeProvider clock)
 {
     private static readonly Actor Worker = new(ActorType.SystemWorker, "generation-coordinator");
@@ -48,6 +49,15 @@ public sealed class GenerationJobCoordinator(
 
             await jobs.SaveAsync(proposed, token);
             await outbox.EnqueueAsync(proposed.PendingEvents, token);
+            await audit.AppendAsync(AuditEntry.Create(requester, "content.generation.start",
+                "GenerationJob", proposed.Id.ToString(),
+                proposed.State == GenerationJobState.PausedBudget
+                    ? "BUDGET_UNAVAILABLE" : "GENERATION_JOB_ACCEPTED",
+                [
+                    new("blueprintVersion", proposed.BlueprintVersion),
+                    new("candidateCount", proposed.CandidateCount.ToString()),
+                    new("state", proposed.State.ToString())
+                ], proposed.Id.ToString(), clock.GetUtcNow()), token);
             return Result(proposed, false);
         }, cancellationToken);
     }

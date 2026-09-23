@@ -17,7 +17,8 @@ public interface IFormCandidateStore
     Task MarkBetaActiveAsync(IReadOnlyCollection<Guid> revisionIds, string formVersion,
         Actor actor, DateTimeOffset activatedAt, CancellationToken cancellationToken);
     Task QuarantineAsync(Guid revisionId, string reasonCode, string policyVersion,
-        Guid statisticSnapshotId, Actor actor, DateTimeOffset quarantinedAt,
+        Guid statisticSnapshotId, IReadOnlyCollection<Guid> affectedFormIds, Actor actor,
+        DateTimeOffset quarantinedAt,
         CancellationToken cancellationToken);
 }
 
@@ -30,7 +31,8 @@ public interface IFormVersionStore
 }
 
 public sealed class FormCompositionService(IApplicationTransaction transaction,
-    IFormCandidateStore candidates, IFormVersionStore forms, TimeProvider clock)
+    IFormCandidateStore candidates, IFormVersionStore forms, IAuditWriter audit,
+    TimeProvider clock)
 {
     public Task<BetaFormVersion> ComposeAsync(ComposeBetaFormCommand command, Actor actor,
         CancellationToken cancellationToken) => transaction.ExecuteAsync(async ct =>
@@ -62,12 +64,20 @@ public sealed class FormCompositionService(IApplicationTransaction transaction,
         if (betaReadyIds.Length > 0)
             await candidates.MarkBetaActiveAsync(betaReadyIds, form.Version, actor,
                 clock.GetUtcNow(), ct);
+        await audit.AppendAsync(AuditEntry.Create(actor, "content.form.activate",
+            "FormVersion", form.Id.ToString(), "FORM_GATE_PASSED",
+            [
+                new("version", form.Version),
+                new("tier", form.Tier.ToString()),
+                new("questionCount", form.Items.Sum(item => item.QuestionRevisionIds.Length).ToString())
+            ], form.Id.ToString(), clock.GetUtcNow()), ct);
         return form;
     }, cancellationToken);
 }
 
 public sealed class AutoQuarantineService(IApplicationTransaction transaction,
-    IFormCandidateStore candidates, IFormVersionStore forms, TimeProvider clock)
+    IFormCandidateStore candidates, IFormVersionStore forms, IAuditWriter audit,
+    TimeProvider clock)
 {
     public Task<IReadOnlyList<Guid>> ApplyAsync(StatisticalDecision decision,
         Actor actor, CancellationToken cancellationToken) => transaction.ExecuteAsync(async ct =>
@@ -76,15 +86,23 @@ public sealed class AutoQuarantineService(IApplicationTransaction transaction,
         if (decision.Action != StatisticalAction.Quarantine)
             throw new DomainException("QUARANTINE_DECISION_REQUIRED");
 
-        await candidates.QuarantineAsync(decision.ItemRevisionId, decision.ReasonCode,
-            decision.PolicyVersion, decision.SnapshotId, actor, clock.GetUtcNow(), ct);
         var affected = await forms.FindActiveContainingAsync(decision.ItemRevisionId, ct);
+        await candidates.QuarantineAsync(decision.ItemRevisionId, decision.ReasonCode,
+            decision.PolicyVersion, decision.SnapshotId, affected.Select(form => form.Id).ToArray(),
+            actor, clock.GetUtcNow(), ct);
         foreach (var form in affected)
         {
             form.DegradeForQuarantinedItem(decision.ItemRevisionId, decision.ReasonCode,
                 actor, clock);
             await forms.SaveAsync(form, ct);
         }
+
+        await audit.AppendAsync(AuditEntry.Create(actor, "content.question.quarantine",
+            "QuestionNode", decision.ItemRevisionId.ToString(), decision.ReasonCode,
+            [
+                new("policyVersion", decision.PolicyVersion),
+                new("affectedFormIds", string.Join(",", affected.Select(form => form.Id)))
+            ], decision.SnapshotId.ToString(), clock.GetUtcNow()), ct);
 
         return (IReadOnlyList<Guid>)affected.Select(form => form.Id).ToArray();
     }, cancellationToken);

@@ -178,6 +178,14 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 - Quarantine một question node khóa source group và chuyển mọi form Active chứa câu đó sang Degraded.
 - Writer PostgreSQL từ chối ID trùng, stable ID trùng sau normalize và thứ tự không liên tục; caller phải lưu source revision và nodes trong cùng application transaction.
 
+## M23 — Privileged content audit writer (hoàn tất write path)
+
+- Audit event lưu actor ID/type, action, target, reason, safe diff, correlation ID và timestamp; migration bổ sung actor type cho dữ liệu cũ.
+- Generation job mới, form activation và auto-quarantine ghi audit trong cùng PostgreSQL transaction với thay đổi nghiệp vụ.
+- Quarantine decision lưu chính xác danh sách form bị ảnh hưởng thay vì giá trị rỗng mặc định; audit dùng cùng snapshot ID làm correlation.
+- Safe diff chỉ chứa metadata vận hành đã chọn, không lưu prompt, đáp án, thông tin learner hoặc secret.
+- Read API, permission quality.view, retention/purge job và export audit vẫn là phần tiếp theo.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 2. Operations quality dashboard và công cụ kiểm soát quarantine.

@@ -48,6 +48,7 @@ public static class PostgresServiceCollectionExtensions
         services.AddScoped<PostgresGenerationJobStore>();
         services.AddScoped<IAtomicGenerationJobStore>(provider =>
             provider.GetRequiredService<PostgresGenerationJobStore>());
+        services.AddScoped<IAuditWriter, PostgresAuditWriter>();
         services.AddScoped<IOutboxWriter>(provider =>
             provider.GetRequiredService<PostgresGenerationJobStore>());
         services.AddScoped<IOutboxStore>(provider =>

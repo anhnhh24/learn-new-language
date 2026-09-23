@@ -331,8 +331,8 @@ internal sealed class PostgresFormCandidateStore(IPostgresSession session) : IFo
     }
 
     public async Task QuarantineAsync(Guid revisionId, string reasonCode,
-        string policyVersion, Guid statisticSnapshotId, Actor actor,
-        DateTimeOffset quarantinedAt, CancellationToken cancellationToken)
+        string policyVersion, Guid statisticSnapshotId, IReadOnlyCollection<Guid> affectedFormIds,
+        Actor actor, DateTimeOffset quarantinedAt, CancellationToken cancellationToken)
     {
         await using var updateCommand = CreateCommand("""
             update content.question_revisions qr
@@ -346,8 +346,10 @@ internal sealed class PostgresFormCandidateStore(IPostgresSession session) : IFo
 
         await using var decisionCommand = CreateCommand("""
             insert into assessment.quarantine_decisions
-                (id, item_revision_id, snapshot_id, reason_code, policy_version, created_at)
-            values (@id, @item_revision_id, @snapshot_id, @reason_code, @policy_version, @at);
+                (id, item_revision_id, snapshot_id, reason_code, policy_version,
+                 affected_forms, created_at)
+            values (@id, @item_revision_id, @snapshot_id, @reason_code, @policy_version,
+                    cast(@affected_forms as jsonb), @at);
             """);
         Add(decisionCommand, "@id", Guid.NewGuid());
         Add(decisionCommand, "@item_revision_id", revisionId);
@@ -355,6 +357,8 @@ internal sealed class PostgresFormCandidateStore(IPostgresSession session) : IFo
             ? (object)DBNull.Value : statisticSnapshotId);
         Add(decisionCommand, "@reason_code", reasonCode);
         Add(decisionCommand, "@policy_version", policyVersion);
+        Add(decisionCommand, "@affected_forms", JsonSerializer.Serialize(
+            affectedFormIds.Order().ToArray(), JsonOptions));
         Add(decisionCommand, "@at", quarantinedAt);
         await decisionCommand.ExecuteNonQueryAsync(cancellationToken);
     }
