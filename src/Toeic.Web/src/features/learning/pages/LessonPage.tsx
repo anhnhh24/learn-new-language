@@ -1,473 +1,440 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '../../../components/ui/Button';
-import { Badge } from '../../../components/ui/Badge';
-import { AudioPlayer } from '../../../components/ui/AudioPlayer';
-import { Alert } from '../../../components/ui/Alert';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
   Bookmark,
-  CheckCircle,
-  HelpCircle,
+  BookOpen,
   Check,
-  X,
-  FileQuestion,
-  ShieldCheck,
-  AlertTriangle,
-  Lightbulb,
   Clock,
-  Layers,
+  FileQuestion,
 } from 'lucide-react';
-import { getTopicByCode, getCheckpointByCode } from '../../../lib/api/curriculumData';
+import { Button } from '../../../components/ui/Button';
+import { getCheckpointByCode, getTopicByCode } from '../../../lib/api/curriculumData';
 import styles from './Lesson.module.css';
+
+const LESSON_STEPS = [
+  { id: 1, label: 'Nắm quy tắc', description: 'Mục tiêu, công thức và ví dụ' },
+  { id: 2, label: 'Áp dụng', description: 'Quy trình và lỗi thường gặp' },
+  { id: 3, label: 'Tự kiểm tra', description: 'Ghi nhớ và luyện tập' },
+] as const;
+
+type LessonStep = (typeof LESSON_STEPS)[number]['id'];
 
 export function LessonPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const totalPages = 3;
-
-  // Bookmarking & Progress state
+  const [currentStep, setCurrentStep] = useState<LessonStep>(1);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [markedRead, setMarkedRead] = useState<Record<number, boolean>>({});
+  const [completedSteps, setCompletedSteps] = useState<Set<LessonStep>>(new Set());
+  const [checkedPrompts, setCheckedPrompts] = useState<Set<string>>(new Set());
 
-  // Interactive Mini-Check state
-  const [selectedMiniOption, setSelectedMiniOption] = useState<string | null>(null);
-  const [miniCheckSubmitted, setMiniCheckSubmitted] = useState(false);
-
-  // Check if route is a Checkpoint
   const checkpoint = id ? getCheckpointByCode(id) : undefined;
-  const isCheckpoint = Boolean(checkpoint);
+  const normalizedCode = id?.toUpperCase().replace(/^LESSON-/, '') ?? '';
+  const topic = checkpoint ? undefined : getTopicByCode(normalizedCode);
 
-  // If not checkpoint, look up concept topic
-  const normalizedCode = id ? id.toUpperCase().replace(/^LESSON-/, '') : 'A1';
-  const topic = getTopicByCode(normalizedCode) || getTopicByCode('A1')!;
+  useEffect(() => {
+    setCurrentStep(1);
+    setCompletedSteps(new Set());
+    setCheckedPrompts(new Set());
+  }, [id]);
 
-  const handleMiniCheckSubmit = (optKey: string) => {
-    setSelectedMiniOption(optKey);
-    setMiniCheckSubmitted(true);
+  const progress = Math.round((completedSteps.size / LESSON_STEPS.length) * 100);
+  const selfCheckPrompts = useMemo(
+    () => topic?.guide?.selfCheckPrompts ?? [],
+    [topic],
+  );
+
+  const goToStep = (step: LessonStep) => {
+    setCurrentStep(step);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleMarkAsRead = () => {
-    setMarkedRead((prev) => ({ ...prev, [currentPage]: true }));
+  const toggleCurrentStep = () => {
+    setCompletedSteps((previous) => {
+      const next = new Set(previous);
+      if (next.has(currentStep)) next.delete(currentStep);
+      else next.add(currentStep);
+      return next;
+    });
   };
 
-  // CHECKPOINT RENDER
-  if (isCheckpoint && checkpoint) {
+  const togglePrompt = (prompt: string) => {
+    setCheckedPrompts((previous) => {
+      const next = new Set(previous);
+      if (next.has(prompt)) next.delete(prompt);
+      else next.add(prompt);
+      return next;
+    });
+  };
+
+  if (checkpoint) {
     return (
       <div className="content-container">
-        <div className={styles.topNav}>
-          <button
-            type="button"
-            onClick={() => navigate('/learn/roadmap')}
-            className={styles.backBtn}
-          >
-            <ArrowLeft size={16} /> Quay lại lộ trình 31 tuần
+        <div className={styles.utilityBar}>
+          <button type="button" onClick={() => navigate('/learn/roadmap')} className={styles.backButton}>
+            <ArrowLeft size={17} aria-hidden="true" />
+            Lộ trình 31 tuần
           </button>
         </div>
 
-        <div className={styles.lessonLayout}>
-          <main className={styles.mainContent}>
-            <div className={styles.checkpointBanner}>
-              <div className={styles.metaRow}>
-                <Badge variant="primary">Checkpoint Đánh giá Cấp độ</Badge>
-                <Badge variant="default">Level {checkpoint.levelCode}</Badge>
-              </div>
-              <h1 className={styles.lessonTitle}>{checkpoint.title}</h1>
-              <p className={styles.leadParagraph}>{checkpoint.description}</p>
+        <main className={styles.checkpointPage}>
+          <header className={styles.checkpointHeader}>
+            <p className={styles.eyebrow}>Checkpoint · Level {checkpoint.levelCode}</p>
+            <h1>{checkpoint.title}</h1>
+            <p className={styles.intro}>{checkpoint.description}</p>
+          </header>
 
-              <div className={styles.checkpointMetrics}>
-                <div className={styles.metricBox}>
-                  <div className={styles.metricValue}>{checkpoint.questionCount}</div>
-                  <div className={styles.metricLabel}>Số câu hỏi Part 5/6</div>
-                </div>
-                <div className={styles.metricBox}>
-                  <div className={styles.metricValue}>
-                    {Math.round(checkpoint.passRate * 100)}%
-                  </div>
-                  <div className={styles.metricLabel}>Tỷ lệ đạt chuẩn</div>
-                </div>
-                <div className={styles.metricBox}>
-                  <div className={styles.metricValue}>{checkpoint.timeLimitMinutes}'</div>
-                  <div className={styles.metricLabel}>Thời gian làm bài</div>
-                </div>
-              </div>
+          <dl className={styles.checkpointFacts}>
+            <div>
+              <dt>Số câu</dt>
+              <dd>{checkpoint.questionCount}</dd>
+              <span>Part 5 và Part 6</span>
             </div>
+            <div>
+              <dt>Ngưỡng đề xuất</dt>
+              <dd>{Math.round(checkpoint.passRate * 100)}%</dd>
+              <span>để chuyển sang chặng tiếp theo</span>
+            </div>
+            <div>
+              <dt>Thời gian</dt>
+              <dd>{checkpoint.timeLimitMinutes} phút</dd>
+              <span>nên làm trong một lượt</span>
+            </div>
+          </dl>
 
-            <div className={styles.sectionBlock}>
-              <h2 className={styles.sectionHeading}>
-                <ShieldCheck size={18} /> Quy định thực hiện Checkpoint
-              </h2>
-              <div className={styles.rulesList}>
-                {checkpoint.rules.map((rule, idx) => (
-                  <div key={idx} className={styles.ruleItem}>
-                    <strong>{idx + 1}.</strong> {rule}
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className={styles.checkpointColumns}>
+            <section aria-labelledby="checkpoint-before">
+              <p className={styles.sectionKicker}>Trước khi bắt đầu</p>
+              <h2 id="checkpoint-before">Cách thực hiện</h2>
+              <ol className={styles.numberedList}>
+                {checkpoint.rules.map((rule) => <li key={rule}>{rule}</li>)}
+              </ol>
+            </section>
 
-            <div className={styles.sectionBlock}>
-              <h2 className={styles.sectionHeading}>
-                <Layers size={18} /> Chính sách sau khi nộp bài
-              </h2>
-              <div className={styles.remediationList}>
-                {checkpoint.remediationPolicy.map((item, idx) => (
-                  <div key={idx} className={styles.ruleItem}>
-                    • {item}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <section aria-labelledby="checkpoint-after">
+              <p className={styles.sectionKicker}>Sau khi nộp bài</p>
+              <h2 id="checkpoint-after">Hướng ôn tập đề xuất</h2>
+              <ul className={styles.plainList}>
+                {checkpoint.remediationPolicy.map((item) => <li key={item}>{item}</li>)}
+              </ul>
+            </section>
+          </div>
 
-            <div className={styles.quizTeaser}>
-              <ShieldCheck size={40} className={styles.quizIcon} />
-              <h3>Sẵn sàng bước vào bài Checkpoint {checkpoint.levelCode}?</h3>
-              <p>
-                Hãy đảm bảo bạn có không gian yên tĩnh trong khoảng {checkpoint.timeLimitMinutes} phút để hoàn thành trọn vẹn bài kiểm tra.
-              </p>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => navigate(`/learn/quiz/checkpoint-${checkpoint.levelCode.toLowerCase()}`)}
-                leftIcon={<Clock size={18} />}
-              >
-                Bắt đầu làm Checkpoint ({checkpoint.questionCount} câu · {checkpoint.timeLimitMinutes} phút)
-              </Button>
+          <div className={styles.checkpointAction}>
+            <div>
+              <strong>Đây là chỉ báo học tập.</strong>
+              <span>Kết quả không được quy đổi thành điểm TOEIC chính thức.</span>
             </div>
-          </main>
-        </div>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => navigate(`/learn/quiz/checkpoint-${checkpoint.levelCode.toLowerCase()}`)}
+              rightIcon={<ArrowRight size={18} aria-hidden="true" />}
+            >
+              Bắt đầu checkpoint
+            </Button>
+          </div>
+        </main>
       </div>
     );
   }
 
-  // STANDARD 2-PAGE TOPIC LESSON
+  if (!topic) {
+    return (
+      <div className="content-container">
+        <main className={styles.emptyState}>
+          <p className={styles.eyebrow}>Không tìm thấy bài học</p>
+          <h1>Đường dẫn này chưa có nội dung</h1>
+          <p>Hãy quay lại lộ trình để chọn một bài học đang được phát hành.</p>
+          <Button
+            variant="primary"
+            onClick={() => navigate('/learn/roadmap')}
+            leftIcon={<ArrowLeft size={17} aria-hidden="true" />}
+          >
+            Quay lại lộ trình
+          </Button>
+        </main>
+      </div>
+    );
+  }
+
+  const formulaPatterns = topic.guide?.formulaPatterns ?? [];
+  const applicationSteps = topic.guide?.applicationSteps ?? [];
+  const extensions = topic.guide?.extensions ?? [];
+  const currentStepDone = completedSteps.has(currentStep);
+
   return (
     <div className="content-container">
-      {/* Top Header */}
-      <div className={styles.topNav}>
+      <div className={styles.utilityBar}>
+        <button type="button" onClick={() => navigate('/learn/roadmap')} className={styles.backButton}>
+          <ArrowLeft size={17} aria-hidden="true" />
+          Lộ trình 31 tuần
+        </button>
         <button
           type="button"
-          onClick={() => navigate('/learn/roadmap')}
-          className={styles.backBtn}
+          onClick={() => setIsBookmarked((value) => !value)}
+          className={`${styles.bookmarkButton} ${isBookmarked ? styles.bookmarkActive : ''}`}
+          aria-pressed={isBookmarked}
         >
-          <ArrowLeft size={16} /> Quay lại lộ trình 31 tuần
+          <Bookmark size={17} fill={isBookmarked ? 'currentColor' : 'none'} aria-hidden="true" />
+          {isBookmarked ? 'Đã lưu' : 'Lưu bài'}
         </button>
-
-        <div className={styles.headerRight}>
-          <button
-            type="button"
-            onClick={() => setIsBookmarked(!isBookmarked)}
-            className={`${styles.bookmarkBtn} ${isBookmarked ? styles.activeBookmark : ''}`}
-            aria-label={isBookmarked ? 'Bỏ lưu trang' : 'Lưu trang này'}
-          >
-            <Bookmark size={16} />
-            <span>{isBookmarked ? 'Đã lưu trang' : 'Lưu trang'}</span>
-          </button>
-        </div>
       </div>
 
-      <div className={styles.lessonLayout}>
-        <main className={styles.mainContent}>
-          {/* Lesson Header */}
-          <div className={styles.lessonHeader}>
-            <div className={styles.metaRow}>
-              <Badge variant="primary">Level {topic.levelCode} · Reading</Badge>
-              <Badge variant="info">{topic.category}</Badge>
-              <span className={styles.pageIndicator}>
-                Trang {currentPage} / {totalPages}
-              </span>
-            </div>
-            <h1 className={styles.lessonTitle}>
-              {topic.code} · {topic.titleVi}
-            </h1>
-            <p className={styles.leadParagraph}>{topic.summary}</p>
+      <div className={styles.lessonGrid}>
+        <aside className={styles.lessonRail} aria-label="Tiến độ bài học">
+          <div className={styles.railSummary}>
+            <span>{topic.code} · Level {topic.levelCode}</span>
+            <strong>{progress}% hoàn thành</strong>
+          </div>
+          <div
+            className={styles.progressTrack}
+            role="progressbar"
+            aria-label="Tiến độ bài học"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progress}
+          >
+            <span style={{ width: `${progress}%` }} />
           </div>
 
-          {/* PAGE 1: KHÁI NIỆM & CÔNG THỨC */}
-          {currentPage === 1 && (
-            <div className={styles.pageBody}>
-              {/* Objectives */}
-              <div className={styles.sectionBlock}>
-                <h2 className={styles.sectionHeading}>
-                  <CheckCircle size={18} /> Mục tiêu bài học
-                </h2>
-                <div className={styles.objectivesList}>
-                  {topic.learningObjectives.map((obj, i) => (
-                    <div key={i} className={styles.objectiveItem}>
-                      • {obj}
-                    </div>
-                  ))}
-                </div>
-              </div>
+          <nav className={styles.stepNavigation} aria-label="Các phần trong bài">
+            {LESSON_STEPS.map((step) => {
+              const isActive = currentStep === step.id;
+              const isDone = completedSteps.has(step.id);
+              return (
+                <button
+                  type="button"
+                  key={step.id}
+                  onClick={() => goToStep(step.id)}
+                  className={`${styles.stepButton} ${isActive ? styles.stepActive : ''}`}
+                  aria-current={isActive ? 'step' : undefined}
+                >
+                  <span className={styles.stepMarker} aria-hidden="true">
+                    {isDone ? <Check size={15} /> : step.id}
+                  </span>
+                  <span>
+                    <strong>{step.label}</strong>
+                    <small>{step.description}</small>
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
 
-              {/* Formula Patterns */}
-              {topic.guide?.formulaPatterns && topic.guide.formulaPatterns.length > 0 && (
-                <div className={styles.sectionBlock}>
-                  <h2 className={styles.sectionHeading}>
-                    <Layers size={18} /> Công thức và mẫu nhận diện
-                  </h2>
-                  <div className={styles.formulaGrid}>
-                    {topic.guide.formulaPatterns.map((f, i) => (
-                      <div key={i} className={styles.formulaCard}>
-                        {f}
-                      </div>
-                    ))}
+          <div className={styles.lessonMeta}>
+            <span><Clock size={16} aria-hidden="true" /> {topic.estimatedMinutes} phút</span>
+            <span><BookOpen size={16} aria-hidden="true" /> {topic.vocabularyTheme}</span>
+          </div>
+        </aside>
+
+        <main className={styles.article}>
+          <header className={styles.lessonHeader}>
+            <p className={styles.eyebrow}>{topic.category} · {topic.primaryTag}</p>
+            <h1>{topic.titleVi}</h1>
+            <p className={styles.englishTitle} lang="en">{topic.titleEn}</p>
+            <p className={styles.intro}>{topic.summary}</p>
+          </header>
+
+          {currentStep === 1 && (
+            <div className={styles.stepContent}>
+              <section aria-labelledby="learning-objectives">
+                <p className={styles.sectionKicker}>Sau bài này</p>
+                <h2 id="learning-objectives">Bạn sẽ làm được gì?</h2>
+                <ul className={styles.outcomeList}>
+                  {topic.learningObjectives.map((objective) => (
+                    <li key={objective}><Check size={16} aria-hidden="true" /><span>{objective}</span></li>
+                  ))}
+                </ul>
+              </section>
+
+              {formulaPatterns.length > 0 && (
+                <section aria-labelledby="lesson-formulas">
+                  <p className={styles.sectionKicker}>Nhận diện nhanh</p>
+                  <h2 id="lesson-formulas">Công thức cần nhớ</h2>
+                  <div className={styles.formulaList}>
+                    {formulaPatterns.map((formula) => <code key={formula}>{formula}</code>)}
                   </div>
-                </div>
+                </section>
               )}
 
-              {/* Core Knowledge */}
-              <div className={styles.sectionBlock}>
-                <h2 className={styles.sectionHeading}>
-                  <Lightbulb size={18} /> Kiến thức cốt lõi
-                </h2>
-                <div className={styles.coreKnowledgeList}>
-                  {topic.coreKnowledge.map((item, i) => (
-                    <div key={i} className={styles.coreItem}>
-                      <span className={styles.coreBullet}>•</span>
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <section aria-labelledby="core-knowledge">
+                <p className={styles.sectionKicker}>Hiểu bản chất</p>
+                <h2 id="core-knowledge">Quy tắc cốt lõi</h2>
+                <ol className={styles.knowledgeList}>
+                  {topic.coreKnowledge.map((item) => <li key={item}>{item}</li>)}
+                </ol>
+              </section>
 
-              {/* Worked Examples */}
-              {topic.workedExamples && topic.workedExamples.length > 0 && (
-                <div className={styles.sectionBlock}>
-                  <h2 className={styles.sectionHeading}>
-                    <FileQuestion size={18} /> Ví dụ minh họa và phân tích
-                  </h2>
-                  {topic.workedExamples.map((ex, i) => (
-                    <div key={i} className={styles.workedExampleCard}>
-                      <div className={styles.workedExampleSentence}>"{ex.sentence}"</div>
-                      <div className={styles.workedExampleFocus}>
-                        <Lightbulb size={15} /> <strong>Phân tích:</strong> {ex.focus}
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Audio Component Example */}
-                  <div style={{ marginTop: 'var(--space-4)' }}>
-                    <AudioPlayer
-                      title={`Nghe câu ví dụ mẫu TOEIC (${topic.vocabularyTheme}):`}
-                      transcript={topic.workedExamples[0].sentence}
-                    />
+              {topic.workedExamples.length > 0 && (
+                <section aria-labelledby="worked-examples">
+                  <p className={styles.sectionKicker}>Xem trong ngữ cảnh</p>
+                  <h2 id="worked-examples">Ví dụ có phân tích</h2>
+                  <div className={styles.examples}>
+                    {topic.workedExamples.map((example, index) => (
+                      <article key={`${example.sentence}-${example.focus}`} className={styles.example}>
+                        <span>Ví dụ {index + 1}</span>
+                        <p lang="en">{example.sentence}</p>
+                        <div><strong>Vì sao?</strong><span>{example.focus}</span></div>
+                      </article>
+                    ))}
                   </div>
-                </div>
+                </section>
               )}
             </div>
           )}
 
-          {/* PAGE 2: QUY TRÌNH ÁP DỤNG & BẪY THƯỜNG GẶP */}
-          {currentPage === 2 && (
-            <div className={styles.pageBody}>
-              {/* Application Steps */}
-              {topic.guide?.applicationSteps && topic.guide.applicationSteps.length > 0 && (
-                <div className={styles.sectionBlock}>
-                  <h2 className={styles.sectionHeading}>
-                    <CheckCircle size={18} /> Quy trình áp dụng giải câu hỏi
-                  </h2>
-                  <div className={styles.applicationStepsList}>
-                    {topic.guide.applicationSteps.map((step, idx) => (
-                      <div key={idx} className={styles.stepRow}>
-                        <span className={styles.stepNum}>{idx + 1}</span>
-                        <span className={styles.stepContent}>{step}</span>
+          {currentStep === 2 && (
+            <div className={styles.stepContent}>
+              {applicationSteps.length > 0 && (
+                <section aria-labelledby="application-process">
+                  <p className={styles.sectionKicker}>Khi gặp câu hỏi</p>
+                  <h2 id="application-process">Quy trình áp dụng</h2>
+                  <ol className={styles.processList}>
+                    {applicationSteps.map((step) => <li key={step}>{step}</li>)}
+                  </ol>
+                  <p className={styles.examNote}>
+                    <strong>Mẹo làm bài:</strong> xác định cấu trúc trước, kiểm tra nghĩa sau.
+                    Nếu trả lời sai, ghi tag <b>{topic.primaryTag}</b> vào sổ tay lỗi để ôn đúng điểm yếu.
+                  </p>
+                </section>
+              )}
+
+              {topic.commonTraps.length > 0 && (
+                <section aria-labelledby="common-traps">
+                  <p className={styles.sectionKicker}>Dừng lại một nhịp</p>
+                  <h2 id="common-traps">Lỗi thường gặp</h2>
+                  <div className={styles.trapList}>
+                    {topic.commonTraps.map((trap, index) => (
+                      <div key={trap} className={styles.trapItem}>
+                        <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                        <p>{trap}</p>
                       </div>
                     ))}
                   </div>
-                  <div className={styles.examUseNotice}>
-                    <strong>Lưu ý làm bài:</strong> Thực hiện phân tích cấu trúc trước, dịch nghĩa sau; ghi nhận primary tag ({topic.primaryTag}) khi trả lời sai để đưa vào Sổ tay lỗi.
-                  </div>
-                </div>
+                </section>
               )}
 
-              {/* Common Traps */}
-              {topic.commonTraps && topic.commonTraps.length > 0 && (
-                <div className={styles.sectionBlock}>
-                  <h2 className={styles.sectionHeading}>
-                    <AlertTriangle size={18} style={{ color: 'var(--color-danger)' }} /> Bẫy thường gặp và cách phòng tránh
-                  </h2>
-                  <div className={styles.trapsList}>
-                    {topic.commonTraps.map((trap, i) => (
-                      <div key={i} className={styles.trapRow}>
-                        <AlertTriangle size={16} style={{ color: 'var(--color-danger)', flexShrink: 0 }} />
-                        <span>{trap}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {extensions.length > 0 && (
+                <section aria-labelledby="lesson-extension">
+                  <details className={styles.extension}>
+                    <summary id="lesson-extension">
+                      <span>
+                        <strong>Mở rộng để hiểu sâu hơn</strong>
+                        <small>Dành cho lượt học thứ hai hoặc khi bạn đã chắc phần chính</small>
+                      </span>
+                      <span className={styles.detailsHint}>Mở phần này</span>
+                    </summary>
+                    <ul className={styles.plainList}>
+                      {extensions.map((extension) => <li key={extension}>{extension}</li>)}
+                    </ul>
+                  </details>
+                </section>
               )}
+            </div>
+          )}
 
-              {/* Extensions */}
-              {topic.guide?.extensions && topic.guide.extensions.length > 0 && (
-                <div className={styles.sectionBlock}>
-                  <div className={styles.extensionsCard}>
-                    <h2 className={styles.sectionHeading}>
-                      <Lightbulb size={18} /> Mở rộng để hiểu sâu hơn
-                    </h2>
-                    <p className={styles.scopeNote}>
-                      Phần mở rộng giúp đọc hiểu văn bản phức tạp; không bắt buộc ghi nhớ ngay ở lượt học đầu.
-                    </p>
-                    <div className={styles.objectivesList}>
-                      {topic.guide.extensions.map((ext, i) => (
-                        <div key={i} className={styles.objectiveItem}>
-                          • {ext}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Self-check prompts */}
-              {topic.guide?.selfCheckPrompts && topic.guide.selfCheckPrompts.length > 0 && (
-                <div className={styles.sectionBlock}>
-                  <h2 className={styles.sectionHeading}>
-                    <HelpCircle size={18} /> Tự kiểm tra nhanh
-                  </h2>
-                  <div className={styles.selfCheckList}>
-                    {topic.guide.selfCheckPrompts.map((prompt, i) => (
-                      <div key={i} className={styles.selfCheckItem}>
-                        <HelpCircle size={16} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+          {currentStep === 3 && (
+            <div className={styles.stepContent}>
+              <section aria-labelledby="self-check">
+                <p className={styles.sectionKicker}>Không cần nhìn tài liệu</p>
+                <h2 id="self-check">Tự giải thích bằng lời của bạn</h2>
+                <p className={styles.sectionIntro}>
+                  Đánh dấu khi bạn có thể trả lời rõ ràng. Đây là bước tự đánh giá,
+                  hệ thống chưa chấm đúng sai ở phần này.
+                </p>
+                <div className={styles.selfCheckList}>
+                  {selfCheckPrompts.map((prompt) => {
+                    const isChecked = checkedPrompts.has(prompt);
+                    return (
+                      <button
+                        type="button"
+                        key={prompt}
+                        onClick={() => togglePrompt(prompt)}
+                        className={`${styles.selfCheckItem} ${isChecked ? styles.selfCheckDone : ''}`}
+                        aria-pressed={isChecked}
+                      >
+                        <span className={styles.checkBox} aria-hidden="true">
+                          {isChecked && <Check size={16} />}
+                        </span>
                         <span>{prompt}</span>
-                      </div>
-                    ))}
-                  </div>
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
+              </section>
 
-              {/* Interactive Mini-Check */}
-              <div className={styles.miniCheckCard}>
-                <div className={styles.miniCheckHeader}>
-                  <HelpCircle size={18} className={styles.checkIcon} />
-                  <h3>Mini-Check: Kiểm tra khả năng nhận diện ({topic.code})</h3>
-                </div>
-                <p className={styles.miniPrompt}>
-                  Áp dụng quy trình nhận diện: "{topic.workedExamples[0]?.sentence || 'The committee approved the budget proposal.'}"
-                  <br />
-                  Chủ điểm nào là trọng tâm phân tích trong câu trên?
-                </p>
-
-                <div className={styles.miniOptions}>
-                  {[
-                    { key: 'A', text: `Dấu hiệu của ${topic.titleVi}`, isCorrect: true },
-                    { key: 'B', text: 'Chỉ dựa vào cảm tính hoặc dịch sơ lược', isCorrect: false },
-                    { key: 'C', text: 'Bỏ qua vị trí ngữ pháp và liên từ', isCorrect: false },
-                    { key: 'D', text: 'Đoán đáp án theo độ dài của từ', isCorrect: false },
-                  ].map((opt) => (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      disabled={miniCheckSubmitted}
-                      onClick={() => handleMiniCheckSubmit(opt.key)}
-                      className={`${styles.miniOptionBtn} ${
-                        selectedMiniOption === opt.key ? styles.selectedMini : ''
-                      } ${
-                        miniCheckSubmitted && opt.isCorrect ? styles.correctMini : ''
-                      } ${
-                        miniCheckSubmitted && selectedMiniOption === opt.key && !opt.isCorrect
-                          ? styles.wrongMini
-                          : ''
-                      }`}
-                    >
-                      <span className={styles.optionLabel}>{opt.key}</span>
-                      <span>{opt.text}</span>
-                      {miniCheckSubmitted && opt.isCorrect && (
-                        <Check size={16} style={{ marginLeft: 'auto', color: 'var(--color-success)' }} />
-                      )}
-                      {miniCheckSubmitted && selectedMiniOption === opt.key && !opt.isCorrect && (
-                        <X size={16} style={{ marginLeft: 'auto', color: 'var(--color-danger)' }} />
-                      )}
-                    </button>
-                  ))}
-                </div>
-
-                {miniCheckSubmitted && (
-                  <div className={styles.miniFeedback}>
-                    {selectedMiniOption === 'A' ? (
-                      <Alert variant="success" title="Chính xác!">
-                        Bạn đã nắm vững quy trình phân tích của bài học {topic.code}. Hãy tiếp tục sang phần tổng kết để làm bài tập củng cố.
-                      </Alert>
-                    ) : (
-                      <Alert variant="warning" title="Chưa chính xác:">
-                        Hãy nhớ quy trình chuẩn: luôn khoanh vùng cấu trúc ngữ pháp trước ({topic.primaryTag}), loại trừ đáp án sai rồi mới kiểm tra ngữ cảnh.
-                      </Alert>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* PAGE 3: TỔNG KẾT & QUIZ */}
-          {currentPage === 3 && (
-            <div className={styles.pageBody}>
-              <h2 className={styles.sectionHeading}>
-                <CheckCircle size={18} /> Tổng kết bài học {topic.code}
-              </h2>
-              <p>
-                Bạn đã hoàn thành các phần kiến thức cốt lõi và quy trình xử lý bẫy cho chủ điểm <strong>{topic.titleVi}</strong> ({topic.titleEn}).
-              </p>
-
-              <div className={styles.quizTeaser}>
-                <FileQuestion size={40} className={styles.quizIcon} />
-                <h3>Quiz kiểm tra: {topic.titleVi}</h3>
+              <section className={styles.recap} aria-labelledby="lesson-recap">
+                <p className={styles.sectionKicker}>Trước khi luyện tập</p>
+                <h2 id="lesson-recap">Điểm cần mang theo</h2>
                 <p>
-                  Gồm 8–10 câu hỏi áp dụng chuẩn format Part 5/6 TOEIC • Tỷ lệ đạt khuyến nghị: 80%
+                  Khi gặp câu hỏi về <strong>{topic.titleVi.toLowerCase()}</strong>, hãy nhận diện
+                  dấu hiệu <strong>{topic.primaryTag}</strong>, áp dụng công thức và kiểm tra lại
+                  câu trong ngữ cảnh đầy đủ.
                 </p>
+              </section>
+
+              <section className={styles.quizCallout} aria-labelledby="lesson-quiz">
+                <div>
+                  <FileQuestion size={25} aria-hidden="true" />
+                  <p className={styles.sectionKicker}>Bước tiếp theo</p>
+                  <h2 id="lesson-quiz">Luyện tập với quiz ngắn</h2>
+                  <p>8–10 câu theo dạng Part 5/6. Mốc 80% dùng để gợi ý phần nên ôn lại.</p>
+                </div>
                 <Button
                   variant="primary"
-                  size="md"
                   onClick={() => navigate(`/learn/quiz/quiz-${topic.code.toLowerCase()}`)}
+                  rightIcon={<ArrowRight size={17} aria-hidden="true" />}
                 >
-                  Bắt đầu làm Quiz kiểm tra ngay
+                  Bắt đầu quiz
                 </Button>
-              </div>
+              </section>
             </div>
           )}
 
-          {/* Footer Navigation */}
           <footer className={styles.lessonFooter}>
-            <div className={styles.footerLeft}>
-              <Button
-                variant="secondary"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => p - 1)}
-              >
-                Trang trước
-              </Button>
+            <Button
+              variant="text"
+              disabled={currentStep === 1}
+              onClick={() => goToStep((currentStep - 1) as LessonStep)}
+              leftIcon={<ArrowLeft size={17} aria-hidden="true" />}
+            >
+              Phần trước
+            </Button>
 
-              <Button
-                variant={markedRead[currentPage] ? 'outline' : 'secondary'}
-                onClick={handleMarkAsRead}
-                leftIcon={markedRead[currentPage] ? <Check size={16} /> : undefined}
-              >
-                {markedRead[currentPage] ? 'Đã xác nhận đọc' : 'Đánh dấu đã đọc'}
-              </Button>
-            </div>
+            <button
+              type="button"
+              onClick={toggleCurrentStep}
+              className={`${styles.markReadButton} ${currentStepDone ? styles.markReadDone : ''}`}
+              aria-pressed={currentStepDone}
+            >
+              <span>{currentStepDone && <Check size={15} aria-hidden="true" />}</span>
+              {currentStepDone ? 'Đã đọc phần này' : 'Đánh dấu đã đọc'}
+            </button>
 
-            <div className={styles.footerRight}>
-              {currentPage < totalPages ? (
-                <Button
-                  variant="primary"
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                  rightIcon={<ArrowRight size={16} />}
-                >
-                  Trang tiếp theo
-                </Button>
-              ) : (
-                <Button
-                  variant="primary"
-                  onClick={() => navigate('/learn/roadmap')}
-                  leftIcon={<CheckCircle size={16} />}
-                >
-                  Hoàn thành bài học
-                </Button>
-              )}
-            </div>
+            {currentStep < LESSON_STEPS.length ? (
+              <Button
+                variant="primary"
+                onClick={() => goToStep((currentStep + 1) as LessonStep)}
+                rightIcon={<ArrowRight size={17} aria-hidden="true" />}
+              >
+                Phần tiếp theo
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                onClick={() => navigate('/learn/roadmap')}
+                rightIcon={<ArrowRight size={17} aria-hidden="true" />}
+              >
+                Về lộ trình
+              </Button>
+            )}
           </footer>
+
+          <p className={styles.srOnly} aria-live="polite">
+            {isBookmarked ? 'Đã lưu bài học.' : 'Bài học chưa được lưu.'}
+          </p>
         </main>
       </div>
     </div>
