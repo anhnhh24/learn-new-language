@@ -4,8 +4,8 @@
 |---|---|---|---|
 | NOTE-01 | 27.3 FR-74, 28.4 | Part 7 ghi R1 ở FR-74 nhưng R0A ở 28.4 và gate pilot. | Theo lát cắt 28.4: Part 7 direct-evidence thuộc R0A; làm sau nền Part 5. |
 | NOTE-02 | 28.3, 28.8 | L1Internal chưa có trong bảng tier; ngoại lệ một provider cần PO nhưng chưa có cấu trúc risk approval. | Không triển khai override; thiếu đa dạng provider thì chỉ giữ nội bộ. |
-| NOTE-03 | 28.5, 28.14, UC-11 | Form gate cần item L2 nhưng L2 lại đòi form gate; dễ tạo vòng phụ thuộc. | Tách BetaReady của item khỏi BetaActive; form composer cần tạo quyết định và snapshot trong transaction ở mốc sau. |
-| NOTE-04 | 28.11 | Chưa định nghĩa N theo population, ability band, xử lý repeated responses, mẫu tối thiểu nhóm năng lực cao. | Chưa tự promote L2D; cần policy và test thống kê riêng. |
+| NOTE-03 | 28.5, 28.14, UC-11 | Form gate cần item L2 nhưng L2 lại đòi form gate; dễ tạo vòng phụ thuộc. | Đã tách BetaReady khỏi BetaActive; composer tạo form Active rồi chuyển các item BetaReady trong cùng transaction contract. |
+| NOTE-04 | 28.11 | Chưa định nghĩa N theo population, ability band, xử lý repeated responses, mẫu tối thiểu nhóm năng lực cao. | Policy khởi điểm đã mã hóa ngưỡng tổng; chưa bật worker auto-promote trước khi chốt cách lọc population/repeat và test thống kê. |
 | NOTE-05 | 28.7 | Không thể xác minh quyền sử dụng/PII/near-duplicate chỉ bằng kiểm tra trường metadata. | Validator ban đầu chỉ kiểm bất biến cấu trúc; quyền và similarity semantic phải là gate riêng, không đánh đồng với đạt publish. |
 | NOTE-06 | 21, D-06 | Chưa có SDK 10 trên PATH, provider, credential, budget và môi trường PostgreSQL. | Dùng SDK 10 riêng trong workspace; chưa gọi model mất phí. Provider và hạ tầng là mốc tiếp theo. |
 | NOTE-07 | 28.10 | Any state -> terminal chưa rõ việc phục hồi hoặc sửa item rejected/quarantined. | Không hồi sinh revision cũ; sửa tạo revision mới ở Generated, không kế thừa bằng chứng. |
@@ -15,6 +15,8 @@
 | NOTE-11 | FR-40–41 | Refund callback có thể đến trước paid callback nhưng chưa có inbox/reconciliation service để giữ event out-of-order. | Commerce giữ PendingIntegration; Infrastructure phải lưu inbox trước khi gọi aggregate. |
 | NOTE-12 | FR-01–03 | Domain identity không tự giải quyết rate limit, MFA, password hashing parameters hoặc email anti-enumeration. | Chỉ mở auth API sau khi application/infrastructure và audit được nối đầy đủ. |
 | NOTE-13 | 28.7–28.9 | Part 7 validator chỉ chứng minh hash/offset/quote và cấu trúc; không chứng minh passage tự nhiên, distractor hợp lý hoặc câu không cần kiến thức ngoài. | Giữ nội bộ tới khi hai solver, critic, perturbation và similarity runner đều có invocation audit thật. |
+| NOTE-14 | 28.9, 28.11, FR-85 | Part 7 cần quarantine theo question nhưng phát hành theo group nguyên khối. | Form snapshot lưu cả group revision và danh sách question revision; một question bị quarantine làm cả form chứa group chuyển Degraded. |
+| NOTE-15 | FR-84, NFR privacy | SRS yêu cầu learnerHash nhưng chưa chốt rotation, key custody và khoảng liên kết pseudonym. | Application chỉ nhận adapter pseudonymizer; Infrastructure phải dùng HMAC có key vault/rotation, không dùng SHA trực tiếp trên user ID. |
 
 ## Quyết định kỹ thuật
 

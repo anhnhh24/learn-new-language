@@ -80,13 +80,38 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 - Stimulus version bất biến, source hash, evidence offset/quote và key/options theo group 2–5 câu.
 - Chưa có generator/solver/critic semantic thật nên chưa câu nào được lên Beta.
 
+## M12 — Automated quality gates (hoàn tất contracts/orchestration)
+
+- Hai solver nhận blind input và chạy độc lập; consensus kiểm invocation, hash, policy và route.
+- Critic, perturbation, similarity và rights gate chạy song song sau consensus; finding Blocking làm reject.
+- Feature flag tắt giữ candidate ở AutoValidated nội bộ, không tự đẩy ra Beta.
+
+## M13 — Telemetry và statistical promotion (hoàn tất domain policy)
+
+- Exposure, response, valid flag, form context và learner report dùng pseudonym thay định danh trực tiếp.
+- Policy version hóa: point-biserial âm sau N >= 100 hoặc report threshold làm quarantine; N >= 300, discrimination đạt và không còn report mới xét DataValidatedPractice.
+- Threshold là cấu hình sản phẩm khởi điểm, chưa phải psychometric validation hoặc chuẩn ETS.
+
+## M14 — Beta form composition (hoàn tất domain/application contracts)
+
+- Form gate kiểm tier, policy, rights reference, coverage, exposure, family collision/family lock và quota.
+- Group Part 7 được giữ nguyên khối nhưng snapshot vẫn ánh xạ từng question revision cho telemetry.
+- Form snapshot bất biến; item quarantine chuyển form Active sang Degraded trong cùng transaction contract.
+
+## M15 — Beta serving và learner report (hoàn tất application contracts)
+
+- Start attempt chỉ dùng form Active, kiểm Beta kill switch trong transaction và có receipt idempotency.
+- Attempt giữ snapshot/key nội bộ; response start chỉ trả tier, nhãn learner, form và deadline.
+- Ghi exposure theo từng question; report chỉ nhận category allowlist và item thực sự thuộc attempt của learner.
+- Chưa mở route công khai cho tới khi auth, repository, locking và pseudonymizer HMAC được nối thật.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 
 1. Repository mapping, migration runner, password/email/MFA và auth endpoints.
-2. Generation Worker, provider adapters, hai solver, critic, perturbation, similarity và rights gates.
-3. Beta serving/report/exposure/quarantine và Reading form composer.
+2. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
+3. Repository/locking cho form, attempt, telemetry, quarantine; Operations quality dashboard.
 4. Course/lesson CMS, import DOCX/PDF text và learner APIs cho Learning/Assessment.
 5. React learner/admin UI, notification, data export/delete, observability và backup/restore.
 6. Test backlog đã hoãn: domain, integration concurrency, contract, E2E và release gates.
 
-Các state sau CrossModelValid hiện chỉ có tên enum; chưa có transition. Các actor trong domain phải do authentication/worker tin cậy cung cấp khi tích hợp, không nhận từ request body. Chưa có persistence/concurrency control hay chữ ký invocation. Không đánh dấu toàn bộ P0/R0A hoặc FR-79–90 hoàn tất.
+Các actor trong domain phải do authentication/worker tin cậy cung cấp khi tích hợp, không nhận từ request body. Chưa có persistence/concurrency control, provider invocation thật hoặc chữ ký invocation. Không đánh dấu toàn bộ P0/R0A hoặc FR-79–90 hoàn tất.
