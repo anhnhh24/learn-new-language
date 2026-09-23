@@ -20,6 +20,7 @@
 | NOTE-16 | Thiết kế kỹ thuật | Reconstitute Aggregate Root (như GenerationJob, Blueprint) từ DB row có thể kích hoạt domain logic validation (VD: Publish state checks) nếu dùng public constructor/methods. | Dùng pattern "trusted reconstitution" với internal methods và init properties để repository dựng lại state mà không chạy domain checks (vì data trong DB đã hợp lệ lúc lưu). |
 | NOTE-17 | 28.9, FR-85, UC-11 | Schema hiện có một revision cho Part 7 group nhưng attempt telemetry cần ID ổn định cho từng question trong group. | Không suy diễn ID từ vị trí/stableId; reader hiện chỉ phục vụ Part 5 và chặn Part 7 bằng `FORM_CONTENT_UNSUPPORTED` tới khi bổ sung entity/version mapping rõ ràng. |
 
+| NOTE-18 | Outbox worker | Lease hiện cố định 5 phút và chưa có heartbeat/renewal. | Chỉ dùng dispatcher cho handler ngắn; provider/model call dài phải là job riêng hoặc bổ sung lease renewal trước khi bật worker production. |
 ## Quyết định kỹ thuật
 
 - .NET 10 LTS cho code mới. Kiểm tra ngày 2026-09-23 tại https://dotnet.microsoft.com/en-us/platform/support/policy (support tới tháng 11/2028).

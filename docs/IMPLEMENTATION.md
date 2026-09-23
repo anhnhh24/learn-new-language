@@ -139,6 +139,14 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 - Part 7 serving tiếp tục đóng cho tới khi chốt mapping group revision sang từng question revision.
 
 
+## M20 — Durable outbox lease (hoàn tất persistence/dispatcher contract)
+
+- Claim dùng một câu lệnh CTE update với `FOR UPDATE SKIP LOCKED`, gắn lease ID và expiry trước khi commit.
+- Handler chạy ngoài database transaction; mark/retry/dead-letter chạy trong transaction ngắn và chỉ lease owner được cập nhật.
+- Lease hết hạn cho phép worker khác thu hồi event; stale worker không thể ghi đè kết quả mới.
+- Payload hash được kiểm trước handler; payload sai bị dead-letter với safe error code.
+- Retry lưu attempts, next retry và last error code; lỗi thiếu handler hoặc quá số lần retry được dead-letter.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 2. Operations quality dashboard và công cụ kiểm soát quarantine.
