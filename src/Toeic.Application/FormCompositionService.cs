@@ -6,7 +6,7 @@ using Toeic.Domain.Content;
 namespace Toeic.Application;
 
 public sealed record ComposeBetaFormCommand(string Version, string PolicyVersion,
-    PublicationTier Tier, ImmutableArray<FormRequirement> Requirements,
+    string ExamProfileVersion, TimeSpan AttemptDuration, PublicationTier Tier, ImmutableArray<FormRequirement> Requirements,
     ImmutableArray<Guid> OrderedRevisionIds, ImmutableHashSet<string> LockedFamilyIds,
     int MaximumPriorExposure);
 
@@ -52,7 +52,7 @@ public sealed class FormCompositionService(IApplicationTransaction transaction,
 
         var ordered = requestedIds.Select(id => byId[id]).ToImmutableArray();
         var form = BetaFormComposer.Compose(command.Version, command.PolicyVersion,
-            command.Tier, command.Requirements, ordered, command.LockedFamilyIds,
+            command.ExamProfileVersion, command.AttemptDuration, command.Tier, command.Requirements, ordered, command.LockedFamilyIds,
             command.MaximumPriorExposure);
         form.Activate(actor, clock);
 

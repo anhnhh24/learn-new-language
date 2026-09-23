@@ -4,6 +4,8 @@ create table content.form_versions (
     tier text not null,
     state text not null check (state in ('Draft','Active','Degraded','Archived')),
     snapshot_json jsonb not null,
+    exam_profile_version text not null,
+    attempt_duration_seconds integer not null check (attempt_duration_seconds between 60 and 14400),
     policy_version text not null,
     created_at timestamptz not null default now()
 );

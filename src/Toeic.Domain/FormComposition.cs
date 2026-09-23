@@ -25,6 +25,8 @@ public sealed class BetaFormVersion
     public Guid Id { get; }
     public string Version { get; }
     public string PolicyVersion { get; }
+    public string ExamProfileVersion { get; }
+    public TimeSpan AttemptDuration { get; }
     public PublicationTier Tier { get; }
     public ImmutableArray<FormItemSnapshot> Items { get; }
     public string SnapshotHash { get; }
@@ -32,14 +34,32 @@ public sealed class BetaFormVersion
     public IReadOnlyList<FormTransition> History => history.AsReadOnly();
 
     internal BetaFormVersion(Guid id, string version, string policyVersion,
-        PublicationTier tier, ImmutableArray<FormItemSnapshot> items)
+        string examProfileVersion, TimeSpan attemptDuration, PublicationTier tier,
+        ImmutableArray<FormItemSnapshot> items)
     {
+        if (string.IsNullOrWhiteSpace(examProfileVersion) ||
+            attemptDuration <= TimeSpan.Zero || attemptDuration > TimeSpan.FromHours(4))
+            throw new DomainException("FORM_DELIVERY_POLICY_INVALID");
         Id = id;
         Version = version;
         PolicyVersion = policyVersion;
         Tier = tier;
         Items = items;
-        SnapshotHash = ContentHash.Of(new { version, policyVersion, tier, items });
+        ExamProfileVersion = examProfileVersion.Trim();
+        AttemptDuration = attemptDuration;
+        SnapshotHash = ContentHash.Of(new { version, policyVersion, ExamProfileVersion,
+            AttemptDuration, tier, items });
+    }
+
+    internal static BetaFormVersion Reconstitute(Guid id, string version, string policyVersion,
+        string examProfileVersion, TimeSpan attemptDuration, PublicationTier tier,
+        ImmutableArray<FormItemSnapshot> items, FormState state)
+    {
+        if (!Enum.IsDefined(state)) throw new DomainException("FORM_STATE_INVALID");
+        var form = new BetaFormVersion(id, version, policyVersion, examProfileVersion,
+            attemptDuration, tier, items);
+        form.State = state;
+        return form;
     }
 
     public void Activate(Actor actor, TimeProvider clock)
@@ -90,11 +110,13 @@ public sealed class BetaFormVersion
 public static class BetaFormComposer
 {
     public static BetaFormVersion Compose(string version, string policyVersion,
+        string examProfileVersion, TimeSpan attemptDuration,
         PublicationTier requestedTier, ImmutableArray<FormRequirement> requirements,
         ImmutableArray<FormItemCandidate> candidates, ImmutableHashSet<string> lockedFamilyIds,
         int maximumPriorExposure)
     {
-        if (string.IsNullOrWhiteSpace(version) || string.IsNullOrWhiteSpace(policyVersion))
+        if (string.IsNullOrWhiteSpace(version) || string.IsNullOrWhiteSpace(policyVersion) ||
+            string.IsNullOrWhiteSpace(examProfileVersion))
             throw new DomainException("FORM_METADATA_REQUIRED");
         if (requestedTier is not (PublicationTier.BetaPractice or
             PublicationTier.DataValidatedPractice))
@@ -141,7 +163,7 @@ public static class BetaFormComposer
         var items = candidates.Select((item, index) => new FormItemSnapshot(item.RevisionId,
             item.FamilyId, item.Part, item.Tier, item.QuestionRevisionIds, index + 1)).ToImmutableArray();
         return new BetaFormVersion(Guid.NewGuid(), version.Trim(), policyVersion.Trim(),
-            requestedTier, items);
+            examProfileVersion, attemptDuration, requestedTier, items);
     }
 
     private static bool Eligible(FormItemCandidate item, PublicationTier requestedTier) =>

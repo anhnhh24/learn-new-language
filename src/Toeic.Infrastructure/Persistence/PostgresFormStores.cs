@@ -21,9 +21,10 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session) : IForm
         ArgumentNullException.ThrowIfNull(form);
         await using var command = CreateCommand("""
             insert into content.form_versions
-                (id, version, tier, state, snapshot_json, policy_version, created_at)
+                (id, version, tier, state, snapshot_json, policy_version,
+                 exam_profile_version, attempt_duration_seconds, created_at)
             values (@id, @version, @tier, @state, cast(@snapshot_json as jsonb),
-                    @policy_version, @created_at);
+                    @policy_version, @exam_profile_version, @attempt_duration_seconds, @created_at);
             """);
         Add(command, "@id", form.Id);
         Add(command, "@version", form.Version);
@@ -33,6 +34,8 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session) : IForm
             new FormSnapshotDocument(form.SnapshotHash, form.Items), JsonOptions));
         Add(command, "@policy_version", form.PolicyVersion);
         Add(command, "@created_at", DateTimeOffset.UtcNow);
+        Add(command, "@exam_profile_version", form.ExamProfileVersion);
+        Add(command, "@attempt_duration_seconds", checked((int)form.AttemptDuration.TotalSeconds));
 
         try
         {
@@ -79,10 +82,11 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session) : IForm
     {
         if (revisionId == Guid.Empty) return [];
         await using var command = CreateCommand("""
-            select fv.id, fv.version, fv.tier, fv.state, fv.snapshot_json::text, fv.policy_version
+            select fv.id, fv.version, fv.tier, fv.state, fv.snapshot_json::text,
+                   fv.policy_version, fv.exam_profile_version, fv.attempt_duration_seconds
             from content.form_versions fv
-            join content.form_items fi on fi.form_version_id = fv.id
-            where fi.item_revision_id = @revision_id and fv.state = 'Active';
+            join content.form_questions fq on fq.form_version_id = fv.id
+            where fq.question_revision_id = @revision_id and fv.state = 'Active';
             """);
         Add(command, "@revision_id", revisionId);
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
@@ -115,16 +119,12 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session) : IForm
         var snapshot = JsonSerializer.Deserialize<FormSnapshotDocument>(snapshotJson, JsonOptions)
             ?? throw new DomainException("FORM_SNAPSHOT_CORRUPT");
 
-        var form = new BetaFormVersion(reader.GetGuid(0), reader.GetString(1),
-            reader.GetString(5), tier, snapshot.Items);
-
-        // Restore the persisted state
         var state = Enum.Parse<FormState>(reader.GetString(3));
-        if (state == FormState.Active)
-        {
-            var worker = new Actor(ActorType.SystemWorker, "db-reconstitute");
-            form.Activate(worker, TimeProvider.System);
-        }
+        var form = BetaFormVersion.Reconstitute(reader.GetGuid(0), reader.GetString(1),
+            reader.GetString(5), reader.GetString(6),
+            TimeSpan.FromSeconds(reader.GetInt32(7)), tier, snapshot.Items, state);
+        if (!string.Equals(form.SnapshotHash, snapshot.SnapshotHash, StringComparison.Ordinal))
+            throw new DomainException("FORM_SNAPSHOT_CORRUPT");
         return form;
     }
 
