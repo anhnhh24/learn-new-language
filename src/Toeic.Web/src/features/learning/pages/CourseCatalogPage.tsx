@@ -23,38 +23,60 @@ interface CourseItem {
   isEnrolled: boolean;
 }
 
-const mockCourses: CourseItem[] = [
+const officialCourses: CourseItem[] = [
   {
-    id: 'course-toeic-500',
-    title: 'TOEIC Nền tảng 500+: Củng cố Ngữ pháp & Từ vựng căn bản',
-    targetLevel: 'Mục tiêu 500 - 600',
-    levelBadge: 'Nền tảng',
-    totalLessons: 24,
-    durationHours: 18,
-    description: 'Bao quát 12 chủ điểm ngữ pháp trọng yếu Part 5 và kỹ năng đọc hiểu văn bản ngắn Part 7.',
+    id: 'toeic-reading-grammar-foundation',
+    title: 'TOEIC Reading: Ngữ pháp và từ vựng từ nền tảng đến nâng cao',
+    targetLevel: 'Lộ trình chính thức 31 tuần (Level A → D)',
+    levelBadge: 'Toàn diện',
+    totalLessons: 35,
+    durationHours: 70,
+    description: 'Chương trình flagship bao quát 35 chủ điểm ngữ pháp cốt lõi, 4 bài thi Checkpoint chuẩn hóa và quy trình remediation chống hổng kiến thức.',
     hasSampleLesson: true,
     isEnrolled: true,
   },
   {
-    id: 'course-toeic-650',
-    title: 'TOEIC Bứt phá 650+: Chiến thuật Đọc hiểu nhanh & Xử lý bẫy',
-    targetLevel: 'Mục tiêu 650 - 750',
-    levelBadge: 'Trung cấp',
-    totalLessons: 32,
-    durationHours: 25,
-    description: 'Kỹ thuật đọc lướt Skimming/Scanning, xử lý đoạn kép và đoạn ba thương mại phức tạp.',
+    id: 'toeic-module-a',
+    title: 'Module A: Dựng nền câu và từ loại (Tuần 1–6)',
+    targetLevel: 'Mục tiêu củng cố căn bản · Level A',
+    levelBadge: 'Level A',
+    totalLessons: 9,
+    durationHours: 16,
+    description: 'Nhận diện 4 từ loại, cấu trúc câu S–V–O, các thì cơ bản, mạo từ và danh từ đếm được/không đếm được. Checkpoint A gồm 25 câu.',
     hasSampleLesson: true,
+    isEnrolled: true,
+  },
+  {
+    id: 'toeic-module-b',
+    title: 'Module B: Cấu trúc trung cấp ứng dụng (Tuần 7–13)',
+    targetLevel: 'Mục tiêu ứng dụng linh hoạt · Level B',
+    levelBadge: 'Level B',
+    totalLessons: 10,
+    durationHours: 20,
+    description: 'Làm chủ thì hoàn thành, thể bị động, câu điều kiện loại 0-1-2, mệnh đề quan hệ và liên từ kết hợp. Checkpoint B gồm 40 câu.',
+    hasSampleLesson: false,
     isEnrolled: false,
   },
   {
-    id: 'course-toeic-800',
-    title: 'TOEIC Chuyên sâu 800+: Thành thạo Văn phong & Từ vựng kinh doanh nâng cao',
-    targetLevel: 'Mục tiêu 800 - 900+',
-    levelBadge: 'Nâng cao',
-    totalLessons: 28,
+    id: 'toeic-module-c',
+    title: 'Module C: Cấu trúc nâng cao có kiểm soát (Tuần 14–21)',
+    targetLevel: 'Mục tiêu xử lý câu khó · Level C',
+    levelBadge: 'Level C',
+    totalLessons: 10,
     durationHours: 22,
-    description: 'Chuyên đề thành ngữ, phrasal verbs công sở và câu hỏi suy luận ngầm logic đa tài liệu.',
-    hasSampleLesson: true,
+    description: 'Chuyên đề đảo ngữ, phân từ rút gọn, câu giả định và cấu trúc nhấn mạnh. Có tuần 21 remediation chuyên sâu. Checkpoint C gồm 40 câu.',
+    hasSampleLesson: false,
+    isEnrolled: false,
+  },
+  {
+    id: 'toeic-module-d',
+    title: 'Module D: Độ chính xác chuyên sâu Part 5/6 (Tuần 22–31)',
+    targetLevel: 'Mục tiêu tối đa điểm Reading · Level D',
+    levelBadge: 'Level D',
+    totalLessons: 11,
+    durationHours: 26,
+    description: 'Tinh chỉnh word-form, collocation công sở, văn phong thương mại và chiến lược né bẫy đề thi. Checkpoint D tốt nghiệp 46 câu.',
+    hasSampleLesson: false,
     isEnrolled: false,
   },
 ];
@@ -62,7 +84,7 @@ const mockCourses: CourseItem[] = [
 export function CourseCatalogPage() {
   const navigate = useNavigate();
   const [levelFilter, setLevelFilter] = useState<string>('all');
-  const [courses, setCourses] = useState<CourseItem[]>(mockCourses);
+  const [courses, setCourses] = useState<CourseItem[]>(officialCourses);
 
   const handleEnroll = (courseId: string) => {
     setCourses((prev) =>
@@ -82,17 +104,19 @@ export function CourseCatalogPage() {
         <div>
           <h1 className={styles.title}>Danh mục khóa học</h1>
           <p className={styles.subtitle}>
-            Các chương trình đào tạo TOEIC Listening & Reading theo lộ trình từng cấp độ (UI-01 & FR-06).
+            Chương trình đào tạo chuẩn hóa từ Database: 31 tuần, 4 cấp độ và 35 chủ điểm bài học.
           </p>
         </div>
       </div>
 
       <div className={styles.filtersRow}>
         {[
-          { key: 'all', label: 'Tất cả trình độ' },
-          { key: 'Nền tảng', label: 'Mục tiêu 500+' },
-          { key: 'Trung cấp', label: 'Mục tiêu 650+' },
-          { key: 'Nâng cao', label: 'Mục tiêu 800+' },
+          { key: 'all', label: 'Tất cả chương trình' },
+          { key: 'Toàn diện', label: 'Toàn diện 31 tuần' },
+          { key: 'Level A', label: 'Level A (Nền tảng)' },
+          { key: 'Level B', label: 'Level B (Trung cấp)' },
+          { key: 'Level C', label: 'Level C (Nâng cao)' },
+          { key: 'Level D', label: 'Level D (Chuyên sâu)' },
         ].map((f) => (
           <button
             key={f.key}
@@ -113,38 +137,48 @@ export function CourseCatalogPage() {
               {c.isEnrolled ? (
                 <Badge variant="success">Đang theo học</Badge>
               ) : (
-                <Badge variant="default">Có bài học thử</Badge>
+                <span className={styles.targetLevel}>{c.targetLevel}</span>
               )}
             </div>
 
-            <h2 className={styles.courseTitle}>{c.title}</h2>
+            <h3 className={styles.courseTitle}>{c.title}</h3>
             <p className={styles.courseDesc}>{c.description}</p>
 
-            <div className={styles.specsList}>
-              <div className={styles.specRow}>
-                <GraduationCap size={15} className={styles.specIcon} />
-                <span>{c.targetLevel}</span>
+            <div className={styles.metaInfo}>
+              <div className={styles.metaItem}>
+                <BookOpen size={16} />
+                <span>{c.totalLessons} bài học</span>
               </div>
-              <div className={styles.specRow}>
-                <BookOpen size={15} className={styles.specIcon} />
-                <span><strong className="text-tabular">{c.totalLessons}</strong> bài học chuẩn hóa</span>
-              </div>
-              <div className={styles.specRow}>
-                <Clock size={15} className={styles.specIcon} />
-                <span>Ước tính <strong className="text-tabular">{c.durationHours}</strong> giờ học tập</span>
+              <div className={styles.metaItem}>
+                <Clock size={16} />
+                <span>{c.durationHours} giờ học</span>
               </div>
             </div>
 
             <div className={styles.cardFooter}>
               <Button
-                variant={c.isEnrolled ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => (c.isEnrolled ? navigate(`/learn/courses/${c.id}`) : handleEnroll(c.id))}
-                leftIcon={c.isEnrolled ? <CheckCircle size={15} /> : undefined}
-                rightIcon={<ArrowRight size={14} />}
+                variant={c.isEnrolled ? 'primary' : 'secondary'}
+                onClick={() => {
+                  if (c.isEnrolled) {
+                    navigate('/learn/roadmap');
+                  } else {
+                    handleEnroll(c.id);
+                  }
+                }}
+                rightIcon={c.isEnrolled ? <ArrowRight size={16} /> : <GraduationCap size={16} />}
               >
-                {c.isEnrolled ? 'Tiếp tục học' : 'Xem chi tiết & Đăng ký'}
+                {c.isEnrolled ? 'Vào học theo lộ trình' : 'Xem chi tiết & Đăng ký'}
               </Button>
+
+              {c.hasSampleLesson && (
+                <button
+                  type="button"
+                  onClick={() => navigate('/learn/lesson/A1')}
+                  className={styles.sampleLink}
+                >
+                  <CheckCircle size={14} /> Học thử bài A1
+                </button>
+              )}
             </div>
           </div>
         ))}

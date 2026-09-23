@@ -39,21 +39,21 @@ export function TodayPage() {
       <section className={styles.primaryActionCard} aria-labelledby="primary-action-heading">
         <div className={styles.actionLeft}>
           <div className={styles.actionMeta}>
-            <span className={styles.actionTag}>HOẠT ĐỘNG CHÍNH TIẾP THEO</span>
+            <span className={styles.actionTag}>LỘ TRÌNH 31 TUẦN · LEVEL A</span>
             <TierBadge tier="BetaPractice" />
           </div>
           <h2 id="primary-action-heading" className={styles.actionTitle}>
-            Part 5 Luyện tập: Ngữ pháp & Từ vựng nâng cao
+            Tuần 1: Bài A1 · Từ loại và vị trí trong câu
           </h2>
           <p className={styles.actionDesc}>
-            Bài làm trước đạt 22/30 câu. Hoàn thành 10 câu còn lại về liên từ và biến đổi từ loại trong ngữ cảnh thương mại.
+            Xác định danh từ, động từ, tính từ và trạng từ theo vị trí và vai trò ngữ pháp thay vì chỉ dịch nghĩa.
           </p>
           <div className={styles.actionDetails}>
             <span className={styles.detailItem}>
-              <Clock size={15} /> Ước tính 15 phút
+              <Clock size={15} /> Thời lượng 40 phút
             </span>
             <span className={styles.detailItem}>
-              <BookOpen size={15} /> 10 câu hỏi mục tiêu
+              <BookOpen size={15} /> 4 công thức & quy trình phân tích
             </span>
           </div>
         </div>
@@ -62,10 +62,10 @@ export function TodayPage() {
           <Button
             variant="primary"
             size="lg"
-            onClick={() => navigate('/learn/practice')}
+            onClick={() => navigate('/learn/lesson/A1')}
             leftIcon={<PlayCircle size={18} />}
           >
-            Tiếp tục bài luyện tập
+            Học bài A1 ngay
           </Button>
         </div>
       </section>

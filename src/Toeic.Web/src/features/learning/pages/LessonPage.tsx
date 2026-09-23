@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
 import { AudioPlayer } from '../../../components/ui/AudioPlayer';
@@ -13,29 +13,136 @@ import {
   Check,
   X,
   FileQuestion,
+  ShieldCheck,
+  AlertTriangle,
+  Lightbulb,
+  Clock,
+  Layers,
 } from 'lucide-react';
+import { getTopicByCode, getCheckpointByCode } from '../../../lib/api/curriculumData';
 import styles from './Lesson.module.css';
 
 export function LessonPage() {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const totalPages = 3;
 
-  // Mini-check state
-  const [selectedMiniOption, setSelectedMiniOption] = useState<string | null>(null);
-  const [miniCheckSubmitted, setMiniCheckSubmitted] = useState(false);
+  // Bookmarking & Progress state
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [markedRead, setMarkedRead] = useState<Record<number, boolean>>({});
 
-  const handleMiniCheckSubmit = (opt: string) => {
-    setSelectedMiniOption(opt);
+  // Interactive Mini-Check state
+  const [selectedMiniOption, setSelectedMiniOption] = useState<string | null>(null);
+  const [miniCheckSubmitted, setMiniCheckSubmitted] = useState(false);
+
+  // Check if route is a Checkpoint
+  const checkpoint = id ? getCheckpointByCode(id) : undefined;
+  const isCheckpoint = Boolean(checkpoint);
+
+  // If not checkpoint, look up concept topic
+  const normalizedCode = id ? id.toUpperCase().replace(/^LESSON-/, '') : 'A1';
+  const topic = getTopicByCode(normalizedCode) || getTopicByCode('A1')!;
+
+  const handleMiniCheckSubmit = (optKey: string) => {
+    setSelectedMiniOption(optKey);
     setMiniCheckSubmitted(true);
   };
 
   const handleMarkAsRead = () => {
-    setMarkedRead({ ...markedRead, [currentPage]: true });
+    setMarkedRead((prev) => ({ ...prev, [currentPage]: true }));
   };
 
+  // CHECKPOINT RENDER
+  if (isCheckpoint && checkpoint) {
+    return (
+      <div className="content-container">
+        <div className={styles.topNav}>
+          <button
+            type="button"
+            onClick={() => navigate('/learn/roadmap')}
+            className={styles.backBtn}
+          >
+            <ArrowLeft size={16} /> Quay lại lộ trình 31 tuần
+          </button>
+        </div>
+
+        <div className={styles.lessonLayout}>
+          <main className={styles.mainContent}>
+            <div className={styles.checkpointBanner}>
+              <div className={styles.metaRow}>
+                <Badge variant="primary">Checkpoint Đánh giá Cấp độ</Badge>
+                <Badge variant="default">Level {checkpoint.levelCode}</Badge>
+              </div>
+              <h1 className={styles.lessonTitle}>{checkpoint.title}</h1>
+              <p className={styles.leadParagraph}>{checkpoint.description}</p>
+
+              <div className={styles.checkpointMetrics}>
+                <div className={styles.metricBox}>
+                  <div className={styles.metricValue}>{checkpoint.questionCount}</div>
+                  <div className={styles.metricLabel}>Số câu hỏi Part 5/6</div>
+                </div>
+                <div className={styles.metricBox}>
+                  <div className={styles.metricValue}>
+                    {Math.round(checkpoint.passRate * 100)}%
+                  </div>
+                  <div className={styles.metricLabel}>Tỷ lệ đạt chuẩn</div>
+                </div>
+                <div className={styles.metricBox}>
+                  <div className={styles.metricValue}>{checkpoint.timeLimitMinutes}'</div>
+                  <div className={styles.metricLabel}>Thời gian làm bài</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.sectionBlock}>
+              <h2 className={styles.sectionHeading}>
+                <ShieldCheck size={18} /> Quy định thực hiện Checkpoint
+              </h2>
+              <div className={styles.rulesList}>
+                {checkpoint.rules.map((rule, idx) => (
+                  <div key={idx} className={styles.ruleItem}>
+                    <strong>{idx + 1}.</strong> {rule}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.sectionBlock}>
+              <h2 className={styles.sectionHeading}>
+                <Layers size={18} /> Chính sách sau khi nộp bài
+              </h2>
+              <div className={styles.remediationList}>
+                {checkpoint.remediationPolicy.map((item, idx) => (
+                  <div key={idx} className={styles.ruleItem}>
+                    • {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.quizTeaser}>
+              <ShieldCheck size={40} className={styles.quizIcon} />
+              <h3>Sẵn sàng bước vào bài Checkpoint {checkpoint.levelCode}?</h3>
+              <p>
+                Hãy đảm bảo bạn có không gian yên tĩnh trong khoảng {checkpoint.timeLimitMinutes} phút để hoàn thành trọn vẹn bài kiểm tra.
+              </p>
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={() => navigate(`/learn/quiz/checkpoint-${checkpoint.levelCode.toLowerCase()}`)}
+                leftIcon={<Clock size={18} />}
+              >
+                Bắt đầu làm Checkpoint ({checkpoint.questionCount} câu · {checkpoint.timeLimitMinutes} phút)
+              </Button>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  // STANDARD 2-PAGE TOPIC LESSON
   return (
     <div className="content-container">
       {/* Top Header */}
@@ -45,7 +152,7 @@ export function LessonPage() {
           onClick={() => navigate('/learn/roadmap')}
           className={styles.backBtn}
         >
-          <ArrowLeft size={16} /> Quay lại lộ trình
+          <ArrowLeft size={16} /> Quay lại lộ trình 31 tuần
         </button>
 
         <div className={styles.headerRight}>
@@ -62,65 +169,193 @@ export function LessonPage() {
       </div>
 
       <div className={styles.lessonLayout}>
-        {/* Main Content Area */}
         <main className={styles.mainContent}>
+          {/* Lesson Header */}
           <div className={styles.lessonHeader}>
             <div className={styles.metaRow}>
-              <Badge variant="primary">Part 5 Ngữ pháp</Badge>
+              <Badge variant="primary">Level {topic.levelCode} · Reading</Badge>
+              <Badge variant="info">{topic.category}</Badge>
               <span className={styles.pageIndicator}>
                 Trang {currentPage} / {totalPages}
               </span>
             </div>
             <h1 className={styles.lessonTitle}>
-              Bài 4: Mệnh đề Phân từ (Participle Clauses) & Rút gọn trong văn bản thương mại
+              {topic.code} · {topic.titleVi}
             </h1>
+            <p className={styles.leadParagraph}>{topic.summary}</p>
           </div>
 
+          {/* PAGE 1: KHÁI NIỆM & CÔNG THỨC */}
           {currentPage === 1 && (
             <div className={styles.pageBody}>
-              <p className={styles.leadParagraph}>
-                Trong bài thi TOEIC Reading Part 5 và Part 7, mệnh đề phân từ thường được sử dụng nhằm rút gọn câu, giúp văn bản trở nên súc tích, trang trọng và mang tính chuyên môn cao.
-              </p>
-
-              <h2>1. Phân từ hiện tại (-ing) rút gọn mệnh đề chủ động</h2>
-              <p>
-                Khi hai mệnh đề có cùng chủ ngữ và mang nghĩa chủ động, ta có thể lược bỏ liên từ và đại từ chủ ngữ, chuyển động từ chính sang dạng <strong>V-ing</strong>.
-              </p>
-
-              <div className={styles.exampleBox}>
-                <div className={styles.exampleOriginal}>
-                  <strong>Câu gốc:</strong> Because Mr. Davis arrived early at the airport, he was able to finish the quarterly budget draft.
-                </div>
-                <div className={styles.exampleReduced}>
-                  <strong>Câu rút gọn:</strong> <em>Arriving early at the airport</em>, Mr. Davis was able to finish the quarterly budget draft.
+              {/* Objectives */}
+              <div className={styles.sectionBlock}>
+                <h2 className={styles.sectionHeading}>
+                  <CheckCircle size={18} /> Mục tiêu bài học
+                </h2>
+                <div className={styles.objectivesList}>
+                  {topic.learningObjectives.map((obj, i) => (
+                    <div key={i} className={styles.objectiveItem}>
+                      • {obj}
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Audio Component Example */}
-              <div style={{ margin: 'var(--space-6) 0' }}>
-                <AudioPlayer
-                  title="Nghe phát âm chuẩn câu ví dụ (Giọng Anh-Mỹ):"
-                  transcript="Arriving early at the airport, Mr. Davis was able to finish the quarterly budget draft."
-                />
+              {/* Formula Patterns */}
+              {topic.guide?.formulaPatterns && topic.guide.formulaPatterns.length > 0 && (
+                <div className={styles.sectionBlock}>
+                  <h2 className={styles.sectionHeading}>
+                    <Layers size={18} /> Công thức và mẫu nhận diện
+                  </h2>
+                  <div className={styles.formulaGrid}>
+                    {topic.guide.formulaPatterns.map((f, i) => (
+                      <div key={i} className={styles.formulaCard}>
+                        {f}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Core Knowledge */}
+              <div className={styles.sectionBlock}>
+                <h2 className={styles.sectionHeading}>
+                  <Lightbulb size={18} /> Kiến thức cốt lõi
+                </h2>
+                <div className={styles.coreKnowledgeList}>
+                  {topic.coreKnowledge.map((item, i) => (
+                    <div key={i} className={styles.coreItem}>
+                      <span className={styles.coreBullet}>•</span>
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* Interactive Mini-Check (FR-08) */}
+              {/* Worked Examples */}
+              {topic.workedExamples && topic.workedExamples.length > 0 && (
+                <div className={styles.sectionBlock}>
+                  <h2 className={styles.sectionHeading}>
+                    <FileQuestion size={18} /> Ví dụ minh họa và phân tích
+                  </h2>
+                  {topic.workedExamples.map((ex, i) => (
+                    <div key={i} className={styles.workedExampleCard}>
+                      <div className={styles.workedExampleSentence}>"{ex.sentence}"</div>
+                      <div className={styles.workedExampleFocus}>
+                        <Lightbulb size={15} /> <strong>Phân tích:</strong> {ex.focus}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Audio Component Example */}
+                  <div style={{ marginTop: 'var(--space-4)' }}>
+                    <AudioPlayer
+                      title={`Nghe câu ví dụ mẫu TOEIC (${topic.vocabularyTheme}):`}
+                      transcript={topic.workedExamples[0].sentence}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* PAGE 2: QUY TRÌNH ÁP DỤNG & BẪY THƯỜNG GẶP */}
+          {currentPage === 2 && (
+            <div className={styles.pageBody}>
+              {/* Application Steps */}
+              {topic.guide?.applicationSteps && topic.guide.applicationSteps.length > 0 && (
+                <div className={styles.sectionBlock}>
+                  <h2 className={styles.sectionHeading}>
+                    <CheckCircle size={18} /> Quy trình áp dụng giải câu hỏi
+                  </h2>
+                  <div className={styles.applicationStepsList}>
+                    {topic.guide.applicationSteps.map((step, idx) => (
+                      <div key={idx} className={styles.stepRow}>
+                        <span className={styles.stepNum}>{idx + 1}</span>
+                        <span className={styles.stepContent}>{step}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className={styles.examUseNotice}>
+                    <strong>Lưu ý làm bài:</strong> Thực hiện phân tích cấu trúc trước, dịch nghĩa sau; ghi nhận primary tag ({topic.primaryTag}) khi trả lời sai để đưa vào Sổ tay lỗi.
+                  </div>
+                </div>
+              )}
+
+              {/* Common Traps */}
+              {topic.commonTraps && topic.commonTraps.length > 0 && (
+                <div className={styles.sectionBlock}>
+                  <h2 className={styles.sectionHeading}>
+                    <AlertTriangle size={18} style={{ color: 'var(--color-danger)' }} /> Bẫy thường gặp và cách phòng tránh
+                  </h2>
+                  <div className={styles.trapsList}>
+                    {topic.commonTraps.map((trap, i) => (
+                      <div key={i} className={styles.trapRow}>
+                        <AlertTriangle size={16} style={{ color: 'var(--color-danger)', flexShrink: 0 }} />
+                        <span>{trap}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Extensions */}
+              {topic.guide?.extensions && topic.guide.extensions.length > 0 && (
+                <div className={styles.sectionBlock}>
+                  <div className={styles.extensionsCard}>
+                    <h2 className={styles.sectionHeading}>
+                      <Lightbulb size={18} /> Mở rộng để hiểu sâu hơn
+                    </h2>
+                    <p className={styles.scopeNote}>
+                      Phần mở rộng giúp đọc hiểu văn bản phức tạp; không bắt buộc ghi nhớ ngay ở lượt học đầu.
+                    </p>
+                    <div className={styles.objectivesList}>
+                      {topic.guide.extensions.map((ext, i) => (
+                        <div key={i} className={styles.objectiveItem}>
+                          • {ext}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Self-check prompts */}
+              {topic.guide?.selfCheckPrompts && topic.guide.selfCheckPrompts.length > 0 && (
+                <div className={styles.sectionBlock}>
+                  <h2 className={styles.sectionHeading}>
+                    <HelpCircle size={18} /> Tự kiểm tra nhanh
+                  </h2>
+                  <div className={styles.selfCheckList}>
+                    {topic.guide.selfCheckPrompts.map((prompt, i) => (
+                      <div key={i} className={styles.selfCheckItem}>
+                        <HelpCircle size={16} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                        <span>{prompt}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Interactive Mini-Check */}
               <div className={styles.miniCheckCard}>
                 <div className={styles.miniCheckHeader}>
                   <HelpCircle size={18} className={styles.checkIcon} />
-                  <h3>Mini-Check 1 (Kiểm tra nhanh)</h3>
+                  <h3>Mini-Check: Kiểm tra khả năng nhận diện ({topic.code})</h3>
                 </div>
                 <p className={styles.miniPrompt}>
-                  Điền dạng đúng của từ vào chỗ trống: <br />
-                  "------- the contract terms thoroughly, the legal advisor approved the final draft."
+                  Áp dụng quy trình nhận diện: "{topic.workedExamples[0]?.sentence || 'The committee approved the budget proposal.'}"
+                  <br />
+                  Chủ điểm nào là trọng tâm phân tích trong câu trên?
                 </p>
 
                 <div className={styles.miniOptions}>
                   {[
-                    { key: 'A', text: 'Review' },
-                    { key: 'B', text: 'Reviewed' },
-                    { key: 'C', text: 'Reviewing', isCorrect: true },
-                    { key: 'D', text: 'To review' },
+                    { key: 'A', text: `Dấu hiệu của ${topic.titleVi}`, isCorrect: true },
+                    { key: 'B', text: 'Chỉ dựa vào cảm tính hoặc dịch sơ lược', isCorrect: false },
+                    { key: 'C', text: 'Bỏ qua vị trí ngữ pháp và liên từ', isCorrect: false },
+                    { key: 'D', text: 'Đoán đáp án theo độ dài của từ', isCorrect: false },
                   ].map((opt) => (
                     <button
                       key={opt.key}
@@ -151,13 +386,13 @@ export function LessonPage() {
 
                 {miniCheckSubmitted && (
                   <div className={styles.miniFeedback}>
-                    {selectedMiniOption === 'C' ? (
+                    {selectedMiniOption === 'A' ? (
                       <Alert variant="success" title="Chính xác!">
-                        Cố vấn pháp lý chủ động xem xét hợp đồng ("Reviewing the contract terms thoroughly..."), do đó dùng V-ing rút gọn mệnh đề chủ động.
+                        Bạn đã nắm vững quy trình phân tích của bài học {topic.code}. Hãy tiếp tục sang phần tổng kết để làm bài tập củng cố.
                       </Alert>
                     ) : (
                       <Alert variant="warning" title="Chưa chính xác:">
-                        Chủ ngữ "legal advisor" thực hiện hành động kiểm tra hợp đồng một cách chủ động, vì vậy ta phải dùng phân từ hiện tại <strong>Reviewing</strong> (V-ing) thay vì phân từ quá khứ (V-ed).
+                        Hãy nhớ quy trình chuẩn: luôn khoanh vùng cấu trúc ngữ pháp trước ({topic.primaryTag}), loại trừ đáp án sai rồi mới kiểm tra ngữ cảnh.
                       </Alert>
                     )}
                   </div>
@@ -166,52 +401,40 @@ export function LessonPage() {
             </div>
           )}
 
-          {currentPage === 2 && (
-            <div className={styles.pageBody}>
-              <h2>2. Phân từ quá khứ (-ed) rút gọn mệnh đề bị động</h2>
-              <p>
-                Khi chủ ngữ nhận tác động của hành động, mệnh đề được rút gọn bằng <strong>V3/V-ed</strong>.
-              </p>
-              <div className={styles.exampleBox}>
-                <div className={styles.exampleOriginal}>
-                  <strong>Câu gốc:</strong> Because it was accompanied by an official receipt, the return request was processed immediately.
-                </div>
-                <div className={styles.exampleReduced}>
-                  <strong>Câu rút gọn:</strong> <em>Accompanied by an official receipt</em>, the return request was processed immediately.
-                </div>
-              </div>
-            </div>
-          )}
-
+          {/* PAGE 3: TỔNG KẾT & QUIZ */}
           {currentPage === 3 && (
             <div className={styles.pageBody}>
-              <h2>3. Tổng kết bài học và Quiz luyện tập cuối bài</h2>
+              <h2 className={styles.sectionHeading}>
+                <CheckCircle size={18} /> Tổng kết bài học {topic.code}
+              </h2>
               <p>
-                Bạn đã hoàn thành các phần kiến thức cốt lõi về mệnh đề phân từ. Hãy thử sức với bài kiểm tra quiz 5 câu để củng cố kiến thức trước khi chuyển sang bài tiếp theo.
+                Bạn đã hoàn thành các phần kiến thức cốt lõi và quy trình xử lý bẫy cho chủ điểm <strong>{topic.titleVi}</strong> ({topic.titleEn}).
               </p>
 
               <div className={styles.quizTeaser}>
-                <FileQuestion size={36} className={styles.quizIcon} />
-                <h3>Quiz kiểm tra: Mệnh đề phân từ</h3>
-                <p>Gồm 5 câu hỏi phân loại ngữ cảnh TOEIC Part 5 • Điểm đạt khuyến nghị: 4/5 câu (80%)</p>
+                <FileQuestion size={40} className={styles.quizIcon} />
+                <h3>Quiz kiểm tra: {topic.titleVi}</h3>
+                <p>
+                  Gồm 8–10 câu hỏi áp dụng chuẩn format Part 5/6 TOEIC • Tỷ lệ đạt khuyến nghị: 80%
+                </p>
                 <Button
                   variant="primary"
                   size="md"
-                  onClick={() => navigate('/learn/practice')}
+                  onClick={() => navigate(`/learn/quiz/quiz-${topic.code.toLowerCase()}`)}
                 >
-                  Làm Quiz kiểm tra ngay
+                  Bắt đầu làm Quiz kiểm tra ngay
                 </Button>
               </div>
             </div>
           )}
 
-          {/* Footer Action Bar */}
+          {/* Footer Navigation */}
           <footer className={styles.lessonFooter}>
             <div className={styles.footerLeft}>
               <Button
                 variant="secondary"
                 disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
+                onClick={() => setCurrentPage((p) => p - 1)}
               >
                 Trang trước
               </Button>
@@ -229,7 +452,7 @@ export function LessonPage() {
               {currentPage < totalPages ? (
                 <Button
                   variant="primary"
-                  onClick={() => setCurrentPage(currentPage + 1)}
+                  onClick={() => setCurrentPage((p) => p + 1)}
                   rightIcon={<ArrowRight size={16} />}
                 >
                   Trang tiếp theo

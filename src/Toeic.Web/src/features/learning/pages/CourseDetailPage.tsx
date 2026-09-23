@@ -10,39 +10,40 @@ import {
   Clock,
   Layers,
   FileCheck,
+  ShieldCheck,
+  MapPin,
 } from 'lucide-react';
+import { toeicReadingCurriculum } from '../../../lib/api/curriculumData';
 import styles from './CourseDetail.module.css';
 
 export function CourseDetailPage() {
-  const { courseId = 'course-toeic-500' } = useParams<{ courseId: string }>();
+  const { courseId = 'toeic-reading-grammar-foundation' } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const [isEnrolled, setIsEnrolled] = useState(true);
 
+  const course = toeicReadingCurriculum;
+
   const handleEnrollClick = () => {
     setIsEnrolled(true);
-    navigate('/learn/lesson/4');
+    navigate('/learn/lesson/A1');
   };
 
-  const chapters = [
-    {
-      chapterNumber: 1,
-      title: 'Chương 1: Các mẫu câu và cấu trúc ngữ pháp Part 5 thường gặp',
-      lessons: [
-        { id: 'les-1', title: 'Bài 1: Danh từ, Cụm danh từ và Vị trí của tính từ', duration: '25 phút', isFreeSample: true, isDone: true },
-        { id: 'les-2', title: 'Bài 2: Đại từ quan hệ (Who, Whom, Whose, Which, That)', duration: '30 phút', isFreeSample: false, isDone: true },
-        { id: 'les-3', title: 'Bài 3: Động từ nguyên mẫu (To-V) và Danh động từ (V-ing)', duration: '35 phút', isFreeSample: false, isDone: true },
-        { id: 'les-4', title: 'Bài 4: Mệnh đề phân từ & Rút gọn trong văn bản thương mại', duration: '30 phút', isFreeSample: false, isDone: false },
-      ],
-    },
-    {
-      chapterNumber: 2,
-      title: 'Chương 2: Đọc hiểu văn bản đơn Part 7',
-      lessons: [
-        { id: 'les-5', title: 'Bài 5: E-mail công việc và thư tín thương mại quốc tế', duration: '40 phút', isFreeSample: false, isDone: false },
-        { id: 'les-6', title: 'Bài 6: Bảng thông báo, Bản tin nội bộ và Thư mời hội thảo', duration: '35 phút', isFreeSample: false, isDone: false },
-      ],
-    },
-  ];
+  // Group topics by level/module
+  const allTopicsList = Object.values(course.topics);
+  const modulesWithTopics = course.modules.map((mod, idx) => {
+    const levelTopics = allTopicsList
+      .filter((t) => t.levelCode === mod.levelCode)
+      .sort((a, b) => a.sequence - b.sequence);
+    return {
+      chapterNumber: idx + 1,
+      levelCode: mod.levelCode,
+      code: mod.code,
+      title: `${mod.title} (Level ${mod.levelCode})`,
+      summary: mod.summary,
+      topics: levelTopics,
+      checkpointCode: `CHECKPOINT-${mod.levelCode}`,
+    };
+  });
 
   return (
     <div className="content-container">
@@ -59,21 +60,17 @@ export function CourseDetailPage() {
       <div className={styles.detailHeader}>
         <div className={styles.headerLeft}>
           <div className={styles.metaRow}>
-            <Badge variant="primary">Khóa học nền tảng</Badge>
+            <Badge variant="primary">{course.levelLabel}</Badge>
             <span className={styles.courseCode}>{courseId.toUpperCase()}</span>
           </div>
-          <h1 className={styles.courseTitle}>
-            TOEIC Nền tảng 500+: Củng cố Ngữ pháp & Từ vựng căn bản
-          </h1>
-          <p className={styles.courseSubtitle}>
-            Chương trình đào tạo giúp học viên làm chủ cấu trúc câu, từ loại và phát triển kỹ năng đọc hiểu văn bản thương mại.
-          </p>
+          <h1 className={styles.courseTitle}>{course.title}</h1>
+          <p className={styles.courseSubtitle}>{course.summary}</p>
 
           <div className={styles.specsRow}>
-            <span><BookOpen size={16} /> 24 bài học</span>
-            <span><Clock size={16} /> 18 giờ học tập</span>
-            <span><Layers size={16} /> 120 thẻ Flashcard kèm theo</span>
-            <span><FileCheck size={16} /> 6 bài Quiz kiểm tra</span>
+            <span><BookOpen size={16} /> 35 chủ điểm bài học</span>
+            <span><Clock size={16} /> 31 tuần lộ trình (~70 giờ)</span>
+            <span><Layers size={16} /> 4 Cột mốc Checkpoint chuyển cấp</span>
+            <span><FileCheck size={16} /> Part 5 & 6 Reading chuyên sâu</span>
           </div>
         </div>
 
@@ -86,7 +83,7 @@ export function CourseDetailPage() {
                   <strong>Bạn đã đăng ký khóa học này</strong>
                 </>
               ) : (
-                <strong>Khóa học miễn phí trong giai đoạn Pilot</strong>
+                <strong>Khóa học mở tự do cho học viên</strong>
               )}
             </div>
 
@@ -95,9 +92,19 @@ export function CourseDetailPage() {
               size="lg"
               onClick={handleEnrollClick}
               leftIcon={<PlayCircle size={18} />}
+              style={{ width: '100%', marginBottom: 'var(--space-2)' }}
+            >
+              {isEnrolled ? 'Vào bài học đang học (A1 · Từ loại)' : 'Đăng ký tham gia học ngay'}
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={() => navigate('/learn/roadmap')}
+              leftIcon={<MapPin size={16} />}
               style={{ width: '100%' }}
             >
-              {isEnrolled ? 'Vào bài học đang dở (Bài 4)' : 'Đăng ký tham gia học ngay'}
+              Xem toàn bộ lộ trình 31 tuần
             </Button>
           </div>
         </div>
@@ -105,40 +112,76 @@ export function CourseDetailPage() {
 
       {/* Course Syllabus */}
       <section className={styles.syllabusSection} aria-labelledby="syllabus-heading">
-        <h2 id="syllabus-heading" className={styles.syllabusTitle}>Nội dung chương trình đào tạo</h2>
+        <h2 id="syllabus-heading" className={styles.syllabusTitle}>
+          Cấu trúc 4 Modules & Danh mục bài học chính thức
+        </h2>
 
         <div className={styles.chapterList}>
-          {chapters.map((ch) => (
+          {modulesWithTopics.map((ch) => (
             <div key={ch.chapterNumber} className={styles.chapterCard}>
-              <h3 className={styles.chapterHeader}>{ch.title}</h3>
+              <div style={{ marginBottom: 'var(--space-3)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                  <Badge variant="primary">Module {ch.levelCode}</Badge>
+                  <h3 className={styles.chapterHeader} style={{ margin: 0 }}>
+                    {ch.title}
+                  </h3>
+                </div>
+                <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-1)' }}>
+                  {ch.summary}
+                </p>
+              </div>
 
               <div className={styles.lessonRows}>
-                {ch.lessons.map((les) => (
-                  <div key={les.id} className={styles.lessonRow}>
+                {ch.topics.map((t) => (
+                  <div key={t.id} className={styles.lessonRow}>
                     <div className={styles.lessonLeft}>
-                      {les.isDone ? (
-                        <CheckCircle size={16} className={styles.doneIcon} />
-                      ) : (
-                        <PlayCircle size={16} className={styles.playIcon} />
-                      )}
-                      <span className={styles.lessonName}>{les.title}</span>
-                      {les.isFreeSample && (
-                        <Badge variant="default">Bài học thử</Badge>
-                      )}
+                      <PlayCircle size={16} className={styles.playIcon} />
+                      <span className={styles.lessonName}>
+                        <strong>{t.code}</strong> · {t.titleVi} ({t.titleEn})
+                      </span>
+                      {t.code === 'A1' && <Badge variant="default">Bài học mẫu</Badge>}
                     </div>
 
                     <div className={styles.lessonRight}>
-                      <span className={`${styles.duration} text-tabular`}>{les.duration}</span>
+                      <span className={`${styles.duration} text-tabular`}>{t.estimatedMinutes} phút</span>
                       <Button
                         variant="secondary"
                         size="sm"
-                        onClick={() => navigate('/learn/lesson/4')}
+                        onClick={() => navigate(`/learn/lesson/${t.code}`)}
                       >
-                        {les.isDone ? 'Xem lại' : 'Học bài'}
+                        Học bài
                       </Button>
                     </div>
                   </div>
                 ))}
+
+                {/* Level Checkpoint Row */}
+                <div
+                  className={styles.lessonRow}
+                  style={{
+                    backgroundColor: 'var(--color-surface-subtle)',
+                    borderLeft: '3px solid var(--color-primary)',
+                  }}
+                >
+                  <div className={styles.lessonLeft}>
+                    <ShieldCheck size={16} style={{ color: 'var(--color-primary)' }} />
+                    <span className={styles.lessonName}>
+                      <strong>{ch.checkpointCode}</strong> · Đánh giá chuẩn đầu ra Level {ch.levelCode}
+                    </span>
+                    <Badge variant="info">Checkpoint</Badge>
+                  </div>
+
+                  <div className={styles.lessonRight}>
+                    <span className={`${styles.duration} text-tabular`}>Đạt chuẩn để chuyển cấp</span>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => navigate(`/learn/lesson/${ch.checkpointCode}`)}
+                    >
+                      Chi tiết Checkpoint
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           ))}

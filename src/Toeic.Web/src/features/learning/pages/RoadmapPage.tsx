@@ -1,152 +1,178 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../../components/ui/Button';
-import { Badge } from '../../../components/ui/Badge';
-import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
+import { 
+  BookOpen, 
+  HelpCircle, 
+  Layers, 
+  RotateCcw, 
+  ShieldCheck, 
+  ArrowRight
+} from 'lucide-react';
+import { Button, Badge } from '../../../components/ui';
+import { toeicReadingCurriculum } from '../../../lib/api/curriculumData';
+import { CurriculumLevelCode } from '../../../types/curriculum';
 import styles from './Roadmap.module.css';
-
-interface ModuleItem {
-  id: string;
-  title: string;
-  part: string;
-  status: 'completed' | 'in_progress' | 'locked' | 'recommended';
-  lessonsCount: number;
-  completedLessons: number;
-}
-
-const mockWeeks = [
-  {
-    weekNumber: 1,
-    title: 'Nền tảng Ngữ pháp & Cấu trúc câu Part 5',
-    status: 'Đang học',
-    modules: [
-      {
-        id: 'mod-1',
-        title: 'Cụm danh từ, Đại từ và Biến đổi từ loại',
-        part: 'Part 5',
-        status: 'completed',
-        lessonsCount: 5,
-        completedLessons: 5,
-      },
-      {
-        id: 'mod-2',
-        title: 'Thì động từ, Dạng chủ động & Bị động',
-        part: 'Part 5',
-        status: 'completed',
-        lessonsCount: 4,
-        completedLessons: 4,
-      },
-      {
-        id: 'mod-3',
-        title: 'Liên từ & Mệnh đề trạng ngữ trong ngữ cảnh kinh doanh',
-        part: 'Part 5',
-        status: 'in_progress',
-        lessonsCount: 6,
-        completedLessons: 3,
-      },
-    ] as ModuleItem[],
-  },
-  {
-    weekNumber: 2,
-    title: 'Kỹ năng Đọc lướt (Skimming & Scanning) Part 7',
-    status: 'Kế tiếp',
-    modules: [
-      {
-        id: 'mod-4',
-        title: 'Đọc hiểu E-mail giao dịch & Bản ghi nhớ nội bộ',
-        part: 'Part 7',
-        status: 'recommended',
-        lessonsCount: 5,
-        completedLessons: 0,
-      },
-      {
-        id: 'mod-5',
-        title: 'Biểu mẫu khảo sát, Hóa đơn và Lịch trình hội thảo',
-        part: 'Part 7',
-        status: 'locked',
-        lessonsCount: 4,
-        completedLessons: 0,
-      },
-    ] as ModuleItem[],
-  },
-];
 
 export function RoadmapPage() {
   const navigate = useNavigate();
+  const [selectedLevel, setSelectedLevel] = useState<CurriculumLevelCode | 'ALL'>('ALL');
+
+  const { levels, weeks } = toeicReadingCurriculum;
+
+  const filteredWeeks = selectedLevel === 'ALL'
+    ? weeks
+    : weeks.filter((w) => w.levelCode === selectedLevel);
+
+  const activeLevelInfo = levels.find((l) => l.code === selectedLevel);
+
+  const handleStartActivity = (act: (typeof weeks)[0]['activities'][0]) => {
+    if (act.type === 'Lesson' && act.topicCode) {
+      navigate(`/learn/lesson/${act.topicCode}`);
+    } else if (act.type === 'Checkpoint') {
+      navigate(`/learn/lesson/${act.lessonCode || 'CHECKPOINT-A'}`);
+    } else if (act.type === 'Quiz' && act.topicCode) {
+      navigate(`/learn/quiz/quiz-${act.topicCode.toLowerCase()}`);
+    } else if (act.type === 'Flashcard') {
+      navigate('/learn/flashcards');
+    } else if (act.type === 'MixedReview') {
+      navigate('/learn/errors');
+    } else {
+      navigate('/learn/lesson/A1');
+    }
+  };
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'Lesson':
+        return <BookOpen size={16} />;
+      case 'Quiz':
+        return <HelpCircle size={16} />;
+      case 'Flashcard':
+        return <Layers size={16} />;
+      case 'Checkpoint':
+        return <ShieldCheck size={16} color="#137333" />;
+      case 'MixedReview':
+      case 'Remediation':
+        return <RotateCcw size={16} color="#b06000" />;
+      default:
+        return <BookOpen size={16} />;
+    }
+  };
 
   return (
     <div className="content-container">
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Lộ trình học tập</h1>
+          <h1 className={styles.title}>Lộ trình TOEIC Reading theo nhịp học cá nhân</h1>
           <p className={styles.subtitle}>
-            Kế hoạch ôn luyện hướng tới mục tiêu TOEIC 650+ • Dựa trên kết quả định hướng chẩn đoán
+            31 tuần học tập có cấu trúc từ Nền tảng (Mức A) đến Chuyên sâu Part 5/6 (Mức D) • Cơ chế kiểm định Checkpoint độc lập
           </p>
         </div>
       </div>
 
-      <div className={styles.roadmapList}>
-        {mockWeeks.map((week) => (
-          <section key={week.weekNumber} className={styles.weekSection} aria-label={`Tuần ${week.weekNumber}`}>
-            <div className={styles.weekHeader}>
-              <div className={styles.weekBadge}>Tuần {week.weekNumber}</div>
-              <h2 className={styles.weekTitle}>{week.title}</h2>
-              <span className={styles.weekStatus}>{week.status}</span>
-            </div>
-
-            <div className={styles.moduleGrid}>
-              {week.modules.map((m) => (
-                <div
-                  key={m.id}
-                  className={`${styles.moduleCard} ${m.status === 'in_progress' ? styles.activeCard : ''}`}
-                >
-                  <div className={styles.moduleHeader}>
-                    <div className={styles.partBadge}>
-                      <Badge variant="primary">{m.part}</Badge>
-                    </div>
-                    {m.status === 'completed' ? (
-                      <span className={styles.completedTag}>
-                        <CheckCircle2 size={16} /> Đã hoàn thành
-                      </span>
-                    ) : m.status === 'in_progress' ? (
-                      <span className={styles.inProgressTag}>
-                        <Circle size={16} className={styles.activeDot} /> Đang tiến hành
-                      </span>
-                    ) : m.status === 'recommended' ? (
-                      <Badge variant="warning">Đề xuất tiếp theo</Badge>
-                    ) : (
-                      <span className={styles.lockedTag}>Chưa mở</span>
-                    )}
-                  </div>
-
-                  <h3 className={styles.moduleTitle}>{m.title}</h3>
-
-                  <div className={styles.moduleProgress}>
-                    <div className={styles.progressTrack}>
-                      <div
-                        className={styles.progressBar}
-                        style={{ width: `${(m.completedLessons / m.lessonsCount) * 100}%` }}
-                      />
-                    </div>
-                    <span className={`${styles.progressText} text-tabular`}>
-                      {m.completedLessons}/{m.lessonsCount} bài hoàn tất
-                    </span>
-                  </div>
-
-                  <div className={styles.moduleFooter}>
-                    <Button
-                      variant={m.status === 'in_progress' ? 'primary' : 'outline'}
-                      size="sm"
-                      onClick={() => navigate('/learn/lesson/4')}
-                      rightIcon={<ArrowRight size={14} />}
-                    >
-                      {m.status === 'completed' ? 'Xem lại' : 'Vào bài học'}
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+      {/* Level Filter Tabs */}
+      <div className={styles.levelTabs}>
+        <button
+          type="button"
+          className={`${styles.levelTab} ${selectedLevel === 'ALL' ? styles.levelTabActive : ''}`}
+          onClick={() => setSelectedLevel('ALL')}
+        >
+          Tất cả 31 tuần
+        </button>
+        {levels.map((lvl) => (
+          <button
+            key={lvl.code}
+            type="button"
+            className={`${styles.levelTab} ${selectedLevel === lvl.code ? styles.levelTabActive : ''}`}
+            onClick={() => setSelectedLevel(lvl.code)}
+          >
+            Mức {lvl.code}: {lvl.title.split('—')[1]?.trim() || lvl.title} ({lvl.recommendedWeeks} tuần)
+          </button>
         ))}
+      </div>
+
+      {/* Level Overview Banner */}
+      {activeLevelInfo && (
+        <div className={styles.levelOverviewBanner}>
+          <div className={styles.levelOverviewTitle}>
+            Mục tiêu {activeLevelInfo.title}
+          </div>
+          <p className={styles.levelOverviewDesc}>
+            {activeLevelInfo.outcomeGuidance}
+          </p>
+          <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--color-ink-tertiary)' }}>
+            Tiêu chuẩn Checkpoint: <strong>{activeLevelInfo.checkpointQuestionCount} câu hỏi</strong> • Ngưỡng khuyến nghị chuyển mức: <strong>{Math.round(activeLevelInfo.checkpointPassRate * 100)}%</strong>
+          </div>
+        </div>
+      )}
+
+      {/* Weeks List */}
+      <div className={styles.roadmapList}>
+        {filteredWeeks.map((week) => {
+          const isCheckpointWeek = week.checkpointKind === 'LevelCheckpoint';
+
+          return (
+            <section 
+              key={week.weekNumber} 
+              className={`${styles.weekSection} ${isCheckpointWeek ? styles.weekSectionCheckpoint : ''}`} 
+              aria-label={`Tuần ${week.weekNumber}`}
+            >
+              <div className={styles.weekHeader}>
+                <div className={styles.weekBadge}>Tuần {week.weekNumber}</div>
+                <h2 className={styles.weekTitle}>{week.title}</h2>
+                
+                <div className={styles.weekMetaPills}>
+                  {week.vocabularyTheme && (
+                    <Badge variant="default">Chủ đề: {week.vocabularyTheme}</Badge>
+                  )}
+                  {isCheckpointWeek ? (
+                    <Badge variant="success">Level Checkpoint ({Math.round(week.passRate * 100)}%)</Badge>
+                  ) : week.checkpointKind === 'MixedReview' ? (
+                    <Badge variant="warning">Ôn tập tích lũy</Badge>
+                  ) : week.checkpointKind === 'Remediation' ? (
+                    <Badge variant="info">Củng cố thích ứng</Badge>
+                  ) : (
+                    <Badge variant="primary">Mức {week.levelCode}</Badge>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.weekGoal}>
+                <strong>Mục tiêu tuần:</strong> {week.goal}
+              </div>
+
+              {/* Activities inside week */}
+              <div className={styles.activityList}>
+                {week.activities.map((act) => (
+                  <div key={act.id} className={styles.activityCard}>
+                    <div className={styles.activityLeft}>
+                      <div className={styles.activityIcon}>
+                        {getActivityIcon(act.type)}
+                      </div>
+                      <div>
+                        <div className={styles.activityTitle}>{act.title}</div>
+                        <div className={styles.activityDuration}>
+                          Thời lượng ước tính: {act.estimatedMinutes} phút {act.required ? '• Bắt buộc' : '• Tùy chọn'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Button
+                        variant={act.type === 'Checkpoint' ? 'primary' : 'secondary'}
+                        size="sm"
+                        onClick={() => handleStartActivity(act)}
+                      >
+                        {act.type === 'Lesson' ? 'Học bài' : act.type === 'Checkpoint' ? 'Vào Checkpoint' : act.type === 'Quiz' ? 'Làm Quiz' : 'Ôn tập'}
+                        <ArrowRight size={14} />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </div>
     </div>
   );
