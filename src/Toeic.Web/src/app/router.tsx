@@ -34,6 +34,11 @@ import { AccountPage } from '../features/account/pages/AccountPage';
 // Support Pages
 import { SupportPage } from '../features/support/pages/SupportPage';
 
+// Billing Pages
+import { CheckoutPage } from '../features/billing/pages/CheckoutPage';
+import { PaymentStatusPage } from '../features/billing/pages/PaymentStatusPage';
+import { BillingHistoryPage } from '../features/billing/pages/BillingHistoryPage';
+
 // Admin Pages
 import { QualityDashboardPage } from '../features/admin/pages/QualityDashboardPage';
 import { JobMonitorPage } from '../features/admin/pages/JobMonitorPage';
@@ -78,6 +83,9 @@ export const router = createBrowserRouter([
       { path: 'dashboard', element: <DashboardPage /> },
       { path: 'account', element: <AccountPage /> },
       { path: 'support', element: <SupportPage /> },
+      { path: 'billing/checkout/:courseId', element: <CheckoutPage /> },
+      { path: 'billing/orders/:orderId', element: <PaymentStatusPage /> },
+      { path: 'billing/history', element: <BillingHistoryPage /> },
     ],
   },
   // Dedicated Exam Room layout without outer chrome

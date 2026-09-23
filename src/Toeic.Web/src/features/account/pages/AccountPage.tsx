@@ -161,6 +161,25 @@ export function AccountPage() {
             )}
           </div>
         </section>
+
+        {/* Entitlements & Billing Section */}
+        <section className={styles.sectionCard} aria-labelledby="billing-heading">
+          <div className={styles.cardHeader}>
+            <h2 id="billing-heading" className={styles.cardTitle}>Quyền học & Lịch sử thanh toán</h2>
+          </div>
+          <p className={styles.cardDescription}>
+            Kiểm tra trạng thái các gói học 180 ngày, xem hóa đơn biên lai điện tử và gửi yêu cầu hoàn tiền trong 7 ngày theo chuẩn FR-41.
+          </p>
+          <div style={{ marginTop: '16px' }}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => window.location.href = '/learn/billing/history'}
+            >
+              Xem danh sách Quyền học & Hóa đơn
+            </Button>
+          </div>
+        </section>
       </div>
 
       {/* Export Confirmation Modal */}
