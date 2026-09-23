@@ -73,3 +73,55 @@ export interface CourseCurriculum {
   topics: Record<string, KnowledgeTopic>;
   weeks: RoadmapWeek[];
 }
+
+export interface VocabularyItem {
+  word: string;
+  ipa: string;
+  partOfSpeech: string;
+  meaningVi: string;
+  collocation?: string;
+  exampleSentence: string;
+}
+
+export interface Part5ExamOption {
+  key: 'A' | 'B' | 'C' | 'D';
+  text: string;
+  isCorrect: boolean;
+  explanation: string;
+}
+
+export interface Part5ExamSample {
+  question: string;
+  options: Part5ExamOption[];
+  translation: string;
+  analysisSteps: {
+    stepTitle: string;
+    description: string;
+  }[];
+  trapWarning?: string;
+}
+
+export interface SelfCheckItem {
+  prompt: string;
+  answer: string;
+  explanation: string;
+}
+
+export interface TopicGrammarRule {
+  title: string;
+  description: string;
+  tableHeaders?: string[];
+  tableRows?: string[][];
+  notes?: string[];
+}
+
+export interface TopicEnrichment {
+  topicCode: string;
+  grammarRules: TopicGrammarRule[];
+  vocabularyList: VocabularyItem[];
+  part5Drills: Part5ExamSample[];
+  selfCheckItems: SelfCheckItem[];
+  examProTips: string[];
+  keyTakeaways: string[];
+}
+
