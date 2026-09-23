@@ -1,5 +1,3 @@
-begin;
-
 create extension if not exists pgcrypto;
 create schema if not exists identity_data;
 create schema if not exists content;
@@ -280,5 +278,3 @@ create table operations.audit_events (
     correlation_id text not null,
     occurred_at timestamptz not null default now()
 );
-
-commit;

@@ -1,5 +1,3 @@
-begin;
-
 create table content.form_versions (
     id uuid primary key,
     version text not null unique,
@@ -107,5 +105,3 @@ create index ix_exposures_item_time on assessment.item_exposures(item_revision_i
 create index ix_responses_item_time on assessment.item_responses(item_revision_id, responded_at);
 create index ix_reports_open_item on assessment.learner_issue_reports(item_revision_id)
     where state = 'Open';
-
-commit;
