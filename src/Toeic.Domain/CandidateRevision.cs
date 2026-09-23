@@ -85,6 +85,35 @@ public sealed class CandidateRevision
         return report;
     }
 
+
+    public ValidationReport ValidateAutomatedQuality(AutomatedQualityEvidence evidence,
+        Actor actor, TimeProvider clock)
+    {
+        RequireActor(actor, ActorType.SystemWorker);
+        RequireState(CandidateState.CrossModelValid);
+        var report = AutomatedQualityGate.Evaluate(this, evidence);
+        Move(report.Passed ? CandidateState.AdversarialValid : CandidateState.Rejected,
+            report.Passed ? "AUTOMATED_QUALITY_PASSED" : report.Findings[0].Code,
+            Content.Provenance.PolicyVersion, actor, clock);
+        return report;
+    }
+
+    public void MarkBetaReady(bool automatedBetaEnabled, Actor actor, TimeProvider clock)
+    {
+        RequireActor(actor, ActorType.SystemWorker);
+        RequireState(CandidateState.AdversarialValid);
+        if (!automatedBetaEnabled) throw new DomainException("BETA_FEATURE_DISABLED");
+        Move(CandidateState.BetaReady, "BETA_READY", Content.Provenance.PolicyVersion, actor, clock);
+    }
+
+    public void ActivateBeta(string formVersion, Actor actor, TimeProvider clock)
+    {
+        RequireActor(actor, ActorType.SystemWorker);
+        RequireState(CandidateState.BetaReady);
+        if (string.IsNullOrWhiteSpace(formVersion)) throw new DomainException("FORM_VERSION_REQUIRED");
+        Move(CandidateState.BetaActive, $"BETA_FORM:{formVersion.Trim()}",
+            Content.Provenance.PolicyVersion, actor, clock);
+    }
     public void Quarantine(string reason, Actor actor, TimeProvider clock)
     {
         RequireActor(actor, ActorType.Admin, ActorType.SystemWorker);
