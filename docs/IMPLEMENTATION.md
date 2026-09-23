@@ -40,13 +40,38 @@
 
 Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ chạy build để bắt lỗi biên dịch; test chi tiết và integration test sẽ bổ sung sau.
 
+## M04 — Attempt lifecycle (hoàn tất phần domain)
+
+- Immutable question snapshot; lease thiết bị; autosave theo revision/operation ID; deadline server.
+- Submit receipt idempotent và chấm objective raw score, không nhận score từ client.
+
+## M05 — Learning loop (hoàn tất phần domain)
+
+- Enrollment, page progress, completion tách NeedsReview, error notebook và flashcard schedule v1.
+- Review event dedupe; early review không farm lịch; error evidence cũ bị chặn.
+
+## M06 — Billing chuẩn bị trước (domain hoàn tất, tích hợp pending)
+
+- Product/order/payment/refund/entitlement/quota ledger và adapter contract.
+- Commerce mặc định `PendingIntegration`; chưa có checkout/webhook route hoặc provider credential.
+
+## M07 — Persistence baseline và status (hoàn tất baseline)
+
+- PostgreSQL DDL cho identity, content factory, attempts, learning, billing, idempotency, outbox và audit.
+- `/api/v1/status` công khai trạng thái trung thực; commerce pending, chưa có official score/expert tier.
+
+## M08 — Identity/scope (hoàn tất phần domain)
+
+- Account, one-time token, session revoke, onboarding profile và permission mặc định deny.
+- Password hashing, email provider, rate limit, MFA và auth API còn ở application/infrastructure.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 
-1. Blueprint catalog/schema persistence và taxonomy/grammar rule catalog; bind provenance từ server.
-2. PostgreSQL, migration, transactional outbox, unique idempotency constraint và budget ledger đồng thời.
-3. Provider adapters, hai solver, critic, perturbation, semantic similarity và rights gates thực tế.
-4. Authentication/authorization có scope, admin UI và React learner UI.
-5. Beta form gate/serving, attempt snapshot/autosave/submit, reports, telemetry và quarantine xuyên form.
-6. Part 7 source-first, statistics/promotion, correction/regrade và gate pilot FR-78.
+1. Application services, repository mapping, migration runner, password/email/MFA và auth endpoints.
+2. Generation Worker, provider adapters, hai solver, critic, perturbation, similarity và rights gates.
+3. Beta serving/report/exposure/quarantine, Part 7 source-first và form composer.
+4. Course/lesson CMS, import DOCX/PDF text và learner APIs cho Learning/Assessment.
+5. React learner/admin UI, notification, data export/delete, observability và backup/restore.
+6. Test backlog đã hoãn: domain, integration concurrency, contract, E2E và release gates.
 
 Các state sau CrossModelValid hiện chỉ có tên enum; chưa có transition. Các actor trong domain phải do authentication/worker tin cậy cung cấp khi tích hợp, không nhận từ request body. Chưa có persistence/concurrency control hay chữ ký invocation. Không đánh dấu toàn bộ P0/R0A hoặc FR-79–90 hoàn tất.

@@ -11,6 +11,9 @@
 | NOTE-07 | 28.10 | Any state -> terminal chưa rõ việc phục hồi hoặc sửa item rejected/quarantined. | Không hồi sinh revision cũ; sửa tạo revision mới ở Generated, không kế thừa bằng chứng. |
 | NOTE-08 | 28.6, FR-79 | SRS chỉ nêu `budget` nhưng chưa chốt đơn vị, currency, cách chia budget cho batch nhỏ hơn quota hoặc làm tròn. | Domain dùng decimal tối đa 6 chữ số thập phân và phân bổ tỷ lệ theo quota; cần chốt với CostLedger trước triển khai thanh toán thật. |
 | NOTE-09 | 28.6 | `allowedVocabulary` bắt buộc nhưng không nói danh sách rỗng có nghĩa là cấm hết hay không giới hạn. | Cho phép danh sách rỗng với nghĩa không có allowlist; `forbiddenTopics` rỗng nghĩa không bổ sung cấm ngoài policy toàn cục. |
+| NOTE-10 | FR-24 | Attempt domain hiện có một deadline chung; TOEIC full mock cần deadline riêng Listening/Reading và khóa section. | Dùng cho R0A Reading practice; chưa mở full simulation trước khi bổ sung section clock. |
+| NOTE-11 | FR-40–41 | Refund callback có thể đến trước paid callback nhưng chưa có inbox/reconciliation service để giữ event out-of-order. | Commerce giữ PendingIntegration; Infrastructure phải lưu inbox trước khi gọi aggregate. |
+| NOTE-12 | FR-01–03 | Domain identity không tự giải quyết rate limit, MFA, password hashing parameters hoặc email anti-enumeration. | Chỉ mở auth API sau khi application/infrastructure và audit được nối đầy đủ. |
 
 ## Quyết định kỹ thuật
 
