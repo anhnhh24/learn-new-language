@@ -7,7 +7,9 @@ import {
   Database,
   BookOpen,
   Layers,
-  UploadCloud
+  UploadCloud,
+  Users,
+  ClipboardList
 } from 'lucide-react';
 import styles from './AdminLayout.module.css';
 
@@ -20,6 +22,8 @@ export function AdminLayout() {
     { to: '/admin/curriculum', label: 'Chương trình đào tạo (CMS)', icon: <BookOpen size={18} /> },
     { to: '/admin/items', label: 'Ngân hàng câu hỏi', icon: <Layers size={18} /> },
     { to: '/admin/import', label: 'Nạp đề đa nguồn (Import)', icon: <UploadCloud size={18} /> },
+    { to: '/admin/users', label: 'Người dùng & Phân quyền', icon: <Users size={18} /> },
+    { to: '/admin/audit', label: 'Nhật ký kiểm toán (Audit)', icon: <ClipboardList size={18} /> },
   ];
 
   return (

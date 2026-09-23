@@ -48,6 +48,8 @@ import { BlueprintsPage } from '../features/admin/pages/BlueprintsPage';
 import { CurriculumEditorPage } from '../features/admin/pages/CurriculumEditorPage';
 import { ItemBankPage } from '../features/admin/pages/ItemBankPage';
 import { ImportConsolePage } from '../features/admin/pages/ImportConsolePage';
+import { UserManagementPage } from '../features/admin/pages/UserManagementPage';
+import { AuditLogPage } from '../features/admin/pages/AuditLogPage';
 
 export const router = createBrowserRouter([
   {
@@ -110,6 +112,8 @@ export const router = createBrowserRouter([
       { path: 'curriculum', element: <CurriculumEditorPage /> },
       { path: 'items', element: <ItemBankPage /> },
       { path: 'import', element: <ImportConsolePage /> },
+      { path: 'users', element: <UserManagementPage /> },
+      { path: 'audit', element: <AuditLogPage /> },
     ],
   },
   {
