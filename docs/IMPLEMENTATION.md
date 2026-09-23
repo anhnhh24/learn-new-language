@@ -186,11 +186,20 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 - Safe diff chỉ chứa metadata vận hành đã chọn, không lưu prompt, đáp án, thông tin learner hoặc secret.
 - Read API, permission quality.view, retention/purge job và export audit vẫn là phần tiếp theo.
 
+## M24 — Versioned TOEIC Reading curriculum và 31-week roadmap (hoàn tất DB/seed)
+
+- Schema version hóa course, level, knowledge topic, lesson/page/block, prerequisite, placement rule và roadmap activity; enrollment giữ nguyên course snapshot.
+- Seed Published gồm 40 chủ điểm A1–D11, 40 learning guide, 44 lesson, 84 trang, 288 block, 31 tuần và 122 hoạt động.
+- Mỗi concept lesson có công thức/pattern, core rule, ví dụ phân tích, quy trình áp dụng, bẫy, phần mở rộng và self-check dưới dạng JSON có cấu trúc.
+- Quiz dưới 80% gắn NeedsReview nhưng không khóa completion; checkpoint mới sinh remediation tối đa hai tag yếu và lịch retry.
+- Khóa được ghi đúng phạm vi Reading/Part 5–6, không cam kết tổng điểm TOEIC; placement chỉ gợi ý điểm bắt đầu và không tự đưa learner vào D.
+- Migration 001–006 đã được áp dụng thành công từ database trống trên PostgreSQL 16; count/invariant của curriculum đã được truy vấn sau migrate.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 2. Operations quality dashboard và công cụ kiểm soát quarantine.
 3. Password/email/MFA, auth endpoints và secret manager.
-4. Course/lesson CMS, import DOCX/PDF text và learner APIs cho Learning/Assessment.
+4. Curriculum repository/API, plan materializer, question bank quiz; CMS write path và import DOCX/PDF.
 5. Notification, data export/delete, observability và backup/restore.
 6. Test backlog đã hoãn: domain, integration concurrency, contract, E2E và release gates.
 

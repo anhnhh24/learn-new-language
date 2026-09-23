@@ -25,6 +25,8 @@
 | NOTE-20 | Migration 003 | Part 7 group đã tồn tại trước migration chưa có UUID riêng cho từng câu. | Backfill một legacy node để giữ toàn vẹn FK nhưng reader sẽ từ chối vì không khớp stable_id; tạo revision Part 7 mới với question nodes rõ ràng thay vì suy diễn hoặc sửa lịch sử. |
 | NOTE-22 | NFR-14, audit retention | SRS đề xuất giữ security/audit log 180 ngày nhưng chưa chốt legal hold và quyền purge production. | Write path chỉ append; chưa tạo purge job hoặc API xóa. Chỉ triển khai retention sau khi policy owner chốt ngoại lệ legal hold và phạm vi dữ liệu bắt buộc giữ. |
 | NOTE-21 | UI Scope | SRS v3.3 quy định 18 màn hình UI-01 đến UI-18; trong đó UI-12 và UI-16 được đặc tả là R3 dự trữ (Speaking/Writing teacher grading). | Đã hoàn thiện toàn bộ các màn hình áp dụng cho R0-R2: Catalog (UI-01), Auth/Onboarding/Placement (UI-02, UI-03), Hôm nay/Lộ trình/Bài học/Quiz (UI-04, UI-05, UI-06, UI-07), Sổ lỗi sai/Flashcards (UI-08, UI-09), Phòng thi/Kết quả (UI-10, UI-11), Dashboard/Tài khoản (UI-13, UI-14), CMS/Ngân hàng đề/Quality Ops (UI-15), Thanh toán/Quyền học (UI-17) và Hỗ trợ/Kiểm toán (UI-18). |
+| NOTE-23 | Lộ trình người dùng | Nhãn 300–900+ có thể bị hiểu là cam kết tổng điểm nhưng nội dung nguồn chủ yếu là grammar/Part 5–6, chưa bao phủ Listening và Part 7 đầy đủ. | Course seed ghi rõ phạm vi TOEIC Reading và chỉ trả accuracy/tag; không quy đổi checkpoint thành tổng điểm hoặc band. |
+| NOTE-24 | BR-LEARN-01, threshold | Ngưỡng 70/75/80/85 và nội dung ví dụ chưa qua giáo viên pilot hoặc hiệu chỉnh dữ liệu. | Version hóa trong curriculum 2026.09-v1; dùng làm policy khởi điểm, không chứng nhận năng lực. Cần editorial review và pilot trước khi đổi claim/tier. |
 
 ## Quyết định kỹ thuật
 
