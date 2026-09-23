@@ -105,9 +105,16 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 - Ghi exposure theo từng question; report chỉ nhận category allowlist và item thực sự thuộc attempt của learner.
 - Chưa mở route công khai cho tới khi auth, repository, locking và pseudonymizer HMAC được nối thật.
 
+## M16 — Database migration foundation (hoàn tất runner)
+
+- Infrastructure project có PostgreSQL migration runner đọc file theo thứ tự, kiểm tên và SHA-256.
+- Advisory lock chặn nhiều instance migrate đồng thời; DDL và migration journal commit cùng transaction.
+- File migration không tự mở/commit transaction để tránh khoảng trống giữa DDL và journal.
+- Chưa chọn/cài PostgreSQL driver và chưa chạy vào database thật; repository mapping vẫn là việc tiếp theo.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 
-1. Repository mapping, migration runner, password/email/MFA và auth endpoints.
+1. PostgreSQL driver/connection factory, repository mapping, password/email/MFA và auth endpoints.
 2. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 3. Repository/locking cho form, attempt, telemetry, quarantine; Operations quality dashboard.
 4. Course/lesson CMS, import DOCX/PDF text và learner APIs cho Learning/Assessment.
