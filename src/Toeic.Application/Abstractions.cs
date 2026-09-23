@@ -49,11 +49,11 @@ public sealed record PendingOutboxMessage(Guid EventId, string EventType, string
 public interface IOutboxStore
 {
     Task<IReadOnlyList<PendingOutboxMessage>> ClaimBatchAsync(int batchSize,
-        DateTimeOffset now, CancellationToken cancellationToken);
-    Task MarkProcessedAsync(Guid eventId, DateTimeOffset processedAt,
+        DateTimeOffset now, Guid leaseId, DateTimeOffset leaseExpiresAt, CancellationToken cancellationToken);
+    Task MarkProcessedAsync(Guid eventId, Guid leaseId, DateTimeOffset processedAt,
         CancellationToken cancellationToken);
-    Task ScheduleRetryAsync(Guid eventId, int attempts, DateTimeOffset nextRetryAt,
+    Task ScheduleRetryAsync(Guid eventId, Guid leaseId, int attempts, DateTimeOffset nextRetryAt,
         string safeErrorCode, CancellationToken cancellationToken);
-    Task DeadLetterAsync(Guid eventId, DateTimeOffset deadLetteredAt,
+    Task DeadLetterAsync(Guid eventId, Guid leaseId, DateTimeOffset deadLetteredAt,
         string safeErrorCode, CancellationToken cancellationToken);
 }

@@ -93,19 +93,32 @@ internal sealed class PostgresGenerationJobStore(IPostgresSession session)
     // --- IOutboxStore ---
 
     public async Task<IReadOnlyList<PendingOutboxMessage>> ClaimBatchAsync(int batchSize,
-        DateTimeOffset now, CancellationToken cancellationToken)
+        DateTimeOffset now, Guid leaseId, DateTimeOffset leaseExpiresAt,
+        CancellationToken cancellationToken)
     {
+        if (leaseId == Guid.Empty || leaseExpiresAt <= now)
+            throw new DomainException("OUTBOX_LEASE_INVALID");
         await using var command = CreateCommand("""
-            select event_id, event_type, payload_json::text, payload_hash, attempts
-            from operations.outbox_events
-            where processed_at is null and dead_lettered_at is null
-              and next_retry_at <= @now
-            order by next_retry_at
-            limit @batch_size
-            for update skip locked;
+            with candidates as (
+                select event_id from operations.outbox_events
+                where processed_at is null and dead_lettered_at is null
+                  and next_retry_at <= @now
+                  and (claim_expires_at is null or claim_expires_at <= @now)
+                order by next_retry_at
+                limit @batch_size
+                for update skip locked
+            )
+            update operations.outbox_events o
+            set claimed_by = @lease_id, claim_expires_at = @lease_expires_at
+            from candidates c
+            where o.event_id = c.event_id
+            returning o.event_id, o.event_type, o.payload_json::text,
+                      o.payload_hash, o.attempts;
             """);
         Add(command, "@now", now);
         Add(command, "@batch_size", batchSize);
+        Add(command, "@lease_id", leaseId);
+        Add(command, "@lease_expires_at", leaseExpiresAt);
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
         var results = new List<PendingOutboxMessage>();
         while (await reader.ReadAsync(cancellationToken))
@@ -116,45 +129,56 @@ internal sealed class PostgresGenerationJobStore(IPostgresSession session)
         return results;
     }
 
-    public async Task MarkProcessedAsync(Guid eventId, DateTimeOffset processedAt,
+    public async Task MarkProcessedAsync(Guid eventId, Guid leaseId, DateTimeOffset processedAt,
         CancellationToken cancellationToken)
     {
         await using var command = CreateCommand("""
             update operations.outbox_events
-            set processed_at = @processed_at
-            where event_id = @event_id;
+            set processed_at = @processed_at, claimed_by = null, claim_expires_at = null,
+                last_error_code = null
+            where event_id = @event_id and claimed_by = @lease_id;
             """);
         Add(command, "@event_id", eventId);
+        Add(command, "@lease_id", leaseId);
         Add(command, "@processed_at", processedAt);
-        await command.ExecuteNonQueryAsync(cancellationToken);
+        if (await command.ExecuteNonQueryAsync(cancellationToken) != 1)
+            throw new DomainException("OUTBOX_LEASE_LOST");
     }
 
-    public async Task ScheduleRetryAsync(Guid eventId, int attempts,
+    public async Task ScheduleRetryAsync(Guid eventId, Guid leaseId, int attempts,
         DateTimeOffset nextRetryAt, string safeErrorCode,
         CancellationToken cancellationToken)
     {
         await using var command = CreateCommand("""
             update operations.outbox_events
-            set attempts = @attempts, next_retry_at = @next_retry_at
-            where event_id = @event_id;
+            set attempts = @attempts, next_retry_at = @next_retry_at,
+                last_error_code = @safe_error_code, claimed_by = null, claim_expires_at = null
+            where event_id = @event_id and claimed_by = @lease_id;
             """);
         Add(command, "@event_id", eventId);
+        Add(command, "@lease_id", leaseId);
         Add(command, "@attempts", attempts);
         Add(command, "@next_retry_at", nextRetryAt);
-        await command.ExecuteNonQueryAsync(cancellationToken);
+        Add(command, "@safe_error_code", safeErrorCode);
+        if (await command.ExecuteNonQueryAsync(cancellationToken) != 1)
+            throw new DomainException("OUTBOX_LEASE_LOST");
     }
 
-    public async Task DeadLetterAsync(Guid eventId, DateTimeOffset deadLetteredAt,
+    public async Task DeadLetterAsync(Guid eventId, Guid leaseId, DateTimeOffset deadLetteredAt,
         string safeErrorCode, CancellationToken cancellationToken)
     {
         await using var command = CreateCommand("""
             update operations.outbox_events
-            set dead_lettered_at = @dead_lettered_at
-            where event_id = @event_id;
+            set dead_lettered_at = @dead_lettered_at, last_error_code = @safe_error_code,
+                claimed_by = null, claim_expires_at = null
+            where event_id = @event_id and claimed_by = @lease_id;
             """);
         Add(command, "@event_id", eventId);
+        Add(command, "@lease_id", leaseId);
         Add(command, "@dead_lettered_at", deadLetteredAt);
-        await command.ExecuteNonQueryAsync(cancellationToken);
+        Add(command, "@safe_error_code", safeErrorCode);
+        if (await command.ExecuteNonQueryAsync(cancellationToken) != 1)
+            throw new DomainException("OUTBOX_LEASE_LOST");
     }
 
     // --- Mapping ---

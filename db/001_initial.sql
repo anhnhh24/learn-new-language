@@ -262,7 +262,10 @@ create table operations.outbox_events (
     attempts integer not null default 0,
     next_retry_at timestamptz not null default now(),
     processed_at timestamptz,
-    dead_lettered_at timestamptz
+    dead_lettered_at timestamptz,
+    claimed_by uuid,
+    claim_expires_at timestamptz,
+    last_error_code text
 );
 create index ix_outbox_pending on operations.outbox_events(next_retry_at)
     where processed_at is null and dead_lettered_at is null;
