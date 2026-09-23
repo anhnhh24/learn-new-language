@@ -19,11 +19,11 @@ export function LearnerLayout() {
 
   const navItems = [
     { to: '/learn/today', label: 'Hôm nay', icon: <Calendar size={18} /> },
+    { to: '/learn/courses', label: 'Khóa học', icon: <BookOpen size={18} /> },
     { to: '/learn/practice', label: 'Luyện đề', icon: <PenTool size={18} /> },
     { to: '/learn/errors', label: 'Sổ lỗi sai', icon: <Bookmark size={18} /> },
     { to: '/learn/flashcards', label: 'Flashcard', icon: <Layers size={18} /> },
-    { to: '/learn/roadmap', label: 'Lộ trình', icon: <BookOpen size={18} /> },
-    { to: '/learn/dashboard', label: 'Thống kê', icon: <BarChart2 size={18} /> },
+    { to: '/learn/roadmap', label: 'Lộ trình', icon: <BarChart2 size={18} /> },
   ];
 
   return (
