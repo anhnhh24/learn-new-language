@@ -1,0 +1,184 @@
+.container {
+  max-width: 1100px;
+}
+
+.header {
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.sectionIcon {
+  color: var(--color-primary);
+}
+
+.sectionHeader h2 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+/* Jobs Section */
+.jobsSection {
+  margin-bottom: var(--space-8);
+}
+
+.jobsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-4);
+}
+
+.jobCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.jobTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.jobId {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.jobBlueprint {
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-4);
+}
+
+.jobStats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-subtle);
+  font-size: var(--font-size-xs);
+}
+
+.statLabel {
+  display: block;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+
+/* Candidates Section */
+.candidatesSection {
+  margin-bottom: var(--space-8);
+}
+
+.candidatesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.candidateCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardQuarantined {
+  border-left: 4px solid var(--color-danger);
+  background-color: #fffbfa;
+}
+
+.candidateHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.candidateMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.candId {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.candPrompt {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  margin-bottom: var(--space-4);
+  line-height: var(--line-height-normal);
+}
+
+.gatesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  background-color: var(--color-surface-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.gateBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.gateTitle {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.gateStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--color-text);
+}
+
+.quarantineNotice {
+  background-color: var(--color-danger-subtle);
+  border: 1px solid #fecdca;
+  color: var(--color-danger);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+}
+
+@media (max-width: 800px) {
+  .gatesGrid {
+    grid-template-columns: 1fr;
+  }
+}
