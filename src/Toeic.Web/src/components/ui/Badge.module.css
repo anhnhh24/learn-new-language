@@ -1,0 +1,66 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.prefix {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.default {
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+.primary {
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary);
+  border-color: #b2d7d2;
+}
+
+.success {
+  background-color: var(--color-success-subtle);
+  color: var(--color-success);
+  border-color: #b6e2c6;
+}
+
+.warning {
+  background-color: var(--color-warning-subtle);
+  color: var(--color-warning);
+  border-color: #f7dfa5;
+}
+
+.danger {
+  background-color: var(--color-danger-subtle);
+  color: var(--color-danger);
+  border-color: #fecdca;
+}
+
+.info {
+  background-color: var(--color-info-subtle);
+  color: var(--color-info);
+  border-color: #b9e6fe;
+}
+
+/* Tier Badges with clear border and contrast */
+.beta {
+  background-color: #fff8eb;
+  color: #93370d;
+  border-color: #fedf89;
+}
+
+.validated {
+  background-color: #ecfdf3;
+  color: #027a48;
+  border-color: #a6f4c5;
+}

@@ -1,4 +1,4 @@
-﻿**/bin/
+**/bin/
 **/obj/
 .tools/
 TestResults/
@@ -6,3 +6,6 @@ TestResults/
 .env
 .env.*
 !.env.example
+**/node_modules/
+**/dist/
+*.local
