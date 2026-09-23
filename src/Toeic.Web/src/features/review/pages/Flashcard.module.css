@@ -1,0 +1,233 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: 0;
+}
+
+.counter {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+}
+
+.flashcardContainer {
+  max-width: 620px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.cardBox {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.cardRevealed {
+  border-color: var(--color-primary);
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.posTag {
+  font-size: var(--font-size-xs);
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.cardFront {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.wordTitle {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+}
+
+.contextBox {
+  background-color: var(--color-surface-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  max-width: 480px;
+  width: 100%;
+  margin-bottom: var(--space-2);
+}
+
+.contextLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.contextSentence {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  font-style: italic;
+  margin-bottom: 0;
+  line-height: var(--line-height-normal);
+}
+
+.cardBack {
+  margin-top: var(--space-4);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--color-border-subtle);
+  margin-bottom: var(--space-4);
+}
+
+.meaningBox {
+  background-color: var(--color-primary-subtle);
+  border-left: 3px solid var(--color-primary);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+}
+
+.meaningLabel {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-primary);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.meaningText {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0;
+}
+
+.actionControls {
+  display: flex;
+  justify-content: center;
+}
+
+.ratingRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.rateBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 52px;
+}
+
+.rateBtn strong {
+  font-size: var(--font-size-sm);
+  margin-bottom: 2px;
+}
+
+.rateBtn span {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.rateAgain:hover {
+  border-color: var(--color-danger);
+  background-color: var(--color-danger-subtle);
+  color: var(--color-danger);
+}
+
+.rateHard:hover {
+  border-color: var(--color-warning);
+  background-color: var(--color-warning-subtle);
+  color: var(--color-warning);
+}
+
+.rateGood:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary);
+}
+
+.rateEasy:hover {
+  border-color: var(--color-success);
+  background-color: var(--color-success-subtle);
+  color: var(--color-success);
+}
+
+.emptyCard,
+.finishedCard {
+  text-align: center;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-12) var(--space-6);
+  max-width: 520px;
+  margin: var(--space-8) auto;
+}
+
+.emptyIcon {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.finishedIcon {
+  color: var(--color-success);
+  margin-bottom: var(--space-4);
+}
+
+.finishedActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

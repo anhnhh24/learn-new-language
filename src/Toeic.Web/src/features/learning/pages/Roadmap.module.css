@@ -1,0 +1,155 @@
+.header {
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: 0;
+}
+
+.roadmapList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.weekSection {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.weekHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.weekBadge {
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
+.weekTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.weekStatus {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.moduleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-4);
+}
+
+.moduleCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s ease;
+}
+
+.moduleCard:hover {
+  border-color: var(--color-primary);
+}
+
+.activeCard {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.moduleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.completedTag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-success);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.inProgressTag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-primary);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.activeDot {
+  fill: var(--color-primary);
+}
+
+.lockedTag {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.moduleTitle {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+  line-height: var(--line-height-normal);
+  flex: 1;
+}
+
+.moduleProgress {
+  margin-bottom: var(--space-4);
+}
+
+.progressTrack {
+  height: 6px;
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: var(--space-1);
+}
+
+.progressBar {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: 3px;
+}
+
+.progressText {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.moduleFooter {
+  display: flex;
+  justify-content: flex-end;
+}
