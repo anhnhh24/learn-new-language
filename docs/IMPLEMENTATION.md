@@ -157,15 +157,17 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
   - UI-03: Onboarding khảo sát mục tiêu và Bài chẩn đoán định hướng 24 câu (/auth/onboarding, /auth/placement).
   - UI-04: Màn hình Hôm nay (/learn/today) với thẻ hành động chính tiếp theo, hàng đợi ôn tập đến hạn, không áp lực streak tiêu cực.
   - UI-05: Lộ trình học tập (/learn/roadmap) theo tuần và theo module kiến thức.
-  - UI-06 & UI-07: Bài học đa phương tiện (/learn/lesson/:id) hỗ trợ đọc dạng trang, đánh dấu đã đọc, audio có điều khiển tốc độ và transcript (ghi nhận Assisted), interactive mini-check với phản hồi tức thì.
+  - UI-06: Bài học đa phương tiện (/learn/lesson/:id) hỗ trợ đọc dạng trang, đánh dấu đã đọc, audio có điều khiển tốc độ và transcript (ghi nhận Assisted), interactive mini-check với phản hồi tức thì.
+  - UI-07: Chuyên biệt Luyện tập Ngữ pháp & Từ vựng Mini-Drill (/learn/quiz/:quizId) với phản hồi tức thì từng câu, hiển thị giải thích chi tiết, 1-click lưu sổ lỗi sai / tạo thẻ flashcard / báo lỗi câu hỏi, và tổng kết chỉ báo thành thạo theo Primary Tag (BR-LEARN-02).
   - UI-08: Sổ lỗi sai (/learn/errors) lọc theo tag, trạng thái Open/Improving/Resolved/Ignored, luyện câu tương đương.
   - UI-09: Ôn tập Flashcard (/learn/flashcards) theo thuật toán lặp ngắt quãng Spaced Repetition (Quên / Khó / Nhớ / Dễ).
   - UI-10: Phòng thi TOEIC (/learn/practice/:attemptId) tập trung, đồng bộ server deadline countdown, autosave state machine (Debounce + ACK timestamp), lưu draft cục bộ khi mất kết nối mạng, hiển thị bài đọc Part 7 chia đôi màn hình (stimulus + questions) và lưới điều hướng 1-100 câu.
   - UI-11: Kết quả thi TOEIC (/learn/practice/:attemptId/result) với điểm thô (raw score), thời gian làm, phân tích theo Part/Tag, xem lại từng câu kèm bằng chứng trích xuất từ bài đọc và ghi chú tier rõ ràng.
   - UI-13: Thống kê & Dashboard (/learn/dashboard) tỷ lệ hoàn thành, độ chính xác quiz lần đầu, chỉ báo kiến thức có giải thích thiếu dữ liệu.
   - UI-14: Tài khoản & Quyền riêng tư (/learn/account) quản lý giờ yên tĩnh (21:00 - 08:00), yêu cầu xuất dữ liệu (export 24h) và hủy tài khoản (7-day window) theo FR-16/18.
-  - UI-15: Quality Dashboard & Console quản trị Controlled AI Item Factory (/admin/quality, /admin/jobs, /admin/quarantine, /admin/blueprints) kiểm soát candidate, dual-solver consensus, critic blocking findings và điều khiển cách ly.
-  - UI-18: Báo lỗi câu hỏi và hỗ trợ học viên (/learn/support).
+  - UI-15: CMS Chương trình đào tạo (/admin/curriculum) hỗ trợ kiểm soát chu trình tiên quyết (AC-33), Ngân hàng câu hỏi (/admin/items) với chỉ số phân biệt D-score và ngưỡng mẫu (FR-36), Cổng nạp đề đa nguồn (/admin/import) hỗ trợ kiểm tra media đính kèm và atomic commit draft (FR-34), cùng Quality Dashboard & Console quản trị Controlled AI Item Factory (/admin/quality, /admin/jobs, /admin/quarantine, /admin/blueprints).
+  - UI-17: Thanh toán & Quản lý Quyền học (/learn/billing/checkout/:courseId, /learn/billing/orders/:orderId, /learn/billing/history) với lựa chọn phương thức thanh toán VietQR / Napas / Thẻ / MoMo, đếm ngược giữ lệnh 30 phút, đối soát ngân hàng tự động, hiển thị thời hạn quyền học 180 ngày và luồng yêu cầu hoàn tiền trong 7 ngày theo chuẩn FR-39/40/41/42.
+  - UI-18: Quản trị Vận hành, Quản lý Người dùng & Nhật ký Kiểm toán bất biến (/admin/users, /admin/audit) với xác thực 2 lớp MFA khi cấp role đặc quyền (FR-38), tạm khóa tài khoản có lý do bắt buộc và truy vết trước/sau (before/after state diff).
 - Tầng API client (src/lib/api/) hỗ trợ kết nối VITE_API_BASE_URL với fallback mock fixtures chuẩn nghiệp vụ SRS phục vụ kiểm thử giao diện độc lập.
 
 ## M22 — Part 7 question-node persistence và beta materialization (hoàn tất backend)

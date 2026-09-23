@@ -23,6 +23,7 @@
 | NOTE-18 | Outbox worker | Lease hiện cố định 5 phút và chưa có heartbeat/renewal. | Chỉ dùng dispatcher cho handler ngắn; provider/model call dài phải là job riêng hoặc bổ sung lease renewal trước khi bật worker production. |
 | NOTE-19 | UI / Web | Backend API routes cho Learner hiện chưa mở ở các milestone trước. | Tầng ApiClient trên Frontend đã được xây dựng hoàn chỉnh với schema validation Zod và bộ Mock Fixtures chi tiết đúng theo SRS v3.3, cho phép chạy độc lập, test giao diện và tự động chuyển sang VITE_API_BASE_URL khi backend triển khai xong. |
 | NOTE-20 | Migration 003 | Part 7 group đã tồn tại trước migration chưa có UUID riêng cho từng câu. | Backfill một legacy node để giữ toàn vẹn FK nhưng reader sẽ từ chối vì không khớp stable_id; tạo revision Part 7 mới với question nodes rõ ràng thay vì suy diễn hoặc sửa lịch sử. |
+| NOTE-21 | UI Scope | SRS v3.3 quy định 18 màn hình UI-01 đến UI-18; trong đó UI-12 và UI-16 được đặc tả là R3 dự trữ (Speaking/Writing teacher grading). | Đã hoàn thiện toàn bộ các màn hình áp dụng cho R0-R2: Catalog (UI-01), Auth/Onboarding/Placement (UI-02, UI-03), Hôm nay/Lộ trình/Bài học/Quiz (UI-04, UI-05, UI-06, UI-07), Sổ lỗi sai/Flashcards (UI-08, UI-09), Phòng thi/Kết quả (UI-10, UI-11), Dashboard/Tài khoản (UI-13, UI-14), CMS/Ngân hàng đề/Quality Ops (UI-15), Thanh toán/Quyền học (UI-17) và Hỗ trợ/Kiểm toán (UI-18). |
 
 ## Quyết định kỹ thuật
 
