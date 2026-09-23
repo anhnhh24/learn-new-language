@@ -1,0 +1,174 @@
+.examContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+}
+
+.topBar {
+  height: 56px;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.titleSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.examTitle {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+.centerSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.timerBadge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.lowTime {
+  background-color: var(--color-danger-subtle);
+  border-color: #fecdca;
+  color: var(--color-danger);
+  animation: pulseLowTime 2s infinite ease-in-out;
+}
+
+@keyframes pulseLowTime {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.timerValue {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+}
+
+.saveState {
+  font-size: var(--font-size-xs);
+  display: flex;
+  align-items: center;
+}
+
+.savingState {
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.savedState {
+  color: var(--color-success);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.failedState {
+  color: var(--color-danger);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 500;
+}
+
+.offlineState {
+  color: var(--color-warning);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 500;
+}
+
+.actionSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.mapButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  min-height: 36px;
+  transition: all 0.15s ease;
+}
+
+.mapButton:hover {
+  background-color: var(--color-border);
+}
+
+.offlineBanner {
+  background-color: #fff8eb;
+  border-bottom: 1px solid #fedf89;
+  color: #93370d;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.examMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .examTitle {
+    max-width: 140px;
+    font-size: var(--font-size-sm);
+  }
+  .saveState span span {
+    display: none; /* Hide timestamp on mobile */
+  }
+}

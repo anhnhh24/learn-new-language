@@ -1,0 +1,230 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.stepIndicator span {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.activeStep {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.activeStep span {
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-color: var(--color-primary);
+}
+
+.stepDivider {
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-border-subtle);
+  margin: 0 var(--space-2);
+}
+
+.stepHeader {
+  margin-bottom: var(--space-6);
+  text-align: center;
+}
+
+.headerIcon {
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+
+.stepHeader h2 {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+.stepHeader p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+  margin-bottom: 0;
+}
+
+.optionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.radioCard {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.radioCard:hover {
+  border-color: var(--color-primary);
+}
+
+.selectedCard {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-subtle);
+}
+
+.radioInput {
+  margin-top: 4px;
+  accent-color: var(--color-primary);
+}
+
+.cardTitle {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.cardDesc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.sectionHeading {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.selectableBox {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background-color: var(--color-surface);
+}
+
+.selectableBox:hover {
+  border-color: var(--color-primary);
+}
+
+.selectedBox {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-subtle);
+}
+
+.boxTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.boxDesc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.daysSelector {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-6);
+}
+
+.dayBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dayBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.selectedDayBtn {
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-color: var(--color-primary);
+}
+
+.placementNote {
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.placementNote h4 {
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-2);
+}
+
+.placementNote ul {
+  list-style: disc;
+  padding-left: var(--space-4);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+}
+
+.placementNote li {
+  margin-bottom: var(--space-1);
+}
+
+.placementActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.buttonRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
