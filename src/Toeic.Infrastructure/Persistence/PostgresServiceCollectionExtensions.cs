@@ -40,6 +40,19 @@ public static class PostgresServiceCollectionExtensions
         services.AddScoped<IPostgresSession>(provider =>
             provider.GetRequiredService<PostgresApplicationTransaction>());
         services.AddScoped<IItemTelemetryStore, PostgresItemTelemetryStore>();
+        services.AddScoped<IAttemptStore, PostgresAttemptStore>();
+        services.AddScoped<IStartAttemptReceiptStore, PostgresStartAttemptReceiptStore>();
+        services.AddScoped<IContentBlueprintRepository, PostgresContentBlueprintRepository>();
+        services.AddScoped<PostgresGenerationJobStore>();
+        services.AddScoped<IAtomicGenerationJobStore>(provider =>
+            provider.GetRequiredService<PostgresGenerationJobStore>());
+        services.AddScoped<IOutboxWriter>(provider =>
+            provider.GetRequiredService<PostgresGenerationJobStore>());
+        services.AddScoped<IOutboxStore>(provider =>
+            provider.GetRequiredService<PostgresGenerationJobStore>());
+        services.AddScoped<IIdempotencyReceiptStore, PostgresIdempotencyStore>();
+        services.AddScoped<IFormVersionStore, PostgresFormVersionStore>();
+        services.AddScoped<IFormCandidateStore, PostgresFormCandidateStore>();
         services.AddHealthChecks()
             .AddCheck<PostgresHealthCheck>("postgres", tags: ["ready"]);
         if (runMigrationsOnStartup)

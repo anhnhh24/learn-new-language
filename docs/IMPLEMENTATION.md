@@ -1,4 +1,4 @@
-﻿# Nhật ký triển khai
+# Nhật ký triển khai
 
 ## M00 — Baseline (hoàn tất)
 
@@ -121,11 +121,19 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 - Health live tách khỏi health ready; readiness kiểm PostgreSQL thật khi đã cấu hình.
 - Attempt/form repositories, secret manager và key rotation vẫn chưa hoàn thành nên learner route tiếp tục đóng.
 
+## M18 — Core PostgreSQL Repositories (hoàn tất)
+
+- Triển khai `PostgresContentBlueprintRepository` đọc cấu hình `content.blueprint_versions`.
+- Triển khai `PostgresGenerationJobStore` hỗ trợ atomic get-or-add bằng `insert ... on conflict`, xử lý lưu trạng thái job và ghi outbox message trong cùng transaction.
+- Triển khai `PostgresIdempotencyStore` lưu và check key bằng `operations.idempotency_records`.
+- Triển khai `PostgresFormStores` (`IFormVersionStore`, `IFormCandidateStore`) hỗ trợ lấy dữ liệu item kết hợp exposure count từ telemetry.
+- Bổ sung pattern "trusted reconstitution" trong Domain để khôi phục AggregateRoot từ CSDL (như `GenerationJob.Reconstitute` và dùng internal constructor access).
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 
-1. Attempt/form/content repositories, password/email/MFA và auth endpoints.
-2. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
-3. Repository/locking cho form, attempt, telemetry, quarantine; Operations quality dashboard.
+1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
+2. Operations quality dashboard và công cụ kiểm soát quarantine.
+3. Password/email/MFA, auth endpoints và secret manager.
 4. Course/lesson CMS, import DOCX/PDF text và learner APIs cho Learning/Assessment.
 5. React learner/admin UI, notification, data export/delete, observability và backup/restore.
 6. Test backlog đã hoãn: domain, integration concurrency, contract, E2E và release gates.

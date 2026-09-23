@@ -64,23 +64,25 @@ public sealed class GenerationJob
     private readonly List<GenerationJobTransition> transitions = [];
     private readonly List<GenerationJobEvent> events = [];
 
-    public Guid Id { get; }
-    public GenerationScope Scope { get; }
-    public string IdempotencyKey { get; }
-    public string InputHash { get; }
-    public Guid BlueprintId { get; }
-    public string BlueprintVersion { get; }
-    public string PolicyVersion { get; }
-    public ModelRoute Route { get; }
-    public int CandidateCount { get; }
-    public decimal RequiredBudget { get; }
-    public string Currency { get; }
+    public Guid Id { get; private init; }
+    public GenerationScope Scope { get; private init; } = null!;
+    public string IdempotencyKey { get; private init; } = null!;
+    public string InputHash { get; private init; } = null!;
+    public Guid BlueprintId { get; private init; }
+    public string BlueprintVersion { get; private init; } = null!;
+    public string PolicyVersion { get; private init; } = null!;
+    public ModelRoute Route { get; private init; } = null!;
+    public int CandidateCount { get; private init; }
+    public decimal RequiredBudget { get; private init; }
+    public string Currency { get; private init; } = null!;
     public GenerationJobState State { get; private set; } = GenerationJobState.Created;
     public BudgetReservation? Reservation { get; private set; }
     public GenerationCheckpoint? Checkpoint { get; private set; }
-    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset CreatedAt { get; private init; }
     public IReadOnlyList<GenerationJobTransition> Transitions => transitions.AsReadOnly();
     public IReadOnlyList<GenerationJobEvent> PendingEvents => events.AsReadOnly();
+
+    private GenerationJob() { }
 
     private GenerationJob(Guid id, CreateGenerationJob request, ContentBlueprintVersion blueprint,
         DateTimeOffset createdAt)
@@ -110,6 +112,22 @@ public sealed class GenerationJob
         if (request.BlueprintId != blueprint.Id) throw new DomainException("BLUEPRINT_ID_MISMATCH");
         return new(Guid.NewGuid(), request, blueprint, clock.GetUtcNow());
     }
+
+    // Trusted reconstitution from persistence — bypasses domain validation because
+    // persisted data has already been validated when originally created.
+    internal static GenerationJob Reconstitute(Guid id, GenerationScope scope, string idempotencyKey,
+        string inputHash, Guid blueprintId, string blueprintVersion, string policyVersion,
+        ModelRoute route, int candidateCount, decimal requiredBudget, string currency,
+        GenerationJobState state, BudgetReservation? reservation,
+        GenerationCheckpoint? checkpoint, DateTimeOffset createdAt) => new()
+    {
+        Id = id, Scope = scope, IdempotencyKey = idempotencyKey, InputHash = inputHash,
+        BlueprintId = blueprintId, BlueprintVersion = blueprintVersion,
+        PolicyVersion = policyVersion, Route = route, CandidateCount = candidateCount,
+        RequiredBudget = requiredBudget, Currency = currency,
+        State = state, Reservation = reservation, Checkpoint = checkpoint,
+        CreatedAt = createdAt
+    };
 
     public void EnsureIdempotentReplay(CreateGenerationJob request, ContentBlueprintVersion blueprint)
     {

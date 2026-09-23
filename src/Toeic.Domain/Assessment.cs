@@ -22,6 +22,7 @@ public sealed class AttemptItemSnapshot
     public string Prompt { get; }
     public ImmutableArray<AttemptOption> Options { get; }
     public decimal MaxScore { get; }
+    internal ImmutableHashSet<string> CorrectOptionIds => correctOptionIds;
 
     public AttemptItemSnapshot(Guid questionRevisionId, Guid questionFamilyId, string section,
         string prompt, ImmutableArray<AttemptOption> options, IEnumerable<string> correctOptionIds,

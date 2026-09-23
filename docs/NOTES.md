@@ -1,4 +1,4 @@
-﻿# Điểm chưa hợp lý / cần làm rõ
+# Điểm chưa hợp lý / cần làm rõ
 
 | ID | Tham chiếu | Vấn đề | Hướng xử lý hiện tại |
 |---|---|---|---|
@@ -17,6 +17,7 @@
 | NOTE-13 | 28.7–28.9 | Part 7 validator chỉ chứng minh hash/offset/quote và cấu trúc; không chứng minh passage tự nhiên, distractor hợp lý hoặc câu không cần kiến thức ngoài. | Giữ nội bộ tới khi hai solver, critic, perturbation và similarity runner đều có invocation audit thật. |
 | NOTE-14 | 28.9, 28.11, FR-85 | Part 7 cần quarantine theo question nhưng phát hành theo group nguyên khối. | Form snapshot lưu cả group revision và danh sách question revision; một question bị quarantine làm cả form chứa group chuyển Degraded. |
 | NOTE-15 | FR-84, NFR privacy | SRS yêu cầu learnerHash nhưng chưa chốt rotation, key custody và khoảng liên kết pseudonym. | Đã dùng HMAC-SHA256 với key runtime tối thiểu 256 bit; chưa bật production trước khi có secret manager, key version và rotation policy. |
+| NOTE-16 | Thiết kế kỹ thuật | Reconstitute Aggregate Root (như GenerationJob, Blueprint) từ DB row có thể kích hoạt domain logic validation (VD: Publish state checks) nếu dùng public constructor/methods. | Dùng pattern "trusted reconstitution" với internal methods và init properties để repository dựng lại state mà không chạy domain checks (vì data trong DB đã hợp lệ lúc lưu). |
 
 ## Quyết định kỹ thuật
 
