@@ -45,6 +45,9 @@ import { QualityDashboardPage } from '../features/admin/pages/QualityDashboardPa
 import { JobMonitorPage } from '../features/admin/pages/JobMonitorPage';
 import { QuarantineListPage } from '../features/admin/pages/QuarantineListPage';
 import { BlueprintsPage } from '../features/admin/pages/BlueprintsPage';
+import { CurriculumEditorPage } from '../features/admin/pages/CurriculumEditorPage';
+import { ItemBankPage } from '../features/admin/pages/ItemBankPage';
+import { ImportConsolePage } from '../features/admin/pages/ImportConsolePage';
 
 export const router = createBrowserRouter([
   {
@@ -104,6 +107,9 @@ export const router = createBrowserRouter([
       { path: 'jobs', element: <JobMonitorPage /> },
       { path: 'quarantine', element: <QuarantineListPage /> },
       { path: 'blueprints', element: <BlueprintsPage /> },
+      { path: 'curriculum', element: <CurriculumEditorPage /> },
+      { path: 'items', element: <ItemBankPage /> },
+      { path: 'import', element: <ImportConsolePage /> },
     ],
   },
   {

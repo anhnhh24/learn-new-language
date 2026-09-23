@@ -1,5 +1,14 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
-import { ShieldCheck, Cpu, AlertOctagon, ArrowLeft, Database } from 'lucide-react';
+import { 
+  ShieldCheck, 
+  Cpu, 
+  AlertOctagon, 
+  ArrowLeft, 
+  Database,
+  BookOpen,
+  Layers,
+  UploadCloud
+} from 'lucide-react';
 import styles from './AdminLayout.module.css';
 
 export function AdminLayout() {
@@ -8,6 +17,9 @@ export function AdminLayout() {
     { to: '/admin/jobs', label: 'Tác vụ AI Factory', icon: <Cpu size={18} /> },
     { to: '/admin/quarantine', label: 'Kiểm soát cách ly', icon: <AlertOctagon size={18} /> },
     { to: '/admin/blueprints', label: 'Cấu hình Blueprint', icon: <Database size={18} /> },
+    { to: '/admin/curriculum', label: 'Chương trình đào tạo (CMS)', icon: <BookOpen size={18} /> },
+    { to: '/admin/items', label: 'Ngân hàng câu hỏi', icon: <Layers size={18} /> },
+    { to: '/admin/import', label: 'Nạp đề đa nguồn (Import)', icon: <UploadCloud size={18} /> },
   ];
 
   return (
