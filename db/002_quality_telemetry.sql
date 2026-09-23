@@ -18,7 +18,28 @@ create table content.form_items (
     unique (form_version_id, item_order)
 );
 
+create table content.form_questions (
+    form_version_id uuid not null references content.form_versions(id),
+    item_revision_id uuid not null,
+    question_revision_id uuid not null references content.question_revisions(id),
+    question_order integer not null,
+    primary key (form_version_id, question_revision_id),
+    unique (form_version_id, question_order),
+    foreign key (form_version_id, item_revision_id) references content.form_items(form_version_id, item_revision_id)
+);
+
 create table assessment.item_exposures (
+create table assessment.start_attempt_receipts (
+    learner_id uuid not null references identity_data.users(id),
+    client_operation_id uuid not null,
+    form_version_id uuid not null references content.form_versions(id),
+    attempt_id uuid not null references assessment.attempts(id),
+    response_json jsonb not null,
+    created_at timestamptz not null default now(),
+    primary key (learner_id, client_operation_id),
+    unique (attempt_id)
+);
+
     event_id uuid primary key,
     attempt_id uuid not null references assessment.attempts(id),
     item_revision_id uuid not null references content.question_revisions(id),

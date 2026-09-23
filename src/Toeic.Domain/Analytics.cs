@@ -11,6 +11,7 @@ public sealed record ItemResponse(Guid EventId, Guid AttemptId, Guid ItemRevisio
     long ResponseTimeMs, string AbilityBand, DateTimeOffset RespondedAt);
 public sealed record LearnerIssueReport(Guid Id, Guid ItemRevisionId, string ReporterHash,
     string Category, string? Comment, DateTimeOffset ReportedAt);
+public sealed record ReportAppendResult(Guid ReportId, bool Inserted);
 
 public sealed record ItemStatisticSnapshot(Guid Id, Guid ItemRevisionId, string PolicyVersion,
     string Population, DateTimeOffset WindowStart, DateTimeOffset WindowEnd, int ValidResponses,
@@ -62,5 +63,5 @@ public interface IItemTelemetryStore
 {
     Task<bool> AppendExposureAsync(ItemExposure exposure, CancellationToken cancellationToken);
     Task<bool> AppendResponseAsync(ItemResponse response, CancellationToken cancellationToken);
-    Task<bool> AppendReportAsync(LearnerIssueReport report, CancellationToken cancellationToken);
+    Task<ReportAppendResult> AppendReportAsync(LearnerIssueReport report, CancellationToken cancellationToken);
 }

@@ -9,11 +9,11 @@ public enum FormState { Draft, Active, Degraded, Archived }
 public sealed record FormRequirement(ToeicPart Part, int QuestionCount);
 
 public sealed record FormItemCandidate(Guid RevisionId, string FamilyId, ToeicPart Part,
-    PublicationTier Tier, CandidateState State, int QuestionCount, int PriorExposureCount,
-    string RightsReference, string PolicyVersion);
+    PublicationTier Tier, CandidateState State, ImmutableArray<Guid> QuestionRevisionIds,
+    int PriorExposureCount, string RightsReference, string PolicyVersion);
 
 public sealed record FormItemSnapshot(Guid RevisionId, string FamilyId, ToeicPart Part,
-    PublicationTier Tier, int QuestionCount, int Position);
+    PublicationTier Tier, ImmutableArray<Guid> QuestionRevisionIds, int Position);
 
 public sealed record FormTransition(FormState From, FormState To, string ReasonCode,
     Guid? ItemRevisionId, string ActorId, DateTimeOffset At);
@@ -110,9 +110,14 @@ public static class BetaFormComposer
         if (candidates.Any(item => item.RevisionId == Guid.Empty ||
             string.IsNullOrWhiteSpace(item.FamilyId) ||
             string.IsNullOrWhiteSpace(item.RightsReference) ||
-            item.PolicyVersion != policyVersion || item.QuestionCount <= 0 ||
+            item.PolicyVersion != policyVersion || item.QuestionRevisionIds.IsDefaultOrEmpty ||
+            item.QuestionRevisionIds.Any(id => id == Guid.Empty) ||
+            item.QuestionRevisionIds.Distinct().Count() != item.QuestionRevisionIds.Length ||
             item.PriorExposureCount < 0))
             throw new DomainException("FORM_ITEM_INVALID");
+        if (candidates.SelectMany(item => item.QuestionRevisionIds).Distinct().Count() !=
+            candidates.Sum(item => item.QuestionRevisionIds.Length))
+            throw new DomainException("FORM_QUESTION_DUPLICATE");
         if (candidates.Select(item => item.RevisionId).Distinct().Count() != candidates.Length)
             throw new DomainException("FORM_ITEM_DUPLICATE");
         if (candidates.Any(item => lockedFamilyIds.Contains(item.FamilyId)))
@@ -126,7 +131,7 @@ public static class BetaFormComposer
         foreach (var requirement in requirements)
         {
             if (candidates.Where(item => item.Part == requirement.Part)
-                .Sum(item => item.QuestionCount) != requirement.QuestionCount)
+                .Sum(item => item.QuestionRevisionIds.Length) != requirement.QuestionCount)
                 throw new DomainException("FORM_COVERAGE_INVALID");
         }
 
@@ -134,7 +139,7 @@ public static class BetaFormComposer
             throw new DomainException("FORM_ITEM_TIER_INVALID");
 
         var items = candidates.Select((item, index) => new FormItemSnapshot(item.RevisionId,
-            item.FamilyId, item.Part, item.Tier, item.QuestionCount, index + 1)).ToImmutableArray();
+            item.FamilyId, item.Part, item.Tier, item.QuestionRevisionIds, index + 1)).ToImmutableArray();
         return new BetaFormVersion(Guid.NewGuid(), version.Trim(), policyVersion.Trim(),
             requestedTier, items);
     }
