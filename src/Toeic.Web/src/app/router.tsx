@@ -36,6 +36,9 @@ import { SupportPage } from '../features/support/pages/SupportPage';
 
 // Admin Pages
 import { QualityDashboardPage } from '../features/admin/pages/QualityDashboardPage';
+import { JobMonitorPage } from '../features/admin/pages/JobMonitorPage';
+import { QuarantineListPage } from '../features/admin/pages/QuarantineListPage';
+import { BlueprintsPage } from '../features/admin/pages/BlueprintsPage';
 
 export const router = createBrowserRouter([
   {
@@ -88,9 +91,9 @@ export const router = createBrowserRouter([
     children: [
       { path: '', element: <Navigate to="/admin/quality" replace /> },
       { path: 'quality', element: <QualityDashboardPage /> },
-      { path: 'jobs', element: <QualityDashboardPage /> },
-      { path: 'quarantine', element: <QualityDashboardPage /> },
-      { path: 'blueprints', element: <QualityDashboardPage /> },
+      { path: 'jobs', element: <JobMonitorPage /> },
+      { path: 'quarantine', element: <QuarantineListPage /> },
+      { path: 'blueprints', element: <BlueprintsPage /> },
     ],
   },
   {
