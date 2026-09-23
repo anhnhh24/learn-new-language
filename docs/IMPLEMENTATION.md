@@ -112,9 +112,18 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 - File migration không tự mở/commit transaction để tránh khoảng trống giữa DDL và journal.
 - Chưa chọn/cài PostgreSQL driver và chưa chạy vào database thật; repository mapping vẫn là việc tiếp theo.
 
+## M17 — PostgreSQL runtime và privacy adapter (hoàn tất foundation)
+
+- Npgsql 10.0.3 dùng một thread-safe data source/pool; connection string chỉ đến từ runtime configuration.
+- Startup migration là opt-in, fail fast khi bật mà thiếu connection string; SQL được copy cùng API artifact.
+- Scoped application transaction được dùng chung bởi repository; telemetry exposure/response/report đã có PostgreSQL adapter idempotent.
+- Learner analytics dùng HMAC-SHA256 key tối thiểu 256 bit; key không nằm trong source/appsettings.
+- Health live tách khỏi health ready; readiness kiểm PostgreSQL thật khi đã cấu hình.
+- Attempt/form repositories, secret manager và key rotation vẫn chưa hoàn thành nên learner route tiếp tục đóng.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 
-1. PostgreSQL driver/connection factory, repository mapping, password/email/MFA và auth endpoints.
+1. Attempt/form/content repositories, password/email/MFA và auth endpoints.
 2. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 3. Repository/locking cho form, attempt, telemetry, quarantine; Operations quality dashboard.
 4. Course/lesson CMS, import DOCX/PDF text và learner APIs cho Learning/Assessment.
