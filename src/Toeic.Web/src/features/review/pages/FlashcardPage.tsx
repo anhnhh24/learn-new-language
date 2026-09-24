@@ -143,6 +143,7 @@ export function FlashcardPage() {
       {/* Header */}
       <div className={styles.header}>
         <div>
+          <span className={styles.pretitle}>🧠 HỆ THỐNG GHI NHỚ LẶP NGẮT QUÃNG</span>
           <h1 className={styles.title}>Phòng luyện Flashcard (SRS)</h1>
           <p className={styles.subtitle}>
             Thuật toán Spaced Repetition giúp nạp từ vựng công sở và collocations vào trí nhớ dài hạn.

@@ -111,9 +111,10 @@ export function ErrorNotebookPage() {
       <div className={styles.header}>
         <div className={styles.titleRow}>
           <div>
+            <span className={styles.pretitle}>📝 SỔ TAY LỖI SAI & CHẨN ĐOÁN BẪY ĐỀ</span>
             <h1 className={styles.title}>Sổ tay lỗi sai thông minh</h1>
             <p className={styles.subtitle}>
-              Lưu trữ tự động các câu làm sai, phân tích bẫy đề thi theo phương pháp PREP và cung cấp chế độ làm lại trực tiếp để triệt tiêu lỗi lặp lại.
+              Lưu trữ tự động các câu làm sai, phân tích bẫy đề thi và cung cấp chế độ làm lại trực tiếp để triệt tiêu lỗi lặp lại.
             </p>
           </div>
           <Button

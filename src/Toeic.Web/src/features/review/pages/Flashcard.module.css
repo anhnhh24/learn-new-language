@@ -7,10 +7,21 @@
   gap: var(--space-3);
 }
 
-.title {
-  font-size: var(--font-size-3xl);
-  font-weight: 750;
+.pretitle {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  color: var(--color-primary);
+  letter-spacing: 0.08em;
   margin-bottom: var(--space-1);
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--color-navy-dark, #252641);
+  margin-bottom: var(--space-1);
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
@@ -22,11 +33,12 @@
 .counter {
   font-size: var(--font-size-sm);
   font-weight: 700;
-  background-color: var(--color-surface);
+  background-color: #ffffff;
   border: 1px solid var(--color-border);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-sm);
-  color: var(--color-text);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  color: var(--color-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* Category Filter Tabs */
@@ -41,16 +53,17 @@
 
 .categoryBtn {
   min-height: 36px;
-  padding: 0 var(--space-3);
-  border-radius: 999px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
-  background: var(--color-surface);
+  background: #ffffff;
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .categoryBtn:hover {
@@ -62,6 +75,7 @@
   background: var(--color-primary);
   border-color: var(--color-primary);
   color: white !important;
+  box-shadow: 0 2px 6px rgba(23, 107, 99, 0.25);
 }
 
 /* Main Flashcard Container */
@@ -75,7 +89,7 @@
 
 .cardProgressTrack {
   width: 100%;
-  height: 4px;
+  height: 6px;
   background: var(--color-border-subtle);
   border-radius: 999px;
   overflow: hidden;
@@ -83,27 +97,28 @@
 
 .cardProgressFill {
   height: 100%;
-  background: var(--color-primary);
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-brand-teal, #49bbbd) 100%);
   border-radius: 999px;
-  transition: width 0.2s ease;
+  transition: width 0.25s ease;
 }
 
 .cardBox {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6) var(--space-8);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-  min-height: 380px;
+  background-color: #ffffff;
+  border: 1.5px solid rgba(23, 107, 99, 0.15);
+  border-radius: 24px;
+  padding: 36px 32px;
+  box-shadow: 0 10px 30px rgba(49, 81, 113, 0.08);
+  min-height: 400px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   position: relative;
 }
 
 .cardRevealed {
   border-color: var(--color-primary);
+  box-shadow: 0 12px 35px rgba(23, 107, 99, 0.14);
 }
 
 .cardTop {
@@ -119,8 +134,8 @@
   text-transform: uppercase;
   color: var(--color-primary);
   background: var(--color-primary-subtle);
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
 }
 
 .cardFront {
@@ -137,7 +152,35 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  margin-bottom: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+.wordText {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--color-navy-dark, #252641);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.audioBtn {
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.audioBtn:hover {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  transform: scale(1.08);
 }
 
 .wordTitle {
@@ -302,20 +345,29 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-surface);
+  padding: 10px 12px;
+  border-radius: var(--radius-xl);
+  border: 1.5px solid var(--color-border);
+  background-color: #ffffff;
   cursor: pointer;
-  transition: all 0.15s ease;
-  min-height: 56px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  min-height: 62px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.rateBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
 }
 
 .rateKeyHint {
   font-size: 10px;
   color: var(--color-text-muted);
   font-family: var(--font-family-mono, monospace);
-  margin-bottom: 1px;
+  margin-bottom: 2px;
+  background-color: rgba(0, 0, 0, 0.04);
+  padding: 1px 5px;
+  border-radius: 4px;
 }
 
 .rateBtn strong {
@@ -328,28 +380,52 @@
   color: var(--color-text-muted);
 }
 
+.rateAgain {
+  border-color: #fecaca;
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
 .rateAgain:hover {
-  border-color: var(--color-danger);
-  background-color: var(--color-danger-subtle);
-  color: var(--color-danger);
+  border-color: #ef4444;
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.rateHard {
+  border-color: #fed7aa;
+  background-color: #fff7ed;
+  color: #c2410c;
 }
 
 .rateHard:hover {
-  border-color: var(--color-warning);
-  background-color: var(--color-warning-subtle);
-  color: var(--color-warning);
+  border-color: #f97316;
+  background-color: #ffedd5;
+  color: #9a3412;
+}
+
+.rateGood {
+  border-color: #bfdbfe;
+  background-color: #eff6ff;
+  color: #1d4ed8;
 }
 
 .rateGood:hover {
-  border-color: var(--color-primary);
-  background-color: var(--color-primary-subtle);
-  color: var(--color-primary);
+  border-color: #3b82f6;
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.rateEasy {
+  border-color: #a7f3d0;
+  background-color: #ecfdf5;
+  color: #047857;
 }
 
 .rateEasy:hover {
-  border-color: var(--color-success);
-  background-color: var(--color-success-subtle);
-  color: var(--color-success);
+  border-color: #10b981;
+  background-color: #d1fae5;
+  color: #065f46;
 }
 
 .shortcutHint {
