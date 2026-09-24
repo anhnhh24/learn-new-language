@@ -81,10 +81,24 @@
   font-weight: 600;
 }
 
-.rightSection {
+.streakBadge {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: 4px;
+  background-color: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #c2410c;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.streakBadge:hover {
+  background-color: #ffedd5;
+  border-color: #fdba74;
 }
 
 .adminLink {

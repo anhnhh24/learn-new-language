@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
-import { TierBadge } from '../../../components/ui/Badge';
+import { Badge, TierBadge } from '../../../components/ui/Badge';
 import {
   PlayCircle,
   Layers,
@@ -9,10 +9,17 @@ import {
   Clock,
   ArrowRight,
   BookOpen,
+  CheckCircle2,
+  Flame,
+  TrendingUp,
+  CalendarCheck,
+  Check,
+  Award,
 } from 'lucide-react';
-import styles from './Today.module.css';
 import { api } from '../../../lib/api/client';
 import { FlashcardItem, MistakeRecord } from '../../../types/review';
+import { toeicReadingCurriculum } from '../../../lib/api/curriculumData';
+import styles from './Today.module.css';
 
 export function TodayPage() {
   const navigate = useNavigate();
@@ -24,129 +31,307 @@ export function TodayPage() {
     api.getMistakes().then((items) => setOpenMistakes(items.filter((i) => i.status === 'Open')));
   }, []);
 
+  const course = toeicReadingCurriculum;
+  const currentWeek = course.weeks[0]; // Week 1
+
+  const weeklyHabit = [
+    { day: 'T2', completed: true, isToday: false },
+    { day: 'T3', completed: true, isToday: false },
+    { day: 'T4', completed: true, isToday: false },
+    { day: 'T5', completed: true, isToday: false },
+    { day: 'T6', completed: true, isToday: true },
+    { day: 'T7', completed: false, isToday: false },
+    { day: 'CN', completed: false, isToday: false },
+  ];
+
   return (
     <div className="content-container">
-      <div className={styles.todayHeader}>
-        <div>
-          <h1 className={styles.title}>Hôm nay</h1>
-          <p className={styles.subtitle}>
-            Kế hoạch học tập ngày 23/09 • Quỹ thời gian dự kiến: 30 phút
-          </p>
-        </div>
-      </div>
-
-      {/* Primary Next Action Banner (UI-04) */}
-      <section className={styles.primaryActionCard} aria-labelledby="primary-action-heading">
-        <div className={styles.actionLeft}>
-          <div className={styles.actionMeta}>
-            <span className={styles.actionTag}>LỘ TRÌNH 31 TUẦN · LEVEL A</span>
-            <TierBadge tier="BetaPractice" />
+      <div className={styles.todayContainer}>
+        {/* Study Space Header */}
+        <header className={styles.studyHeader}>
+          <div className={styles.greetingBlock}>
+            <h1>Phòng học thông minh</h1>
+            <p className={styles.greetingSub}>
+              Chào mừng bạn trở lại! Tiếp tục hoàn thành 30 phút mục tiêu hôm nay để duy trì chuỗi học tập 🎯
+            </p>
           </div>
-          <h2 id="primary-action-heading" className={styles.actionTitle}>
-            Tuần 1: Bài A1 · Từ loại và vị trí trong câu
-          </h2>
-          <p className={styles.actionDesc}>
-            Xác định danh từ, động từ, tính từ và trạng từ theo vị trí và vai trò ngữ pháp thay vì chỉ dịch nghĩa.
-          </p>
-          <div className={styles.actionDetails}>
-            <span className={styles.detailItem}>
-              <Clock size={15} /> Thời lượng 40 phút
-            </span>
-            <span className={styles.detailItem}>
-              <BookOpen size={15} /> 4 công thức & quy trình phân tích
-            </span>
-          </div>
-        </div>
 
-        <div className={styles.actionRight}>
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={() => navigate('/learn/lesson/A1')}
-            leftIcon={<PlayCircle size={18} />}
-          >
-            Học bài A1 ngay
-          </Button>
-        </div>
-      </section>
-
-      {/* Grid of Due Review Tasks */}
-      <div className={styles.tasksGrid}>
-        {/* Flashcard Due Queue */}
-        <section className={styles.taskCard} aria-labelledby="flashcards-heading">
-          <div className={styles.cardHeader}>
-            <div className={styles.cardHeaderLeft}>
-              <Layers className={styles.cardIcon} size={20} />
-              <h3 id="flashcards-heading">Ôn tập Flashcard</h3>
+          <div className={styles.quickStatsRow}>
+            <div className={styles.streakPill} title="Chuỗi ngày học liên tục">
+              <Flame size={18} />
+              <span>5 ngày liên tiếp</span>
             </div>
-            <span className={`${styles.badgeCount} text-tabular`}>{dueCards.length} thẻ đến hạn</span>
+
+            <div className={styles.predictedScorePill} title="Dự đoán điểm TOEIC theo dữ liệu làm bài gần nhất">
+              <TrendingUp size={16} />
+              <span>Dự đoán: 685 / 990</span>
+            </div>
           </div>
-          <p className={styles.cardText}>
-            Các từ vựng và cụm diễn đạt thuộc chủ đề kinh doanh và công sở cần ôn lại theo thuật toán lặp ngắt quãng.
-          </p>
-          <div className={styles.cardFooter}>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => navigate('/learn/flashcards')}
-              rightIcon={<ArrowRight size={14} />}
-            >
-              Ôn ngay ({dueCards.length} thẻ)
-            </Button>
+        </header>
+
+        {/* Weekly Habit Tracker */}
+        <section className={styles.weekHabitSection} aria-label="Thói quen học tập tuần này">
+          <div className={styles.habitTitleBlock}>
+            <CalendarCheck size={18} style={{ color: 'var(--color-primary)' }} />
+            <span>Kỷ luật học tập tuần này (5/7 ngày đã hoàn thành)</span>
+          </div>
+
+          <div className={styles.habitDaysGrid}>
+            {weeklyHabit.map((h, i) => (
+              <div key={i} className={styles.habitDayItem}>
+                <span className={styles.dayLabel}>{h.day}</span>
+                <span
+                  className={`${styles.dayCircle} ${h.completed ? styles.dayCompleted : ''} ${
+                    h.isToday ? styles.dayToday : ''
+                  }`}
+                >
+                  {h.completed ? <Check size={14} /> : i + 19}
+                </span>
+              </div>
+            ))}
           </div>
         </section>
 
-        {/* Error Notebook Tasks */}
-        <section className={styles.taskCard} aria-labelledby="errors-heading">
-          <div className={styles.cardHeader}>
-            <div className={styles.cardHeaderLeft}>
-              <Bookmark className={styles.cardIcon} size={20} />
-              <h3 id="errors-heading">Sổ lỗi sai</h3>
+        {/* Core Daily Tasks List (PREP-style) */}
+        <section aria-labelledby="daily-tasks-heading">
+          <div className={styles.sectionHeadingRow}>
+            <h2 id="daily-tasks-heading" className={styles.sectionTitle}>
+              <CheckCircle2 size={20} style={{ color: 'var(--color-primary)' }} />
+              Nhiệm vụ học tập hôm nay
+            </h2>
+            <div className={styles.taskProgressBar}>
+              <span>Tiến độ: 1/4 nhiệm vụ đã nộp</span>
             </div>
-            <span className={`${styles.badgeCount} text-tabular`}>{openMistakes.length} câu cần xem</span>
           </div>
-          <p className={styles.cardText}>
-            Các câu làm sai trong Part 5 & Part 7 chưa được giải quyết hoặc cần làm câu tương đương để củng cố.
-          </p>
-          <div className={styles.cardFooter}>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => navigate('/learn/errors')}
-              rightIcon={<ArrowRight size={14} />}
-            >
-              Mở sổ lỗi sai
-            </Button>
+
+          <div className={styles.taskList}>
+            {/* Task 1: Core Concept Lesson */}
+            <div className={`${styles.taskCard} ${styles.taskCardPrimary}`}>
+              <div className={styles.taskLeft}>
+                <div className={styles.taskIconBox}>
+                  <BookOpen size={20} />
+                </div>
+                <div className={styles.taskInfo}>
+                  <div className={styles.taskMetaRow}>
+                    <span className={styles.taskBadge}>BÀI HỌC CỐT LÕI · TUẦN 1</span>
+                    <Badge variant="primary">Level A</Badge>
+                  </div>
+                  <h3 className={styles.taskName}>Bài A1: Từ loại và vị trí trong câu</h3>
+                  <p className={styles.taskDesc}>
+                    Nhận diện 4 từ loại, bảng hậu tố nhận biết và công thức vị trí vàng trong Part 5 (40 phút).
+                  </p>
+                  <div className={styles.taskSpecs}>
+                    <span className={styles.specItem}>
+                      <Clock size={13} /> 40 phút lý thuyết
+                    </span>
+                    <span className={styles.specItem}>
+                      <Award size={13} /> 2 câu Part 5 thực chiến
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.taskRight}>
+                <Button
+                  variant="primary"
+                  size="md"
+                  onClick={() => navigate('/learn/lesson/A1')}
+                  leftIcon={<PlayCircle size={16} />}
+                >
+                  Vào học ngay
+                </Button>
+              </div>
+            </div>
+
+            {/* Task 2: Part 5 Practice Drill */}
+            <div className={styles.taskCard}>
+              <div className={styles.taskLeft}>
+                <div className={styles.taskIconBox}>
+                  <TrendingUp size={20} />
+                </div>
+                <div className={styles.taskInfo}>
+                  <div className={styles.taskMetaRow}>
+                    <span className={styles.taskBadge}>LUYỆN TẬP THỰC CHIẾN</span>
+                    <TierBadge tier="BetaPractice" />
+                  </div>
+                  <h3 className={styles.taskName}>Quiz A1: 10 câu trắc nghiệm Phân biệt Từ loại</h3>
+                  <p className={styles.taskDesc}>
+                    Giải đề có bấm giờ và xem giải thích chi tiết tức thì cho từng phương án A, B, C, D.
+                  </p>
+                  <div className={styles.taskSpecs}>
+                    <span className={styles.specItem}>
+                      <Clock size={13} /> 10 phút
+                    </span>
+                    <span className={styles.specItem}>
+                      <Award size={13} /> Mục tiêu đạt 80%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.taskRight}>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={() => navigate('/learn/quiz/part5-grammar')}
+                >
+                  Làm Quiz (10 câu)
+                </Button>
+              </div>
+            </div>
+
+            {/* Task 3: Flashcard Spaced Repetition */}
+            <div className={styles.taskCard}>
+              <div className={styles.taskLeft}>
+                <div className={styles.taskIconBox}>
+                  <Layers size={20} />
+                </div>
+                <div className={styles.taskInfo}>
+                  <div className={styles.taskMetaRow}>
+                    <span className={styles.taskBadge}>LẶP NGẮT QUÃNG (SRS)</span>
+                    <Badge variant="default">{dueCards.length} thẻ đến hạn</Badge>
+                  </div>
+                  <h3 className={styles.taskName}>Ôn tập Flashcard từ vựng thương mại</h3>
+                  <p className={styles.taskDesc}>
+                    Củng cố từ vựng chuyên ngành văn phòng và collocations theo thuật toán lặp ngắt quãng.
+                  </p>
+                  <div className={styles.taskSpecs}>
+                    <span className={styles.specItem}>
+                      <Clock size={13} /> ~8 phút
+                    </span>
+                    <span className={styles.specItem}>
+                      <Award size={13} /> {dueCards.length} thẻ cần ôn
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.taskRight}>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={() => navigate('/learn/flashcards')}
+                >
+                  Ôn {dueCards.length} thẻ
+                </Button>
+              </div>
+            </div>
+
+            {/* Task 4: Error Notebook Review */}
+            <div className={styles.taskCard}>
+              <div className={styles.taskLeft}>
+                <div className={styles.taskIconBox}>
+                  <Bookmark size={20} />
+                </div>
+                <div className={styles.taskInfo}>
+                  <div className={styles.taskMetaRow}>
+                    <span className={styles.taskBadge}>SỔ TAY LỖI SAI</span>
+                    <Badge variant={openMistakes.length > 0 ? 'danger' : 'success'}>
+                      {openMistakes.length} câu chưa sửa
+                    </Badge>
+                  </div>
+                  <h3 className={styles.taskName}>Rà soát và làm lại câu làm sai</h3>
+                  <p className={styles.taskDesc}>
+                    Khắc phục các bẫy liên từ và danh từ ghép hay nhầm lẫn trong các bài thi thử trước.
+                  </p>
+                  <div className={styles.taskSpecs}>
+                    <span className={styles.specItem}>
+                      <Clock size={13} /> ~5 phút
+                    </span>
+                    <span className={styles.specItem}>
+                      <Award size={13} /> {openMistakes.length} câu cần làm lại
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.taskRight}>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={() => navigate('/learn/errors')}
+                >
+                  Mở sổ lỗi sai
+                </Button>
+              </div>
+            </div>
           </div>
         </section>
+
+        {/* Bottom Grid: Active Course & Skill Analytics Overview */}
+        <div className={styles.bottomGrid}>
+          {/* Active Course Status */}
+          <div className={styles.panelCard}>
+            <div className={styles.panelHeader}>
+              <h3 className={styles.panelTitle}>
+                <BookOpen size={18} style={{ color: 'var(--color-primary)' }} />
+                Khóa học đang theo học
+              </h3>
+              <Link to="/learn/roadmap" className={styles.panelLink}>
+                Xem 31 tuần <ArrowRight size={13} />
+              </Link>
+            </div>
+
+            <div className={styles.courseProgressBox}>
+              <div className={styles.courseProgressHeader}>
+                <span className={styles.courseTitle}>{course.title}</span>
+                <span className={styles.courseLevel}>Level A · Tuần 1/31</span>
+              </div>
+
+              <div className={styles.progressBarBg}>
+                <div className={styles.progressBarFill} style={{ width: '12%' }} />
+              </div>
+
+              <div className={styles.courseMetaFooter}>
+                <span>Tuần 1: {currentWeek.title}</span>
+                <span>Tiến độ: 12% hoàn thành</span>
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/learn/roadmap')}
+              style={{ width: '100%' }}
+            >
+              Mở lộ trình chi tiết 31 tuần
+            </Button>
+          </div>
+
+          {/* Quick Review Overview */}
+          <div className={styles.panelCard}>
+            <div className={styles.panelHeader}>
+              <h3 className={styles.panelTitle}>
+                <TrendingUp size={18} style={{ color: 'var(--color-primary)' }} />
+                Chỉ số năng lực hiện tại
+              </h3>
+              <Link to="/learn/dashboard" className={styles.panelLink}>
+                Báo cáo chi tiết <ArrowRight size={13} />
+              </Link>
+            </div>
+
+            <div className={styles.reviewStatsRow}>
+              <div className={styles.reviewStatBox}>
+                <div className={styles.reviewStatVal}>76.4%</div>
+                <div className={styles.reviewStatLabel}>Độ chính xác Part 5</div>
+              </div>
+              <div className={styles.reviewStatBox}>
+                <div className={styles.reviewStatVal}>240 từ</div>
+                <div className={styles.reviewStatLabel}>Từ vựng đã làm chủ</div>
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/learn/dashboard')}
+              style={{ width: '100%' }}
+            >
+              Xem biểu đồ kỹ năng & phân tích điểm yếu
+            </Button>
+          </div>
+        </div>
       </div>
-
-      {/* Suggested Next Chapter / Course Card */}
-      <section className={styles.nextCourseSection}>
-        <div className={styles.nextCourseHeader}>
-          <h3>Bài học kiến thức tiếp theo</h3>
-          <Link to="/learn/roadmap" className={styles.viewRoadmapLink}>
-            Xem toàn bộ lộ trình <ArrowRight size={14} />
-          </Link>
-        </div>
-
-        <div className={styles.courseItem}>
-          <div className={styles.courseIconBox}>
-            <BookOpen size={24} />
-          </div>
-          <div className={styles.courseContent}>
-            <h4>Bài 4: Mệnh đề phân từ & Rút gọn trong văn bản kinh doanh</h4>
-            <p>Trang 1/5 • Kèm 3 mini-check kiểm tra giải thích ngay và audio ví dụ.</p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/learn/lesson/4')}
-          >
-            Học bài này
-          </Button>
-        </div>
-      </section>
     </div>
   );
 }

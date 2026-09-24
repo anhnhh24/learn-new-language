@@ -24,7 +24,7 @@ export interface QuestionSnapshot {
 export interface ExamForm {
   id: string;
   title: string;
-  part: ExamPart | 'FullReading' | 'FullListening';
+  part: ExamPart | 'FullReading' | 'FullListening' | 'MiniTest' | 'FullTest';
   tier: FormTier;
   questionCount: number;
   durationMinutes: number;

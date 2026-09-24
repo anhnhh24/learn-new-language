@@ -7,6 +7,7 @@ import {
   Bookmark,
   Layers,
   BarChart2,
+  TrendingUp,
   User,
   ShieldCheck,
   Menu,
@@ -24,6 +25,7 @@ export function LearnerLayout() {
     { to: '/learn/errors', label: 'Sổ lỗi sai', icon: <Bookmark size={18} /> },
     { to: '/learn/flashcards', label: 'Flashcard', icon: <Layers size={18} /> },
     { to: '/learn/roadmap', label: 'Lộ trình', icon: <BarChart2 size={18} /> },
+    { to: '/learn/dashboard', label: 'Báo cáo', icon: <TrendingUp size={18} /> },
   ];
 
   return (
@@ -53,6 +55,15 @@ export function LearnerLayout() {
           </div>
 
           <div className={styles.rightSection}>
+            <Link
+              to="/learn/today"
+              className={styles.streakBadge}
+              title="Chuỗi 5 ngày học tập liên tục"
+            >
+              <span>🔥</span>
+              <span>5 ngày</span>
+            </Link>
+
             <Link
               to="/admin/quality"
               className={styles.adminLink}
