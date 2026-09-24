@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Modal } from '../../../components/ui/Modal';
@@ -8,15 +9,24 @@ import {
   Download,
   Trash2,
   CheckCircle,
+  LogOut,
 } from 'lucide-react';
+import { api } from '../../../lib/api/client';
 import styles from './Account.module.css';
 
 export function AccountPage() {
-  const [displayName, setDisplayName] = useState('Học viên TOEIC');
-  const [email] = useState('hocvien@example.com');
+  const navigate = useNavigate();
+  const currentUser = api.getCurrentUser();
+  const [displayName, setDisplayName] = useState(currentUser?.displayName || 'Học viên TOEIC');
+  const [email] = useState(currentUser?.email || 'hocvien@example.com');
   const [quietHoursStart, setQuietHoursStart] = useState('21:00');
   const [quietHoursEnd, setQuietHoursEnd] = useState('08:00');
   const [allowEmailReminders, setAllowEmailReminders] = useState(true);
+
+  const handleLogout = async () => {
+    await api.logout();
+    navigate('/auth/login');
+  };
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -69,9 +79,20 @@ export function AccountPage() {
               hint="Email không thể tự đổi trực tiếp khi chưa qua quy trình xác minh lại"
             />
 
-            <Button variant="primary" size="sm" type="submit">
-              Lưu thay đổi hồ sơ
-            </Button>
+            <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-3)' }}>
+              <Button variant="primary" size="sm" type="submit">
+                Lưu thay đổi hồ sơ
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                onClick={handleLogout}
+                leftIcon={<LogOut size={14} />}
+              >
+                Đăng xuất
+              </Button>
+            </div>
           </form>
         </section>
 

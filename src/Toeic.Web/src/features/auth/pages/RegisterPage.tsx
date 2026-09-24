@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import { Alert } from '../../../components/ui/Alert';
+import { api } from '../../../lib/api/client';
 import styles from './Auth.module.css';
 
 export function RegisterPage() {
@@ -15,7 +16,7 @@ export function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -41,10 +42,19 @@ export function RegisterPage() {
 
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const res = await api.register(displayName, email, password);
+      if (!res.success) {
+        setError(res.error || 'Đăng ký tài khoản không thành công.');
+        return;
+      }
       navigate('/auth/onboarding');
-    }, 700);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Lỗi kết nối máy chủ.';
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

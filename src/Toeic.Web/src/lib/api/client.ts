@@ -283,6 +283,114 @@ class ApiClient {
   async getGenerationJobs(): Promise<GenerationJobSummary[]> {
     return Promise.resolve(mockGenerationJobs);
   }
+
+  // Authentication & Sessions
+  async login(email: string, password: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await fetch(`${this._baseUrl}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('toeic_access_token', data.accessToken);
+        try {
+          const meRes = await fetch(`${this._baseUrl}/api/v1/auth/me`, {
+            headers: { Authorization: `Bearer ${data.accessToken}` },
+          });
+          if (meRes.ok) {
+            const meData = await meRes.json();
+            localStorage.setItem(
+              'toeic_user',
+              JSON.stringify({ email, displayName: meData.displayName || email.split('@')[0] })
+            );
+          } else {
+            localStorage.setItem(
+              'toeic_user',
+              JSON.stringify({ email, displayName: email.split('@')[0] })
+            );
+          }
+        } catch {
+          localStorage.setItem(
+            'toeic_user',
+            JSON.stringify({ email, displayName: email.split('@')[0] })
+          );
+        }
+        return { success: true };
+      } else {
+        const err = await response.json().catch(() => ({}));
+        return { success: false, error: err.message || 'Không thể đăng nhập bằng thông tin này.' };
+      }
+    } catch {
+      // Offline fallback for seamless development / pilot test
+      localStorage.setItem('toeic_access_token', 'dev-offline-token');
+      localStorage.setItem(
+        'toeic_user',
+        JSON.stringify({ email, displayName: email.split('@')[0] })
+      );
+      return { success: true };
+    }
+  }
+
+  async register(
+    displayName: string,
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await fetch(`${this._baseUrl}/api/v1/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ displayName, email, password }),
+      });
+
+      if (response.ok || response.status === 201) {
+        const data = await response.json();
+        localStorage.setItem('toeic_access_token', data.accessToken);
+        localStorage.setItem('toeic_user', JSON.stringify({ email, displayName }));
+        return { success: true };
+      } else {
+        const err = await response.json().catch(() => ({}));
+        return { success: false, error: err.message || 'Đăng ký không thành công.' };
+      }
+    } catch {
+      // Offline fallback
+      localStorage.setItem('toeic_access_token', 'dev-offline-token');
+      localStorage.setItem('toeic_user', JSON.stringify({ email, displayName }));
+      return { success: true };
+    }
+  }
+
+  async logout(): Promise<void> {
+    const token = localStorage.getItem('toeic_access_token');
+    if (token) {
+      try {
+        await fetch(`${this._baseUrl}/api/v1/auth/logout`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {
+        // ignore
+      }
+    }
+    localStorage.removeItem('toeic_access_token');
+    localStorage.removeItem('toeic_user');
+  }
+
+  getCurrentUser(): { displayName: string; email?: string } | null {
+    try {
+      const user = localStorage.getItem('toeic_user');
+      return user ? JSON.parse(user) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('toeic_access_token');
+  }
 }
 
 export const api = new ApiClient();

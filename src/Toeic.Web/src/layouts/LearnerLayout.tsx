@@ -13,10 +13,12 @@ import {
   Menu,
   X,
 } from 'lucide-react';
+import { api } from '../lib/api/client';
 import styles from './LearnerLayout.module.css';
 
 export function LearnerLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const currentUser = api.getCurrentUser();
 
   const navItems = [
     { to: '/learn/today', label: 'Hôm nay', icon: <Calendar size={18} /> },
@@ -81,7 +83,9 @@ export function LearnerLayout() {
               <div className={styles.avatar}>
                 <User size={16} />
               </div>
-              <span className={styles.accountName}>Học viên</span>
+              <span className={styles.accountName}>
+                {currentUser?.displayName || 'Học viên'}
+              </span>
             </Link>
 
             <button

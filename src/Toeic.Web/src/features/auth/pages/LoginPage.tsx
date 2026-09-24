@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import { Alert } from '../../../components/ui/Alert';
+import { api } from '../../../lib/api/client';
 import styles from './Auth.module.css';
 
 export function LoginPage() {
@@ -12,7 +13,7 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -23,12 +24,19 @@ export function LoginPage() {
 
     setIsLoading(true);
 
-    // Simulate login API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // Navigate to today dashboard
+    try {
+      const res = await api.login(email, password);
+      if (!res.success) {
+        setError(res.error || 'Email hoặc mật khẩu không chính xác.');
+        return;
+      }
       navigate('/learn/today');
-    }, 600);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Lỗi kết nối máy chủ xác thực.';
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
