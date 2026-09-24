@@ -80,5 +80,20 @@
   /* Layout Constraints */
   --max-width-content: 1120px;
   --max-width-editorial: 68ch; /* 60-75ch readability standard */
-  --header-height: 60px;
+  --max-width-container: 1280px;
+  --header-height: 64px;
+
+  /* TOTC Palette Enhancements */
+  --color-brand-teal: #49bbbd;
+  --color-brand-teal-dark: #176b63;
+  --color-brand-teal-light: #eaf8f8;
+  --color-accent-orange: #f48c06;
+  --color-accent-orange-hover: #dc7d03;
+  --color-accent-orange-subtle: #fef5ea;
+  --color-navy-dark: #252641;
+  --color-navy-surface: #2f327d;
+  --color-navy-card: #1e1f38;
+  --shadow-card: 0 4px 20px rgba(49, 81, 113, 0.08);
+  --shadow-card-hover: 0 10px 30px rgba(49, 81, 113, 0.14);
 }
+

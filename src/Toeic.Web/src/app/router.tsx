@@ -50,11 +50,13 @@ import { ItemBankPage } from '../features/admin/pages/ItemBankPage';
 import { ImportConsolePage } from '../features/admin/pages/ImportConsolePage';
 import { UserManagementPage } from '../features/admin/pages/UserManagementPage';
 import { AuditLogPage } from '../features/admin/pages/AuditLogPage';
+// Landing Page (TOTC Inspired)
+import { LandingPage } from '../features/landing/pages/LandingPage';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/learn/today" replace />,
+    element: <LandingPage />,
   },
   {
     path: '/auth',

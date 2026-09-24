@@ -84,6 +84,7 @@ const officialCourses: CourseItem[] = [
 export function CourseCatalogPage() {
   const navigate = useNavigate();
   const [levelFilter, setLevelFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [courses, setCourses] = useState<CourseItem[]>(officialCourses);
 
   const handleEnroll = (courseId: string) => {
@@ -94,18 +95,33 @@ export function CourseCatalogPage() {
   };
 
   const filteredCourses = courses.filter((c) => {
-    if (levelFilter === 'all') return true;
-    return c.levelBadge === levelFilter;
+    const matchesLevel = levelFilter === 'all' || c.levelBadge === levelFilter;
+    const matchesSearch =
+      searchQuery.trim() === '' ||
+      c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesLevel && matchesSearch;
   });
 
   return (
     <div className="content-container">
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Danh mục khóa học</h1>
+          <span className={styles.pretitle}>CHƯƠNG TRÌNH ĐÀO TẠO</span>
+          <h1 className={styles.title}>Danh mục khóa học & Lộ trình</h1>
           <p className={styles.subtitle}>
             Chương trình đào tạo chuẩn hóa từ Database: 31 tuần, 4 cấp độ và 35 chủ điểm bài học.
           </p>
+        </div>
+
+        <div className={styles.searchBox}>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm kiếm chủ điểm, cấp độ hoặc module..."
+            className={styles.searchInput}
+          />
         </div>
       </div>
 

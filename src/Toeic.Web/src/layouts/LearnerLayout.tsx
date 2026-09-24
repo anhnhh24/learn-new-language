@@ -35,9 +35,9 @@ export function LearnerLayout() {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.leftSection}>
-            <Link to="/learn/today" className={styles.brand}>
-              <span className={styles.brandBadge}>TOEIC</span>
-              <span className={styles.brandTitle}>Luyện tập</span>
+            <Link to="/" className={styles.brand} title="Trang chủ TOTC TOEIC">
+              <span className={styles.brandBadge}>TOTC</span>
+              <span className={styles.brandTitle}>TOEIC Master</span>
             </Link>
 
             <nav className={styles.desktopNav} aria-label="Điều hướng chính">
