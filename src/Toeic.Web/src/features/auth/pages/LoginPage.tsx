@@ -74,9 +74,9 @@ export function LoginPage() {
         />
 
         <div className={styles.helperRow}>
-          <a href="#forgot" className={styles.forgotLink} onClick={(e) => { e.preventDefault(); alert('Liên kết đặt lại mật khẩu đã được gửi (mô phỏng).'); }}>
+          <Link to="/auth/forgot-password" className={styles.forgotLink}>
             Quên mật khẩu?
-          </a>
+          </Link>
         </div>
 
         <Button

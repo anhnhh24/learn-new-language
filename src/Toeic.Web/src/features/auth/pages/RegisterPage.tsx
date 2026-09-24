@@ -43,12 +43,12 @@ export function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const res = await api.register(displayName, email, password);
+      const res = await api.register(displayName, email, password, agreeTerms);
       if (!res.success) {
         setError(res.error || 'Đăng ký tài khoản không thành công.');
         return;
       }
-      navigate('/auth/onboarding');
+      navigate('/auth/verify-email', { state: { email } });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Lỗi kết nối máy chủ.';
       setError(msg);
@@ -136,7 +136,7 @@ export function RegisterPage() {
           className={styles.submitBtn}
           isLoading={isLoading}
         >
-          Tạo tài khoản và Tiếp tục
+          Tạo tài khoản
         </Button>
       </form>
 

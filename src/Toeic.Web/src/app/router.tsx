@@ -8,6 +8,7 @@ import { LoginPage } from '../features/auth/pages/LoginPage';
 import { RegisterPage } from '../features/auth/pages/RegisterPage';
 import { OnboardingPage } from '../features/auth/pages/OnboardingPage';
 import { PlacementPage } from '../features/auth/pages/PlacementPage';
+import { ResetPasswordPage } from '../features/auth/pages/AccountActionPage';
 import { VerifyEmailPage } from '../features/auth/pages/VerifyEmailPage';
 import { ForgotPasswordPage } from '../features/auth/pages/ForgotPasswordPage';
 
@@ -67,6 +68,7 @@ export const router = createBrowserRouter([
       { path: 'onboarding', element: <OnboardingPage /> },
       { path: 'verify-email', element: <VerifyEmailPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },
+      { path: 'reset-password', element: <ResetPasswordPage /> },
       { path: '', element: <Navigate to="/auth/login" replace /> },
     ],
   },
