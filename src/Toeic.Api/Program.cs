@@ -4,6 +4,7 @@ using Toeic.Infrastructure.Persistence;
 using Toeic.Infrastructure.Security;
 using Toeic.Application;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
 using System.Threading.RateLimiting;
 
 ﻿var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +38,33 @@ if (analyticsPseudonymConfigured)
 if (learnerApiEnabled)
 {
     builder.Services.AddSingleton<ILearnerSessions, PostgresLearnerSessions>();
+    var mail = builder.Configuration.GetSection("AccountMail").Get<AccountMailOptions>() ?? new();
+    if (mail.Mode is not ("Disabled" or "Smtp" or "DevelopmentFile"))
+        throw new InvalidOperationException("Unknown AccountMail mode.");
+    if (mail.Mode != "Disabled")
+    {
+        if (!Uri.TryCreate(mail.PublicWebUrl, UriKind.Absolute, out var webUrl) ||
+            (!builder.Environment.IsDevelopment() && webUrl.Scheme != "https") ||
+            (webUrl.Scheme != "http" && webUrl.Scheme != "https") ||
+            !string.IsNullOrEmpty(webUrl.UserInfo) || !string.IsNullOrEmpty(webUrl.Query) ||
+            !string.IsNullOrEmpty(webUrl.Fragment))
+            throw new InvalidOperationException("AccountMail:PublicWebUrl must be a trusted web origin.");
+        if (mail.Mode == "DevelopmentFile" && (!builder.Environment.IsDevelopment() ||
+            string.IsNullOrWhiteSpace(mail.DevelopmentDirectory)))
+            throw new InvalidOperationException("DevelopmentFile mail requires Development and a directory.");
+        if (mail.Mode == "Smtp" && (string.IsNullOrWhiteSpace(mail.SmtpHost) ||
+            mail.SmtpPort is < 1 or > 65535 || !System.Net.Mail.MailAddress.TryCreate(mail.From, out _)))
+            throw new InvalidOperationException("SMTP host, port and sender are required.");
+        if (string.IsNullOrWhiteSpace(mail.TermsVersion))
+            throw new InvalidOperationException("AccountMail:TermsVersion is required.");
+        builder.Services.AddHostedService<AccountMailWorker>();
+    }
+    builder.Services.AddSingleton(mail);
+    var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Toeic.Accounts");
+    var keyDirectory = builder.Configuration["AccountMail:DataProtectionKeyDirectory"];
+    if (!string.IsNullOrWhiteSpace(keyDirectory))
+        dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keyDirectory));
+    builder.Services.AddSingleton<IAccountLifecycle, PostgresAccountLifecycle>();
     builder.Services.AddAuthentication(LearnerAuthentication.SchemeName)
         .AddScheme<AuthenticationSchemeOptions, LearnerAuthentication>(
             LearnerAuthentication.SchemeName, _ => { });
@@ -73,6 +101,7 @@ if (learnerApiEnabled)
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapSessionEndpoints();
+    app.MapAccountEndpoints();
     app.MapLearnerEndpoints();
 }
 app.MapHealthChecks("/health");

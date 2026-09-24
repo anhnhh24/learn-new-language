@@ -45,6 +45,7 @@ public static class ApiPipeline
 
     private static int StatusFor(string code)
     {
+        if (code == "ACCOUNT_MAIL_UNAVAILABLE") return StatusCodes.Status503ServiceUnavailable;
         if (code == "FORBIDDEN") return StatusCodes.Status403Forbidden;
         if (code.EndsWith("_NOT_FOUND", StringComparison.Ordinal)) return StatusCodes.Status404NotFound;
         if (code.Contains("CONFLICT", StringComparison.Ordinal) ||
@@ -56,6 +57,10 @@ public static class ApiPipeline
 
     private static string SafeMessage(string code) => code switch
     {
+        "ACCOUNT_MAIL_UNAVAILABLE" => "Dịch vụ email tài khoản chưa được cấu hình. Vui lòng thử lại sau.",
+        "ACCOUNT_TOKEN_INVALID" => "Liên kết không hợp lệ, đã dùng hoặc hết hạn. Vui lòng yêu cầu liên kết mới.",
+        "TERMS_CONSENT_REQUIRED" => "Bạn cần đồng ý với điều khoản trước khi đăng ký.",
+        "PASSWORD_REQUIREMENT" => "Mật khẩu cần từ 12 đến 128 ký tự.",
         "FORBIDDEN" => "Bạn không có quyền thực hiện thao tác này.",
         "ATTEMPT_NOT_FOUND" or "ORDER_NOT_FOUND" or "ENROLLMENT_NOT_FOUND" =>
             "Không tìm thấy tài nguyên.",

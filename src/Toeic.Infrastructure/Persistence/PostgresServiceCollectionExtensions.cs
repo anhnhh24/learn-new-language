@@ -67,8 +67,11 @@ public static class PostgresServiceCollectionExtensions
         services.AddScoped<IQuestionNodeStore, PostgresQuestionNodeStore>();
         services.AddSingleton<IBetaServingControl>(
             new ConfiguredBetaServingControl(betaServingEnabled));
-        services.AddScoped<BetaServingService>();
-        services.AddScoped<LearnerIssueReportService>();
+        if (betaServingEnabled)
+        {
+            services.AddScoped<BetaServingService>();
+            services.AddScoped<LearnerIssueReportService>();
+        }
         services.AddScoped<FormCompositionService>();
         services.AddScoped<AutoQuarantineService>();
         services.AddHealthChecks()
