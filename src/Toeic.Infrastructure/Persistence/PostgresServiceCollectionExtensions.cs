@@ -49,6 +49,7 @@ public static class PostgresServiceCollectionExtensions
         services.AddScoped<ILearnerLearning, PostgresLearnerLearning>();
         services.AddScoped<ILearnerToday, PostgresLearnerToday>();
         services.AddScoped<ILearnerProfile, PostgresLearnerProfile>();
+        services.AddScoped<ISupportTickets, PostgresSupportTickets>();
         services.AddScoped<PostgresGenerationJobStore>();
         services.AddScoped<IAtomicGenerationJobStore>(provider =>
             provider.GetRequiredService<PostgresGenerationJobStore>());
