@@ -159,7 +159,8 @@ public interface ICurriculumReader
         string slug, CancellationToken cancellationToken);
 
     Task<PublishedRoadmapView?> FindPublishedRoadmapAsync(
-        string slug, CancellationToken cancellationToken);
+        string slug, CancellationToken cancellationToken,
+        Guid? requestedCourseVersionId = null);
 
     Task<PublishedLessonView?> FindPublishedLessonAsync(
         string courseSlug, string lessonCode, CancellationToken cancellationToken,

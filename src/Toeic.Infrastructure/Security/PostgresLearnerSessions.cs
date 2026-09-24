@@ -84,6 +84,74 @@ public sealed class PostgresLearnerSessions(IDbConnectionFactory connections, Ti
         return new SessionToken(token, expires);
     }
 
+    public async Task<RegisterResult> RegisterAsync(
+        string displayName, string email, string password, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(displayName) || displayName.Trim().Length < 2 || displayName.Length > 100)
+            return new RegisterResult(false, "INVALID_DISPLAY_NAME", "Tên hiển thị phải có từ 2 đến 100 ký tự.");
+
+        if (string.IsNullOrWhiteSpace(email) || email.Length > 254 || !email.Contains('@'))
+            return new RegisterResult(false, "INVALID_EMAIL", "Địa chỉ email không hợp lệ.");
+
+        if (string.IsNullOrEmpty(password) || password.Length < 12 || password.Length > 128)
+            return new RegisterResult(false, "PASSWORD_REQUIREMENT", "Mật khẩu phải chứa ít nhất 12 ký tự.");
+
+        var normalized = email.Trim().Normalize(NormalizationForm.FormKC).ToUpperInvariant();
+        var trimmedName = displayName.Trim();
+
+        await using var connection = await connections.OpenAsync(ct);
+        await using var transaction = await connection.BeginTransactionAsync(ct);
+
+        await using var checkCmd = connection.Query("""
+            select id from identity_data.users where email_normalized = @email;
+            """, transaction, ("email", normalized));
+        await using (var checkReader = await checkCmd.ExecuteReaderAsync(ct))
+        {
+            if (await checkReader.ReadAsync(ct))
+            {
+                return new RegisterResult(false, "EMAIL_EXISTS", "Địa chỉ email này đã được sử dụng trên hệ thống.");
+            }
+        }
+
+        var userId = Guid.NewGuid();
+        var now = clock.GetUtcNow();
+        var passwordHash = hasher.HashPassword(normalized, password);
+
+        await using var insertUser = connection.Query("""
+            insert into identity_data.users
+                (id, email_normalized, password_hash, display_name, timezone, status, email_verified_at, created_at, failed_login_count)
+            values
+                (@id, @email, @hash, @name, 'Asia/Ho_Chi_Minh', 'Active', @verifiedAt, @createdAt, 0);
+            """, transaction,
+            ("id", userId),
+            ("email", normalized),
+            ("hash", passwordHash),
+            ("name", trimmedName),
+            ("verifiedAt", now),
+            ("createdAt", now));
+        await insertUser.ExecuteNonQueryAsync(ct);
+
+        var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
+        var expires = now.AddHours(8);
+        var sessionId = Guid.NewGuid();
+
+        await using var insertSession = connection.Query("""
+            insert into identity_data.learner_sessions
+                (id, user_id, token_hash, created_at, expires_at)
+            values (@session, @id, @token, @now, @expires);
+            """, transaction,
+            ("session", sessionId),
+            ("id", userId),
+            ("token", Hash(token)),
+            ("now", now),
+            ("expires", expires));
+        await insertSession.ExecuteNonQueryAsync(ct);
+
+        await transaction.CommitAsync(ct);
+
+        return new RegisterResult(true, null, null, new SessionToken(token, expires));
+    }
+
     public async Task<LearnerSession?> AuthenticateAsync(string token, CancellationToken ct)
     {
         if (token.Length != 64 || token.Any(c => !char.IsAsciiHexDigit(c))) return null;

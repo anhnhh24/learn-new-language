@@ -108,7 +108,8 @@ internal sealed class PostgresCurriculumReader(IDbConnectionFactory connections)
     }
 
     public async Task<PublishedRoadmapView?> FindPublishedRoadmapAsync(
-        string slug, CancellationToken cancellationToken)
+        string slug, CancellationToken cancellationToken,
+        Guid? requestedCourseVersionId = null)
     {
         if (!IsSafeCode(slug)) return null;
         await using var connection = await connections.OpenAsync(cancellationToken);
