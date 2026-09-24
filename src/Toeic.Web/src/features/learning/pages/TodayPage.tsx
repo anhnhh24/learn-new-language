@@ -108,7 +108,7 @@ export function TodayPage() {
             {/* Task 1: Core Concept Lesson */}
             <div className={`${styles.taskCard} ${styles.taskCardPrimary}`}>
               <div className={styles.taskLeft}>
-                <div className={styles.taskIconBox}>
+                <div className={`${styles.taskIconBox} ${styles.iconBoxTeal}`}>
                   <BookOpen size={20} />
                 </div>
                 <div className={styles.taskInfo}>
@@ -144,14 +144,14 @@ export function TodayPage() {
             </div>
 
             {/* Task 2: Part 5 Practice Drill */}
-            <div className={styles.taskCard}>
+            <div className={`${styles.taskCard} ${styles.taskCardBlue}`}>
               <div className={styles.taskLeft}>
-                <div className={styles.taskIconBox}>
+                <div className={`${styles.taskIconBox} ${styles.iconBoxBlue}`}>
                   <TrendingUp size={20} />
                 </div>
                 <div className={styles.taskInfo}>
                   <div className={styles.taskMetaRow}>
-                    <span className={styles.taskBadge}>LUYỆN TẬP THỰC CHIẾN</span>
+                    <span className={styles.taskBadge} style={{ color: '#2563eb' }}>LUYỆN TẬP THỰC CHIẾN</span>
                     <TierBadge tier="BetaPractice" />
                   </div>
                   <h3 className={styles.taskName}>Quiz A1: 10 câu trắc nghiệm Phân biệt Từ loại</h3>
@@ -181,14 +181,14 @@ export function TodayPage() {
             </div>
 
             {/* Task 3: Flashcard Spaced Repetition */}
-            <div className={styles.taskCard}>
+            <div className={`${styles.taskCard} ${styles.taskCardAmber}`}>
               <div className={styles.taskLeft}>
-                <div className={styles.taskIconBox}>
+                <div className={`${styles.taskIconBox} ${styles.iconBoxAmber}`}>
                   <Layers size={20} />
                 </div>
                 <div className={styles.taskInfo}>
                   <div className={styles.taskMetaRow}>
-                    <span className={styles.taskBadge}>LẶP NGẮT QUÃNG (SRS)</span>
+                    <span className={styles.taskBadge} style={{ color: '#f48c06' }}>LẶP NGẮT QUÃNG (SRS)</span>
                     <Badge variant="default">{dueCards.length} thẻ đến hạn</Badge>
                   </div>
                   <h3 className={styles.taskName}>Ôn tập Flashcard từ vựng thương mại</h3>
@@ -218,14 +218,14 @@ export function TodayPage() {
             </div>
 
             {/* Task 4: Error Notebook Review */}
-            <div className={styles.taskCard}>
+            <div className={`${styles.taskCard} ${styles.taskCardRose}`}>
               <div className={styles.taskLeft}>
-                <div className={styles.taskIconBox}>
+                <div className={`${styles.taskIconBox} ${styles.iconBoxRose}`}>
                   <Bookmark size={20} />
                 </div>
                 <div className={styles.taskInfo}>
                   <div className={styles.taskMetaRow}>
-                    <span className={styles.taskBadge}>SỔ TAY LỖI SAI</span>
+                    <span className={styles.taskBadge} style={{ color: '#e11d48' }}>SỔ TAY LỖI SAI</span>
                     <Badge variant={openMistakes.length > 0 ? 'danger' : 'success'}>
                       {openMistakes.length} câu chưa sửa
                     </Badge>
