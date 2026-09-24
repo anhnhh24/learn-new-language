@@ -58,13 +58,18 @@ export function PracticeListPage() {
 
   return (
     <div className="content-container">
-      <div className={styles.header}>
-        <div className={styles.titleRow}>
-          <div>
-            <h1 className={styles.title}>Thư viện Đề thi & Phòng luyện TOEIC</h1>
-            <p className={styles.subtitle}>
-              Hệ thống đề thi mô phỏng ETS chuẩn hóa, chia theo Full Test, Mini Test và chuyên đề từng Part với chế độ thi thử tính giờ hoặc luyện tập có giải thích tức thì.
-            </p>
+      {/* TOTC-inspired Hero Banner */}
+      <div className={styles.heroBanner}>
+        <div className={styles.heroBannerContent}>
+          <span className={styles.heroPretitle}>🎯 THƯ VIỆN ĐỀ THI CHUẨN ETS</span>
+          <h1 className={styles.heroTitle}>Phòng Thi & Luyện Đề Chuẩn Hóa</h1>
+          <p className={styles.heroSubtitle}>
+            Hệ thống bộ đề thi Full Reading, Mini Test và chuyên đề Part 1–7 với đồng hồ tính giờ server, tự động lưu bài chống rớt mạng và giải thích dẫn chứng chi tiết.
+          </p>
+          <div className={styles.heroStatsRow}>
+            <span className={styles.heroStatChip}>📝 1,200+ Câu hỏi chuẩn hóa</span>
+            <span className={styles.heroStatChip}>⏱️ Đồng hồ đếm ngược Server</span>
+            <span className={styles.heroStatChip}>💡 Phân tích bẫy đề thi Part 5 & 7</span>
           </div>
         </div>
       </div>
