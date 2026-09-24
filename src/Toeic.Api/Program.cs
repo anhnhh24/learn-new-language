@@ -103,6 +103,7 @@ if (learnerApiEnabled)
     app.MapSessionEndpoints();
     app.MapAccountEndpoints();
     app.MapLearnerEndpoints();
+    app.MapProfileEndpoints();
 }
 app.MapHealthChecks("/health");
 app.MapPlatformStatus(persistenceConfigured, analyticsPseudonymConfigured, betaServingEnabled);
