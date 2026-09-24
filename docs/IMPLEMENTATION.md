@@ -195,6 +195,22 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 - Khóa được ghi đúng phạm vi Reading/Part 5–6, không cam kết tổng điểm TOEIC; placement chỉ gợi ý điểm bắt đầu và không tự đưa learner vào D.
 - Migration 001–006 đã được áp dụng thành công từ database trống trên PostgreSQL 16; count/invariant của curriculum đã được truy vấn sau migrate.
 
+## M25 — Tái cấu trúc Lộ trình thành Hệ thống phân hệ kiến thức (Knowledge Architecture & Mastery Map)
+
+- **Định hướng nghiệp vụ:** Loại bỏ cách trình bày theo lịch 31 tuần cứng nhắc; chuyển đổi hoàn toàn sang mô hình **Hệ thống phân hệ kiến thức chuẩn hóa (Knowledge Architecture)** gồm 4 phân hệ lớn và 40 chuyên đề cốt lõi:
+  - **Phần 1: Cấu trúc câu & 4 từ loại cốt lõi** *(Level A — 9 chuyên đề: A1–A9)*: Nhận diện 4 từ loại, cấu trúc câu S–V–O, các thì cơ bản, mạo từ và danh từ đếm được/không đếm được. Kết thúc bằng bài kiểm định **Checkpoint A** (25 câu, ngưỡng chuẩn hóa 70%).
+  - **Phần 2: Hệ thống các thì & Mệnh đề liên kết** *(Level B — 10 chuyên đề: B1–B10)*: Thì hoàn thành, thể bị động, câu điều kiện loại 0-1-2, động từ khuyết thiếu, danh động từ, mệnh đề quan hệ và liên từ kết hợp. Kết thúc bằng bài kiểm định **Checkpoint B** (40 câu, ngưỡng chuẩn hóa 70%).
+  - **Phần 3: Cấu trúc nâng cao & Điểm ngữ pháp phức** *(Level C — 10 chuyên đề: C1–C10)*: Đảo ngữ trạng từ phủ định, cụm phân từ rút gọn, câu giả định, cấu trúc song song, mệnh đề danh từ và câu chẻ nhấn mạnh. Kết thúc bằng bài kiểm định **Checkpoint C** (40 câu, ngưỡng chuẩn hóa 75%).
+  - **Phần 4: Độ chính xác chuyên sâu & Né bẫy Part 5/6** *(Level D — 11 chuyên đề: D1–D11)*: Word form khó, collocation công sở, văn phong thương mại, liên từ chuyển tiếp đoạn Part 6 và chiến lược né bẫy đề thi. Kết thúc bằng bài kiểm định **Checkpoint D Tốt nghiệp** (46 câu, ngưỡng chuẩn hóa 85%).
+- **Giao diện & Trải nghiệm người dùng:**
+  - Trang `/learn/roadmap` được tái thiết kế thành Bản đồ hệ thống kiến thức (Knowledge Map) phong cách TOTC hiện đại: Hero banner tóm tắt 4 phân hệ/40 chuyên đề/4 Checkpoint, ô tìm kiếm chuyên đề/công thức/từ khóa tức thì, bộ lọc tab theo phân hệ (Phần 1 đến Phần 4) và danh mục (Ngữ pháp, Từ vựng, Chiến thuật).
+  - Mỗi thẻ chuyên đề hiển thị mã bài nổi bật (`A1`..`D11`), tiêu đề song ngữ, tóm tắt cốt lõi, hộp trọng tâm ghi nhớ 2 quy tắc vàng, hộp cảnh báo bẫy thi Part 5/6 và 2 nút hành động trực tiếp: "Học lý thuyết" (mở `/learn/lesson/:id`) và "Luyện bài tập" (mở `/learn/quiz/:quizId`).
+  - Mỗi phân hệ tích hợp mốc kiểm định chuẩn hóa độc lập (Checkpoint Card) với thông số câu hỏi, thời gian và ngưỡng đạt.
+  - Đồng bộ thanh điều hướng `LearnerLayout` (`Hệ thống kiến thức`), nút quay lại trong `LessonPage` và thẻ khóa học trong `TodayPage`.
+- **Cơ sở dữ liệu & Persistence:**
+  - Bổ sung migration `db/009_update_curriculum_knowledge_system.sql` cập nhật các bảng `learning.course_versions`, `learning.curriculum_levels`, `learning.course_modules` đồng bộ với cấu trúc phân hệ kiến thức mới.
+  - Đồng bộ `curriculumData.ts` ở Frontend phản ánh chính xác cấu trúc phân hệ từ Database.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 2. Operations quality dashboard và công cụ kiểm soát quarantine.

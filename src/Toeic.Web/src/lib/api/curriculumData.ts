@@ -6,14 +6,14 @@ export const toeicReadingCurriculum: CourseCurriculum = {
   slug: 'toeic-reading-grammar-foundation',
   title: 'TOEIC Reading: Ngữ pháp và từ vựng từ nền tảng đến nâng cao',
   summary:
-    'Lộ trình 31 tuần có thể học theo nhịp riêng, tập trung ngữ pháp, từ vựng kinh doanh và kỹ năng Part 5/6. Đây không phải cam kết tổng điểm TOEIC và không thay thế lộ trình Listening.',
+    'Hệ thống kiến thức TOEIC Reading gồm 4 phân hệ lớn, 40 chuyên đề ngữ pháp - từ vựng cốt lõi và 4 bài thi Checkpoint kiểm định năng lực độc lập.',
   levelLabel: 'Nền tảng đến nâng cao',
   estimatedMinutes: 4200, // 70 giờ
   levels: [
     {
       id: '61000000-0000-4000-8000-000000000001',
       code: 'A',
-      title: 'A — Củng cố nền tảng',
+      title: 'Phần 1: Cấu trúc câu & 4 từ loại cốt lõi (Level A)',
       sequence: 1,
       recommendedWeeks: 6,
       entryGuidance:
@@ -26,7 +26,7 @@ export const toeicReadingCurriculum: CourseCurriculum = {
     {
       id: '61000000-0000-4000-8000-000000000002',
       code: 'B',
-      title: 'B — Trung cấp ứng dụng',
+      title: 'Phần 2: Hệ thống các thì & Mệnh đề liên kết (Level B)',
       sequence: 2,
       recommendedWeeks: 7,
       entryGuidance:
@@ -39,7 +39,7 @@ export const toeicReadingCurriculum: CourseCurriculum = {
     {
       id: '61000000-0000-4000-8000-000000000003',
       code: 'C',
-      title: 'C — Nâng cao có kiểm soát',
+      title: 'Phần 3: Cấu trúc nâng cao & Điểm ngữ pháp phức (Level C)',
       sequence: 3,
       recommendedWeeks: 8,
       entryGuidance:
@@ -52,7 +52,7 @@ export const toeicReadingCurriculum: CourseCurriculum = {
     {
       id: '61000000-0000-4000-8000-000000000004',
       code: 'D',
-      title: 'D — Chuyên sâu Part 5/6',
+      title: 'Phần 4: Độ chính xác chuyên sâu & Né bẫy Part 5/6 (Level D)',
       sequence: 4,
       recommendedWeeks: 10,
       entryGuidance:
@@ -68,29 +68,29 @@ export const toeicReadingCurriculum: CourseCurriculum = {
       id: '62000000-0000-4000-8000-000000000001',
       levelCode: 'A',
       code: 'MODULE-A',
-      title: 'Nền câu và từ loại',
-      summary: 'Dựng lại cấu trúc câu, thì cơ bản và nhóm danh từ.',
+      title: 'Phần 1: Cấu trúc câu và từ loại cốt lõi',
+      summary: 'Dựng lại cấu trúc câu S–V–O, các thì cơ bản, mạo từ và nhóm danh từ.',
     },
     {
       id: '62000000-0000-4000-8000-000000000002',
       levelCode: 'B',
       code: 'MODULE-B',
-      title: 'Cấu trúc trung cấp',
-      summary: 'Các thì hoàn thành, bị động, điều kiện, mệnh đề và giới từ.',
+      title: 'Phần 2: Hệ thống các thì và mệnh đề liên kết',
+      summary: 'Các thì hoàn thành, bị động, điều kiện, mệnh đề quan hệ và liên từ kết hợp.',
     },
     {
       id: '62000000-0000-4000-8000-000000000003',
       levelCode: 'C',
       code: 'MODULE-C',
-      title: 'Cấu trúc nâng cao',
-      summary: 'Đảo ngữ, rút gọn, song song, giả định và nhấn mạnh.',
+      title: 'Phần 3: Cấu trúc nâng cao và ngữ pháp phức',
+      summary: 'Đảo ngữ, phân từ rút gọn, câu giả định, cấu trúc song song và nhấn mạnh.',
     },
     {
       id: '62000000-0000-4000-8000-000000000004',
       levelCode: 'D',
       code: 'MODULE-D',
-      title: 'Độ chính xác chuyên sâu',
-      summary: 'Word form, collocation, register, transitions và cấu trúc nén.',
+      title: 'Phần 4: Độ chính xác chuyên sâu và né bẫy Part 5/6',
+      summary: 'Word form khó, collocation công sở, văn phong thương mại, transitions và cấu trúc nén.',
     },
   ],
   topics: curriculumTopicsJson as unknown as Record<string, KnowledgeTopic>,

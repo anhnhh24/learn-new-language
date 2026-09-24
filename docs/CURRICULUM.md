@@ -58,6 +58,7 @@ Content block là JSON có cấu trúc; không lưu HTML/script. Quiz question/a
 
 - 005_learning_curriculum.sql: schema version hóa course, level, topic, lesson/page/block, prerequisite, roadmap và placement rule.
 - 006_seed_toeic_reading_curriculum.sql: nội dung và roadmap Published.
+- 009_update_curriculum_knowledge_system.sql: cập nhật phân hệ kiến thức (Knowledge Architecture), đồng bộ tiêu đề 4 phân hệ và các modules tương ứng.
 - enrollments.course_version_id và lesson_progress.lesson_version_id dùng FK NOT VALID để không phá dữ liệu legacy; row mới vẫn được kiểm FK. Cần audit dữ liệu cũ rồi VALIDATE CONSTRAINT trước production.
 
 ## Giới hạn còn lại
