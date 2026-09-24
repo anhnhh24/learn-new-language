@@ -153,7 +153,9 @@ export function CourseCatalogPage() {
               {c.isEnrolled ? (
                 <Badge variant="success">Đang theo học</Badge>
               ) : (
-                <span className={styles.targetLevel}>{c.targetLevel}</span>
+                <span className={styles.targetLevel} title={c.targetLevel}>
+                  {c.targetLevel}
+                </span>
               )}
             </div>
 
@@ -174,6 +176,7 @@ export function CourseCatalogPage() {
             <div className={styles.cardFooter}>
               <Button
                 variant={c.isEnrolled ? 'primary' : 'secondary'}
+                className={styles.actionBtn}
                 onClick={() => {
                   if (c.isEnrolled) {
                     navigate('/learn/roadmap');
