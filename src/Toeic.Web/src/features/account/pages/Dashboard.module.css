@@ -1,23 +1,32 @@
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   margin-bottom: var(--space-6);
   flex-wrap: wrap;
   gap: var(--space-4);
 }
 
+.pretitle {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  color: var(--color-primary);
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-1);
+}
+
 .title {
   font-size: var(--font-size-2xl);
-  font-weight: 700;
-  color: var(--color-text);
+  font-weight: 800;
+  color: var(--color-navy-dark, #252641);
   letter-spacing: -0.02em;
   margin-bottom: var(--space-1);
 }
 
 .subtitle {
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   margin-bottom: 0;
   max-width: 680px;
 }
@@ -28,15 +37,15 @@
   gap: var(--space-1);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  padding: 3px;
-  border-radius: var(--radius-md);
+  padding: 4px;
+  border-radius: var(--radius-pill);
 }
 
 .filterBtn {
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
   font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-text-muted);
   cursor: pointer;
   background: none;
@@ -49,23 +58,24 @@
 }
 
 .activeFilter {
-  background-color: var(--color-primary-subtle);
-  color: var(--color-primary);
-  font-weight: 600;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* Predicted Score Showcase Section */
+/* Predicted Score Showcase Section (TOTC Navy & Teal Gradient) */
 .predictedBanner {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-6);
-  background: linear-gradient(135deg, #09090b 0%, #18181b 100%);
+  background: linear-gradient(135deg, #1e1f38 0%, #252641 45%, #176b63 100%);
   color: #ffffff;
-  border-radius: var(--radius-xl);
-  padding: var(--space-6);
+  border-radius: 24px;
+  padding: 32px;
   margin-bottom: var(--space-8);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #27272a;
+  box-shadow: 0 16px 36px rgba(37, 38, 65, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .predictedLeft {

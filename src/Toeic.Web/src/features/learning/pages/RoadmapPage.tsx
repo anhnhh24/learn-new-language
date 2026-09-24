@@ -63,6 +63,7 @@ export function RoadmapPage() {
     <div className="content-container">
       <div className={styles.header}>
         <div>
+          <span className={styles.pretitle}>🗺️ LỘ TRÌNH 31 TUẦN CHUẨN HÓA</span>
           <h1 className={styles.title}>Lộ trình TOEIC Reading theo nhịp học cá nhân</h1>
           <p className={styles.subtitle}>
             31 tuần học tập có cấu trúc từ Nền tảng (Mức A) đến Chuyên sâu Part 5/6 (Mức D) • Cơ chế kiểm định Checkpoint độc lập

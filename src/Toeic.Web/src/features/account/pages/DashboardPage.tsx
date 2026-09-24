@@ -52,6 +52,7 @@ export function DashboardPage() {
     <div className="content-container">
       <div className={styles.header}>
         <div>
+          <span className={styles.pretitle}>📊 BÁO CÁO NĂNG LỰC & DỰ ĐOÁN ĐIỂM SỐ</span>
           <h1 className={styles.title}>Báo cáo Năng lực & Dự đoán Điểm số TOEIC</h1>
           <p className={styles.subtitle}>
             Chẩn đoán năng lực học viên dựa trên bài thi, bài tập trắc nghiệm và lịch sử sổ lỗi sai theo mô hình chuẩn hóa.
