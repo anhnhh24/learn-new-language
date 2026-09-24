@@ -94,7 +94,7 @@ export function PracticeListPage() {
           <div className={styles.drillTop}>
             <div className={styles.drillMeta}>
               <span className={styles.drillTag}>PART 5 • NGỮ PHÁP</span>
-              <TierBadge tier="BetaPractice" />
+              <TierBadge tier="BetaPractice" compact />
             </div>
             <h3 className={styles.drillTitle}>
               Giới từ & Rút gọn Mệnh đề phân từ
@@ -112,7 +112,7 @@ export function PracticeListPage() {
           <div className={styles.drillTop}>
             <div className={styles.drillMeta}>
               <span className={styles.drillTag}>PART 5 • TỪ LOẠI</span>
-              <TierBadge tier="DataValidatedPractice" />
+              <TierBadge tier="DataValidatedPractice" compact />
             </div>
             <h3 className={styles.drillTitle}>
               Hòa hợp Chủ vị & Hậu tố Từ loại
@@ -130,7 +130,7 @@ export function PracticeListPage() {
           <div className={styles.drillTop}>
             <div className={styles.drillMeta}>
               <span className={styles.drillTag}>PART 7 • ĐỌC HIỂU</span>
-              <TierBadge tier="BetaPractice" />
+              <TierBadge tier="BetaPractice" compact />
             </div>
             <h3 className={styles.drillTitle}>
               Kỹ năng Quét thông tin E-mail & Đơn hàng
@@ -204,7 +204,7 @@ export function PracticeListPage() {
             <div className={styles.cardTop}>
               <div className={styles.cardMeta}>
                 <span className={styles.partTag}>{form.part}</span>
-                <TierBadge tier={form.tier} />
+                <TierBadge tier={form.tier} compact />
               </div>
               <h3 className={styles.cardTitle}>{form.title}</h3>
               <p className={styles.cardDesc}>{form.description}</p>

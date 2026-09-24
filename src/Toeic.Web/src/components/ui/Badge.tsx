@@ -31,9 +31,23 @@ export function Badge({ variant = 'default', children, className, ...props }: Ba
 /**
  * Component chuyên dụng cho Tier đề thi, tuân thủ UI_GUIDE.md
  */
-export function TierBadge({ tier }: { tier: 'BetaPractice' | 'DataValidatedPractice' | string }) {
+export function TierBadge({
+  tier,
+  compact = false,
+}: {
+  tier: 'BetaPractice' | 'DataValidatedPractice' | string;
+  compact?: boolean;
+}) {
   if (tier === 'DataValidatedPractice') {
-    return <Badge variant="validated">Dữ liệu đã kiểm định</Badge>;
+    return (
+      <Badge variant="validated">
+        {compact ? 'Kiểm định' : 'Dữ liệu đã kiểm định'}
+      </Badge>
+    );
   }
-  return <Badge variant="beta">Luyện tập Beta (AI Item Factory)</Badge>;
+  return (
+    <Badge variant="beta">
+      {compact ? 'Item Factory' : 'Luyện tập Beta (AI Item Factory)'}
+    </Badge>
+  );
 }

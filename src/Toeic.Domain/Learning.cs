@@ -50,6 +50,7 @@ public sealed class Enrollment
 public sealed class LessonProgress
 {
     private readonly ImmutableHashSet<Guid> requiredPageIds;
+    private readonly ImmutableHashSet<Guid> allPageIds;
     private readonly HashSet<Guid> readPageIds = [];
 
     public Guid Id { get; }
@@ -64,7 +65,7 @@ public sealed class LessonProgress
     public DateTimeOffset? CompletedAt { get; private set; }
     public IReadOnlySet<Guid> ReadPageIds => readPageIds;
 
-    public LessonProgress(Guid id, string learnerId, Guid lessonVersionId, IEnumerable<Guid> requiredPages)
+    public LessonProgress(Guid id, string learnerId, Guid lessonVersionId, IEnumerable<Guid> requiredPages, IEnumerable<Guid>? allPages = null)
     {
         if (id == Guid.Empty || lessonVersionId == Guid.Empty || string.IsNullOrWhiteSpace(learnerId))
             throw new DomainException("LESSON_PROGRESS_INVALID");
@@ -75,13 +76,29 @@ public sealed class LessonProgress
         Id = id;
         LearnerId = learnerId.Trim();
         LessonVersionId = lessonVersionId;
+        allPageIds = allPages?.ToImmutableHashSet() ?? requiredPageIds;
+        if (!requiredPageIds.IsSubsetOf(allPageIds) || allPageIds.Contains(Guid.Empty))
+            throw new DomainException("LESSON_PAGES_INVALID");
+    }
+
+    internal void Restore(long revision, IEnumerable<Guid> pages, Guid? bookmark,
+        bool quizSubmitted, decimal? accuracy, DateTimeOffset? completedAt, bool needsReview)
+    {
+        Revision = revision;
+        readPageIds.UnionWith(pages);
+        BookmarkPageId = bookmark;
+        QuizSubmitted = quizSubmitted;
+        FirstQuizAccuracy = accuracy;
+        CompletedAt = completedAt;
+        Completed = completedAt.HasValue;
+        NeedsReview = needsReview;
     }
 
     public void MarkPageRead(string learnerId, Guid pageId, long expectedRevision,
         DateTimeOffset receivedAt)
     {
         RequireOwnerAndRevision(learnerId, expectedRevision);
-        if (!requiredPageIds.Contains(pageId)) throw new DomainException("LESSON_PAGE_NOT_FOUND");
+        if (!allPageIds.Contains(pageId)) throw new DomainException("LESSON_PAGE_NOT_FOUND");
         if (readPageIds.Add(pageId)) Revision++;
         RecalculateCompletion(receivedAt);
     }
@@ -89,7 +106,7 @@ public sealed class LessonProgress
     public void SetBookmark(string learnerId, Guid? pageId, long expectedRevision)
     {
         RequireOwnerAndRevision(learnerId, expectedRevision);
-        if (pageId.HasValue && !requiredPageIds.Contains(pageId.Value))
+        if (pageId.HasValue && !allPageIds.Contains(pageId.Value))
             throw new DomainException("LESSON_PAGE_NOT_FOUND");
         BookmarkPageId = pageId;
         Revision++;

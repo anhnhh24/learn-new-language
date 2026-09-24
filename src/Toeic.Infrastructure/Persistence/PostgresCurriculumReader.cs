@@ -122,10 +122,12 @@ internal sealed class PostgresCurriculumReader(IDbConnectionFactory connections)
             from learning.roadmap_templates rt
             join learning.course_versions cv on cv.id = rt.course_version_id
             where cv.slug = @slug and cv.state = 'Published' and rt.state = 'Published'
+              and (cast(@version_id as uuid) is null or cv.id = @version_id)
             order by cv.published_at desc
             limit 1;
             """;
         Add(header, "@slug", slug);
+        Add(header, "@version_id", (object?)requestedCourseVersionId ?? DBNull.Value);
         await using var headerReader = await header.ExecuteReaderAsync(cancellationToken);
         if (!await headerReader.ReadAsync(cancellationToken)) return null;
 
@@ -181,10 +183,19 @@ internal sealed class PostgresCurriculumReader(IDbConnectionFactory connections)
     }
 
     public async Task<PublishedLessonView?> FindPublishedLessonAsync(
-        string courseSlug, string lessonCode, CancellationToken cancellationToken)
+        string courseSlug, string lessonCode, CancellationToken cancellationToken,
+        Guid? requestedCourseVersionId = null)
     {
         if (!IsSafeCode(courseSlug) || !IsSafeCode(lessonCode)) return null;
         await using var connection = await connections.OpenAsync(cancellationToken);
+        return await ReadLessonAsync(connection, courseSlug, lessonCode, cancellationToken, requestedCourseVersionId);
+    }
+
+    internal static async Task<PublishedLessonView?> ReadLessonAsync(
+        DbConnection connection, string courseSlug, string lessonCode, CancellationToken cancellationToken,
+        Guid? requestedCourseVersionId = null)
+    {
+        if (!IsSafeCode(courseSlug) || !IsSafeCode(lessonCode)) return null;
         await using var command = connection.CreateCommand();
         command.CommandText = """
             select lv.id, cv.id, cv.slug, cv.version, lv.code, lv.version,
@@ -197,11 +208,13 @@ internal sealed class PostgresCurriculumReader(IDbConnectionFactory connections)
             join learning.course_versions cv on cv.id = lv.course_version_id
             where cv.slug = @slug and cv.state = 'Published'
               and lv.code = @lesson_code and lv.state = 'Published'
+              and (cast(@version_id as uuid) is null or cv.id = @version_id)
             order by cv.published_at desc, lv.published_at desc
             limit 1;
             """;
         Add(command, "@slug", courseSlug);
         Add(command, "@lesson_code", lessonCode.ToUpperInvariant());
+        Add(command, "@version_id", (object?)requestedCourseVersionId ?? DBNull.Value);
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
         if (!await reader.ReadAsync(cancellationToken)) return null;
 
@@ -423,7 +436,7 @@ internal sealed class PostgresCurriculumReader(IDbConnectionFactory connections)
         foreach (var character in decomposed)
         {
             if (CharUnicodeInfo.GetUnicodeCategory(character) != UnicodeCategory.NonSpacingMark)
-                builder.Append(char.ToLowerInvariant(character));
+                builder.Append(character is 'đ' or 'Đ' ? 'd' : char.ToLowerInvariant(character));
         }
         return builder.ToString().Normalize(NormalizationForm.FormC);
     }

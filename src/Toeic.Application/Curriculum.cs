@@ -162,5 +162,6 @@ public interface ICurriculumReader
         string slug, CancellationToken cancellationToken);
 
     Task<PublishedLessonView?> FindPublishedLessonAsync(
-        string courseSlug, string lessonCode, CancellationToken cancellationToken);
+        string courseSlug, string lessonCode, CancellationToken cancellationToken,
+        Guid? requestedCourseVersionId = null);
 }
