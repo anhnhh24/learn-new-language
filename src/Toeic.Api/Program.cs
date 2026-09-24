@@ -33,6 +33,8 @@ var app = builder.Build();
 app.UseToeicApiPipeline();
 app.MapHealthChecks("/health");
 app.MapPlatformStatus(persistenceConfigured, analyticsPseudonymConfigured, betaServingEnabled);
+if (persistenceConfigured)
+    app.MapCurriculumEndpoints();
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {
     Predicate = _ => false

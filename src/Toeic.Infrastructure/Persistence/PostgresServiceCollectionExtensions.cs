@@ -45,6 +45,7 @@ public static class PostgresServiceCollectionExtensions
         services.AddScoped<IAttemptStore, PostgresAttemptStore>();
         services.AddScoped<IStartAttemptReceiptStore, PostgresStartAttemptReceiptStore>();
         services.AddScoped<IContentBlueprintRepository, PostgresContentBlueprintRepository>();
+        services.AddScoped<ICurriculumReader, PostgresCurriculumReader>();
         services.AddScoped<PostgresGenerationJobStore>();
         services.AddScoped<IAtomicGenerationJobStore>(provider =>
             provider.GetRequiredService<PostgresGenerationJobStore>());

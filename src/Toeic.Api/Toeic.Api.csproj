@@ -1,5 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <ItemGroup>
+    <ProjectReference Include="../Toeic.Application/Toeic.Application.csproj" />
     <ProjectReference Include="../Toeic.Domain/Toeic.Domain.csproj" />
     <ProjectReference Include="../Toeic.Infrastructure/Toeic.Infrastructure.csproj" />
   </ItemGroup>
