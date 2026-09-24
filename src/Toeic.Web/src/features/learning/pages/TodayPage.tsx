@@ -32,7 +32,6 @@ export function TodayPage() {
   }, []);
 
   const course = toeicReadingCurriculum;
-  const currentWeek = course.weeks[0]; // Week 1
 
   const weeklyHabit = [
     { day: 'T2', completed: true, isToday: false },
@@ -268,14 +267,14 @@ export function TodayPage() {
                 Khóa học đang theo học
               </h3>
               <Link to="/learn/roadmap" className={styles.panelLink}>
-                Xem 31 tuần <ArrowRight size={13} />
+                Xem hệ thống kiến thức <ArrowRight size={13} />
               </Link>
             </div>
 
             <div className={styles.courseProgressBox}>
               <div className={styles.courseProgressHeader}>
                 <span className={styles.courseTitle}>{course.title}</span>
-                <span className={styles.courseLevel}>Level A · Tuần 1/31</span>
+                <span className={styles.courseLevel}>Level A · 40 chuyên đề</span>
               </div>
 
               <div className={styles.progressBarBg}>
@@ -283,7 +282,7 @@ export function TodayPage() {
               </div>
 
               <div className={styles.courseMetaFooter}>
-                <span>Tuần 1: {currentWeek.title}</span>
+                <span>Phần 1: Cấu trúc câu & 4 từ loại cốt lõi</span>
                 <span>Tiến độ: 12% hoàn thành</span>
               </div>
             </div>
@@ -294,7 +293,7 @@ export function TodayPage() {
               onClick={() => navigate('/learn/roadmap')}
               style={{ width: '100%' }}
             >
-              Mở lộ trình chi tiết 31 tuần
+              Mở hệ thống kiến thức chuẩn hóa
             </Button>
           </div>
 

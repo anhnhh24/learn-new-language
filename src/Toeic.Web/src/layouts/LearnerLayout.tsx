@@ -6,12 +6,12 @@ import {
   BookOpen,
   Bookmark,
   Layers,
-  BarChart2,
   TrendingUp,
   User,
   ShieldCheck,
   Menu,
   X,
+  Compass,
 } from 'lucide-react';
 import { api } from '../lib/api/client';
 import styles from './LearnerLayout.module.css';
@@ -26,7 +26,7 @@ export function LearnerLayout() {
     { to: '/learn/practice', label: 'Luyện đề', icon: <PenTool size={18} /> },
     { to: '/learn/errors', label: 'Sổ lỗi sai', icon: <Bookmark size={18} /> },
     { to: '/learn/flashcards', label: 'Flashcard', icon: <Layers size={18} /> },
-    { to: '/learn/roadmap', label: 'Lộ trình', icon: <BarChart2 size={18} /> },
+    { to: '/learn/roadmap', label: 'Hệ thống kiến thức', icon: <Compass size={18} /> },
     { to: '/learn/dashboard', label: 'Báo cáo', icon: <TrendingUp size={18} /> },
   ];
 
