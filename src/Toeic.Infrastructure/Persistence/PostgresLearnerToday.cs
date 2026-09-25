@@ -55,7 +55,10 @@ internal sealed class PostgresLearnerToday(IDbConnectionFactory connections, Tim
         }
         await using var counts = db.Query("""
             select
-              (select count(*)::int from learning.user_cards where learner_id = @user and due_at <= @now),
+              (select count(*)::int from learning.user_cards c
+                 join learning.private_card_content pc on pc.card_id = c.id
+                 where c.learner_id = @user and c.due_at <= @now
+                   and pc.introduced_at is not null and not pc.archived),
               (select count(*)::int from learning.error_entries
                  where learner_id = @user and state in ('Open','Improving')),
               count(*) filter (where p.completed_at is not null)::int, count(*)::int

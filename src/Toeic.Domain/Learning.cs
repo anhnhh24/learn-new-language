@@ -235,11 +235,20 @@ public sealed class UserCard
         DueAt = createdAt;
     }
 
+    internal void Restore(int intervalDays, DateTimeOffset dueAt, CardLearningState state)
+    {
+        if (intervalDays is < 0 or > 180 || !Enum.IsDefined(state))
+            throw new DomainException("USER_CARD_INVALID");
+        IntervalDays = intervalDays;
+        DueAt = dueAt;
+        State = state;
+    }
     public ReviewEvent Review(string learnerId, ReviewRating rating, Guid eventId,
         DateTimeOffset reviewedAt, TimeZoneInfo learnerTimeZone)
     {
         if (LearnerId != learnerId?.Trim()) throw new DomainException("USER_CARD_NOT_FOUND");
         if (eventId == Guid.Empty) throw new DomainException("REVIEW_EVENT_ID_REQUIRED");
+        if (!Enum.IsDefined(rating)) throw new DomainException("REVIEW_RATING_INVALID");
 
         if (reviewEvents.TryGetValue(eventId, out var replay))
         {
