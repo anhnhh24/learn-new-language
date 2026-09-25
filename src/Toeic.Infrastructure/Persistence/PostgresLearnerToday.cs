@@ -2,7 +2,7 @@ using Toeic.Application;
 
 namespace Toeic.Infrastructure.Persistence;
 
-internal sealed class PostgresLearnerToday(IDbConnectionFactory connections, TimeProvider clock)
+internal sealed class PostgresLearnerToday(IDbConnectionFactory connections, TimeProvider clock, IBetaServingControl betaServing)
     : ILearnerToday
 {
     public async Task<TodayView> GetAsync(Guid learnerId, CancellationToken ct)
@@ -52,6 +52,21 @@ internal sealed class PostgresLearnerToday(IDbConnectionFactory connections, Tim
                     read ? "LessonQuiz" : "ReadLesson",
                     read ? "QuestionBankPending" : "Available");
             }
+        }
+        if (next?.Action == "LessonQuiz")
+        {
+            var availability = "QuizServingDisabled";
+            if (await betaServing.IsEnabledAsync(ct))
+            {
+                await using var quiz = db.Query("""
+                    select exists(select 1 from learning.lesson_quiz_forms q
+                      join content.form_versions f on f.id = q.form_version_id
+                      where q.lesson_version_id = @lesson and f.state = 'Active')
+                    """, null, ("lesson", next.LessonVersionId));
+                // This is a discovery hint; start still validates all item and prerequisite gates.
+                availability = (bool)(await quiz.ExecuteScalarAsync(ct))! ? "QuizConfigured" : "QuestionBankPending";
+            }
+            next = next with { Availability = availability };
         }
         await using var counts = db.Query("""
             select

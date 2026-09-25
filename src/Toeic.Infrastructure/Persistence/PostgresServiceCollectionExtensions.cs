@@ -73,6 +73,7 @@ public static class PostgresServiceCollectionExtensions
         if (betaServingEnabled)
         {
             services.AddScoped<BetaServingService>();
+            services.AddScoped<ILessonQuizzes, PostgresLessonQuizzes>();
             services.AddScoped<LearnerIssueReportService>();
         }
         services.AddScoped<FormCompositionService>();

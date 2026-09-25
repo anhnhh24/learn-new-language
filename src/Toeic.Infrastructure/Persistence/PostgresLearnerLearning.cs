@@ -198,7 +198,7 @@ internal sealed class PostgresLearnerLearning(
         return await command.ExecuteScalarAsync(ct) is not null;
     }
 
-    private static async Task<(Guid[] Required, Guid[] All)> ReadPageIdsAsync(
+    internal static async Task<(Guid[] Required, Guid[] All)> ReadPageIdsAsync(
         DbConnection db, DbTransaction tx, Guid lesson, CancellationToken ct)
     {
         await using var command = db.Query("""
@@ -216,7 +216,7 @@ internal sealed class PostgresLearnerLearning(
         return (required.ToArray(), all.ToArray());
     }
 
-    private static async Task<LessonProgress> LoadProgressAsync(DbConnection db, DbTransaction tx,
+    internal static async Task<LessonProgress> LoadProgressAsync(DbConnection db, DbTransaction tx,
         Guid user, Guid lesson, IEnumerable<Guid> required, IEnumerable<Guid> all, bool locked, CancellationToken ct)
     {
         await using var command = db.Query("""

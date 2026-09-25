@@ -106,6 +106,7 @@ if (learnerApiEnabled)
     app.MapProfileEndpoints();
     app.MapSupportEndpoints();
     app.MapFlashcardEndpoints();
+    if (betaServingEnabled) app.MapLessonQuizEndpoints();
 }
 app.MapHealthChecks("/health");
 app.MapPlatformStatus(persistenceConfigured, analyticsPseudonymConfigured, betaServingEnabled);
