@@ -232,6 +232,10 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
   - Mặt sau hiển thị định nghĩa tiếng Việt trực quan, bản dịch câu ví dụ chuẩn công sở, và grid 2 cột cho Collocations & Họ từ vựng (Word Family).
   - Tích hợp 4 nút đánh giá SRS màu sắc phân biệt (`Quên`, `Khó`, `Tốt`, `Dễ`) kèm phím tắt `[1-4]`, lọc từ khó có dấu sao (⭐) và nút xáo trộn thẻ (Shuffle). Màn hình hoàn thành hiển thị phân tích tỷ lệ ghi nhớ và chi tiết kết quả.
 
+- **Kết nối Live API cho Account, Support & Quiz Pages:**
+  - Hoàn thiện và tích hợp `LiveAccountPage` và `LiveSupportPage` (`AccountLivePages.tsx`) kết nối với các endpoint Learner API (`/profile`, `/security/sessions`, `/notifications`, `/tickets`).
+  - Hoàn thiện `LiveQuizPage.tsx` kết nối backend `/lessons/{id}/quiz-attempts`, đồng bộ đồng hồ server, lưu đáp án real-time qua `PUT /quiz-attempts/{id}/answer` và nộp bài chấm điểm `/submit`.
+  - Tích hợp điều hướng trong `QuizRunnerPage.tsx`: tự động nhận diện quiz bài học/checkpoint để chạy `LiveQuizPage`, đồng thời giữ runner cho bài luyện tập chuyên đề tự do.
 
 ## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.

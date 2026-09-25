@@ -11,6 +11,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { Button, Badge, Modal, Input, Textarea, Alert } from '../../../components/ui';
+import { LiveQuizPage } from '../../live/LiveQuizPage';
 import styles from './QuizRunner.module.css';
 
 interface QuizQuestion {
@@ -103,8 +104,13 @@ const SAMPLE_QUIZ_QUESTIONS: QuizQuestion[] = [
 ];
 
 export function QuizRunnerPage() {
-  const { quizId: _quizId } = useParams<{ quizId: string }>();
+  const { quizId = '' } = useParams<{ quizId: string }>();
   const navigate = useNavigate();
+
+  const isLiveQuiz = /^quiz-[a-d]\d+$/i.test(quizId) || /^checkpoint-[a-d]$/i.test(quizId);
+  if (isLiveQuiz) {
+    return <LiveQuizPage />;
+  }
 
   const questions = SAMPLE_QUIZ_QUESTIONS;
   const [currentIndex, setCurrentIndex] = useState(0);
