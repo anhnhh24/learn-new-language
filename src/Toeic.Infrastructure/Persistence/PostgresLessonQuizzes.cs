@@ -186,6 +186,7 @@ internal sealed class PostgresLessonQuizzes(IApplicationTransaction transaction,
             ("receipt", Guid.NewGuid()), ("passed", passed), ("retry", retry), ("result", JsonSerializer.Serialize(result, Json)));
         await grade.ExecuteNonQueryAsync(ct);
         await UpdateProgress(user, state.Lesson, raw, items.Length, now, ct);
+        await PostgresErrorNotebook.CaptureGradedQuizAsync(session.Connection, session.Transaction, user, state.Id, now, ct);
         var learnerHash = pseudonymizer.Pseudonymize(user.ToString());
         foreach (var item in items.Where(i => i.SelectedOptionId is not null))
         {
