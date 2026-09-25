@@ -225,6 +225,14 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
   - **BL-08 (Đã xong):** Tách mảng `weeks[]` (415 dòng) sang file riêng `src/Toeic.Web/src/lib/api/legacyRoadmapWeeks.ts` phục vụ tương thích ngược; làm sạch hoàn toàn cấu trúc `curriculumData.ts` chỉ tập trung vào Knowledge Topics và Checkpoint Catalog.
 - Chi tiết đầy đủ tại [NOTE-26, NOTE-27](file:///d:/Study/New%20folder/docs/NOTES.md) và artifact [business_logic_audit.md](file:///C:/Users/nhhag/.gemini/antigravity-ide/brain/201d6d79-8174-4156-b7cc-4c6567040052/business_logic_audit.md).
 
+- **Nâng cấp Giao diện Flashcards SRS (UI-09):**
+  - Tái thiết kế toàn diện trang `/learn/flashcards` theo phong cách TOTC hiện đại: Hero banner deep teal sang trọng tích hợp chuỗi học tập (Streak) và bộ đếm tiến độ.
+  - Hiệu ứng lật thẻ 3D chân thực (`rotateY(180deg)`), hỗ trợ lật thẻ bằng nhấp chuột hoặc phím `Space`.
+  - Mặt trước tích hợp thẻ phân loại màu sắc theo từ loại (Noun, Verb, Adjective, Adverb, Phrase), nút phát âm Audio US với hiệu ứng sóng âm (`speakingPulse`), thước đo cấp độ ghi nhớ SRS (Level 1–5), và hộp ngữ cảnh TOEIC nổi bật.
+  - Mặt sau hiển thị định nghĩa tiếng Việt trực quan, bản dịch câu ví dụ chuẩn công sở, và grid 2 cột cho Collocations & Họ từ vựng (Word Family).
+  - Tích hợp 4 nút đánh giá SRS màu sắc phân biệt (`Quên`, `Khó`, `Tốt`, `Dễ`) kèm phím tắt `[1-4]`, lọc từ khó có dấu sao (⭐) và nút xáo trộn thẻ (Shuffle). Màn hình hoàn thành hiển thị phân tích tỷ lệ ghi nhớ và chi tiết kết quả.
+
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 2. Operations quality dashboard và công cụ kiểm soát quarantine.
