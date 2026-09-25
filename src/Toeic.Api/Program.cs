@@ -107,6 +107,7 @@ if (learnerApiEnabled)
     app.MapSupportEndpoints();
     app.MapFlashcardEndpoints();
     app.MapErrorNotebookEndpoints();
+    app.MapDashboardEndpoints();
     if (betaServingEnabled) app.MapLessonQuizEndpoints();
 }
 app.MapHealthChecks("/health");
