@@ -38,6 +38,9 @@ if (analyticsPseudonymConfigured)
 if (learnerApiEnabled)
 {
     builder.Services.AddSingleton<ILearnerSessions, PostgresLearnerSessions>();
+    builder.Services.AddScoped<IAccountSecurity, PostgresAccountSecurity>();
+    if (betaServingEnabled && builder.Configuration.GetValue("Workers:QuizExpiryEnabled", true))
+        builder.Services.AddHostedService<QuizExpiryWorker>();
     var mail = builder.Configuration.GetSection("AccountMail").Get<AccountMailOptions>() ?? new();
     if (mail.Mode is not ("Disabled" or "Smtp" or "DevelopmentFile"))
         throw new InvalidOperationException("Unknown AccountMail mode.");
@@ -102,6 +105,7 @@ if (learnerApiEnabled)
     app.UseAuthorization();
     app.MapSessionEndpoints();
     app.MapAccountEndpoints();
+    app.MapAccountSecurityEndpoints();
     app.MapLearnerEndpoints();
     app.MapProfileEndpoints();
     app.MapSupportEndpoints();
