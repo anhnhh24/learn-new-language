@@ -14,6 +14,10 @@ import {
   Clock,
   Target,
   Award,
+  Lock,
+  Unlock,
+  RotateCcw,
+  Info,
 } from 'lucide-react';
 import { Button, Badge } from '../../../components/ui';
 import { toeicReadingCurriculum, checkpointCatalog } from '../../../lib/api/curriculumData';
@@ -91,6 +95,53 @@ export function RoadmapPage() {
   const [selectedLevel, setSelectedLevel] = useState<CurriculumLevelCode | 'ALL'>('ALL');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // BL-02 & RISK-01: Prerequisite Enforcement & Progression State
+  const [enforcePrerequisites, setEnforcePrerequisites] = useState<boolean>(() => {
+    const saved = localStorage.getItem('toeic_enforce_prerequisites');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  const [passedCheckpoints, setPassedCheckpoints] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('toeic_passed_checkpoints');
+      return saved ? JSON.parse(saved) : ['CHECKPOINT-A'];
+    } catch {
+      return ['CHECKPOINT-A'];
+    }
+  });
+
+  const isLevelUnlocked = (levelCode: CurriculumLevelCode): { unlocked: boolean; reason?: string } => {
+    if (!enforcePrerequisites) return { unlocked: true };
+    if (levelCode === 'A') return { unlocked: true };
+    if (levelCode === 'B') {
+      const ok = passedCheckpoints.includes('CHECKPOINT-A');
+      return ok ? { unlocked: true } : { unlocked: false, reason: 'Yêu cầu đạt Checkpoint A (ngưỡng 70%) để mở khóa Phân hệ 2' };
+    }
+    if (levelCode === 'C') {
+      const ok = passedCheckpoints.includes('CHECKPOINT-B');
+      return ok ? { unlocked: true } : { unlocked: false, reason: 'Yêu cầu đạt Checkpoint B (ngưỡng 70%) để mở khóa Phân hệ 3' };
+    }
+    if (levelCode === 'D') {
+      const ok = passedCheckpoints.includes('CHECKPOINT-C');
+      return ok ? { unlocked: true } : { unlocked: false, reason: 'Yêu cầu đạt Checkpoint C (ngưỡng 75%) để mở khóa Phân hệ 4 Chuyên sâu' };
+    }
+    return { unlocked: true };
+  };
+
+  const toggleCheckpointPass = (cpCode: string) => {
+    setPassedCheckpoints((prev) => {
+      const next = prev.includes(cpCode) ? prev.filter((c) => c !== cpCode) : [...prev, cpCode];
+      localStorage.setItem('toeic_passed_checkpoints', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const resetProgression = () => {
+    const defaultState = ['CHECKPOINT-A'];
+    setPassedCheckpoints(defaultState);
+    localStorage.setItem('toeic_passed_checkpoints', JSON.stringify(defaultState));
+  };
 
   // Extract all 40 topics from curriculum and sort deterministically
   const allTopics: KnowledgeTopic[] = Object.values(
@@ -285,6 +336,71 @@ export function RoadmapPage() {
             </button>
           ))}
         </div>
+
+        {/* Prerequisite & Progression Gate Bar (BL-02 & RISK-01) */}
+        <div className={styles.gateToggleBar}>
+          <div className={styles.gateToggleLeft}>
+            <Info size={14} style={{ color: '#0284c7', flexShrink: 0 }} />
+            <span>
+              {enforcePrerequisites
+                ? 'Hệ thống đang khóa tuần tự: Phân hệ B, C, D chỉ mở khi bạn vượt qua bài thi Checkpoint của phân hệ trước.'
+                : 'Chế độ xem tự do (Audit Mode): Đang mở khóa toàn bộ chuyên đề và bài kiểm định để khảo sát nhanh.'}
+            </span>
+          </div>
+
+          <div className={styles.gateToggleRight}>
+            <button
+              type="button"
+              onClick={() => {
+                const next = !enforcePrerequisites;
+                setEnforcePrerequisites(next);
+                localStorage.setItem('toeic_enforce_prerequisites', String(next));
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '20px',
+                fontSize: '12px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                border: enforcePrerequisites ? '1px solid #10b981' : '1px solid #cbd5e1',
+                backgroundColor: enforcePrerequisites ? '#ecfdf5' : '#ffffff',
+                color: enforcePrerequisites ? '#065f46' : '#64748b',
+                transition: 'all 0.2s',
+              }}
+              title="Bật/Tắt khóa phân hệ theo điều kiện tiên quyết"
+            >
+              {enforcePrerequisites ? <Lock size={12} style={{ color: '#059669' }} /> : <Unlock size={12} />}
+              <span>Khóa điều kiện: {enforcePrerequisites ? 'ĐANG BẬT' : 'TỰ DO (Audit)'}</span>
+            </button>
+
+            {enforcePrerequisites && (
+              <button
+                type="button"
+                onClick={resetProgression}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '6px 10px',
+                  borderRadius: '20px',
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  border: '1px solid #e2e8f0',
+                  backgroundColor: '#ffffff',
+                  color: '#64748b',
+                }}
+                title="Khôi phục trạng thái tiến độ mặc định (Level A passed)"
+              >
+                <RotateCcw size={11} />
+                <span>Reset tiến độ</span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Empty State */}
@@ -310,153 +426,228 @@ export function RoadmapPage() {
       ) : (
         /* Sections List */
         <div className={styles.sectionsList}>
-          {processedSections.map((section) => (
-            <section key={section.sectionNumber} className={styles.sectionCard}>
-              {/* Section Header */}
-              <div className={styles.sectionHeader}>
-                <div className={styles.sectionHeaderLeft}>
-                  <div className={styles.sectionBadgeRow}>
-                    <span className={`${styles.sectionBadge} ${getBadgeThemeClass(section.themeColor)}`}>
-                      {section.badgeTitle}
+          {processedSections.map((section) => {
+            const levelStatus = isLevelUnlocked(section.levelCode);
+            const isLevelLocked = !levelStatus.unlocked;
+            const isCheckpointPassed = passedCheckpoints.includes(section.checkpointCode);
+
+            return (
+              <section
+                key={section.sectionNumber}
+                className={`${styles.sectionCard} ${isLevelLocked ? styles.lockedSectionCard : ''}`}
+              >
+                {/* Section Header */}
+                <div className={styles.sectionHeader}>
+                  <div className={styles.sectionHeaderLeft}>
+                    <div className={styles.sectionBadgeRow}>
+                      <span className={`${styles.sectionBadge} ${getBadgeThemeClass(section.themeColor)}`}>
+                        {section.badgeTitle}
+                      </span>
+                      <Badge variant="default">Cấp độ {section.levelCode}</Badge>
+                      {isLevelLocked ? (
+                        <span className={styles.topicLockBadge}>
+                          <Lock size={11} /> Đang khóa
+                        </span>
+                      ) : isCheckpointPassed ? (
+                        <Badge variant="success">✓ Đã vượt qua Checkpoint</Badge>
+                      ) : (
+                        <Badge variant="warning">Đang tiến hành</Badge>
+                      )}
+                    </div>
+                    <h2 className={styles.sectionTitle}>{section.title}</h2>
+                    <div className={styles.sectionEnglishTitle}>{section.englishTitle}</div>
+                    <p className={styles.sectionDesc}>{section.description}</p>
+                    <div className={styles.sectionOutcome}>
+                      <Target size={14} />
+                      <span><strong>Mục tiêu:</strong> {section.outcome}</span>
+                    </div>
+                  </div>
+
+                  <div className={styles.sectionHeaderRight}>
+                    <span className={styles.countChip}>
+                      {section.matchedTopics.length} / {section.totalSectionTopics} chuyên đề
                     </span>
-                    <Badge variant="default">Cấp độ {section.levelCode}</Badge>
-                  </div>
-                  <h2 className={styles.sectionTitle}>{section.title}</h2>
-                  <div className={styles.sectionEnglishTitle}>{section.englishTitle}</div>
-                  <p className={styles.sectionDesc}>{section.description}</p>
-                  <div className={styles.sectionOutcome}>
-                    <Target size={14} />
-                    <span><strong>Mục tiêu:</strong> {section.outcome}</span>
                   </div>
                 </div>
 
-                <div className={styles.sectionHeaderRight}>
-                  <span className={styles.countChip}>
-                    {section.matchedTopics.length} / {section.totalSectionTopics} chuyên đề
-                  </span>
-                </div>
-              </div>
-
-              {/* Topics Grid */}
-              <div className={styles.topicsGrid}>
-                {section.matchedTopics.map((topic) => (
-                  <div key={topic.id} className={styles.topicCard}>
-                    {/* Top Row: Code Pill, Category, Duration */}
-                    <div className={styles.topicTopRow}>
-                      <div className={`${styles.codePill} ${getPillThemeClass(section.themeColor)}`}>
-                        {topic.code}
-                      </div>
-                      <div className={styles.topicMetaBadges}>
-                        <span className={styles.topicCategoryTag}>
-                          {CATEGORY_NAMES[topic.category] || topic.category}
-                        </span>
-                        <span className={styles.topicDuration}>
-                          <Clock size={12} /> {topic.estimatedMinutes} phút
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Topic Title */}
-                    <h3 className={styles.topicTitle}>{topic.titleVi}</h3>
-                    <div className={styles.topicSubtitle}>{topic.titleEn}</div>
-
-                    {/* Topic Summary */}
-                    <p className={styles.topicSummary}>{topic.summary}</p>
-
-                    {/* Key Knowledge Box */}
-                    {topic.coreKnowledge && topic.coreKnowledge.length > 0 && (
-                      <div className={styles.keyPointsBox}>
-                        <div className={styles.keyPointsHeader}>
-                          <Sparkles size={12} /> Trọng tâm ghi nhớ:
-                        </div>
-                        <ul className={styles.keyPointsList}>
-                          {topic.coreKnowledge.slice(0, 2).map((item, idx) => (
-                            <li key={idx} className={styles.keyPointItem}>
-                              <CheckCircle2 size={12} />
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Common Trap Box */}
-                    {topic.commonTraps && topic.commonTraps.length > 0 && (
-                      <div className={styles.trapBox}>
-                        <AlertTriangle size={13} />
-                        <span><strong>Bẫy Part 5:</strong> {topic.commonTraps[0]}</span>
-                      </div>
-                    )}
-
-                    {/* Action Buttons */}
-                    <div className={styles.topicActions}>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        className={styles.topicActionBtn}
-                        onClick={() => navigate(`/learn/lesson/${topic.code}`)}
-                        rightIcon={<ArrowRight size={14} />}
-                      >
-                        Học lý thuyết
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className={styles.topicActionBtn}
-                        onClick={() => navigate(`/learn/quiz/quiz-${topic.code.toLowerCase()}`)}
-                        leftIcon={<HelpCircle size={14} />}
-                      >
-                        Luyện bài tập
-                      </Button>
+                {/* Locked Banner if level is locked */}
+                {isLevelLocked && (
+                  <div className={styles.lockedSectionBanner}>
+                    <Lock size={18} style={{ flexShrink: 0 }} />
+                    <div>
+                      <strong>Phân hệ đang khóa:</strong> {levelStatus.reason}
                     </div>
                   </div>
-                ))}
-              </div>
+                )}
 
-              {/* Section Checkpoint Milestone Card */}
-              {section.checkpoint && (
-                <div className={styles.checkpointCard}>
-                  <div className={styles.checkpointLeft}>
-                    <div className={styles.checkpointIconBox}>
-                      <ShieldCheck size={28} />
-                    </div>
-                    <div className={styles.checkpointMeta}>
-                      <div className={styles.checkpointTagRow}>
-                        <Badge variant="success">MỐC KIỂM ĐỊNH NĂNG LỰC</Badge>
-                        <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                          Đánh giá chuẩn hóa độc lập
-                        </span>
-                      </div>
-                      <h3 className={styles.checkpointTitle}>{section.checkpoint.title}</h3>
-                      <p className={styles.checkpointDesc}>{section.checkpoint.description}</p>
-                      <div className={styles.checkpointSpecs}>
-                        <span className={styles.checkpointSpecItem}>
-                          <BookOpen size={13} /> {section.checkpoint.questionCount} câu hỏi
-                        </span>
-                        <span className={styles.checkpointSpecItem}>
-                          <Clock size={13} /> {section.checkpoint.timeLimitMinutes} phút
-                        </span>
-                        <span className={styles.checkpointSpecItem}>
-                          <Award size={13} /> Ngưỡng đạt: {Math.round(section.checkpoint.passRate * 100)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={styles.checkpointRight}>
-                    <Button
-                      variant="primary"
-                      size="md"
-                      onClick={() => navigate(`/learn/lesson/${section.checkpointCode}`)}
-                      rightIcon={<ArrowRight size={16} />}
+                {/* Topics Grid */}
+                <div className={styles.topicsGrid}>
+                  {section.matchedTopics.map((topic) => (
+                    <div
+                      key={topic.id}
+                      className={`${styles.topicCard} ${isLevelLocked ? styles.lockedTopicCard : ''}`}
                     >
-                      Vào làm bài Checkpoint {section.levelCode}
-                    </Button>
-                  </div>
+                      {/* Top Row: Code Pill, Category, Duration */}
+                      <div className={styles.topicTopRow}>
+                        <div className={`${styles.codePill} ${getPillThemeClass(section.themeColor)}`}>
+                          {topic.code}
+                        </div>
+                        <div className={styles.topicMetaBadges}>
+                          <span className={styles.topicCategoryTag}>
+                            {CATEGORY_NAMES[topic.category] || topic.category}
+                          </span>
+                          <span className={styles.topicDuration}>
+                            <Clock size={12} /> {topic.estimatedMinutes} phút
+                          </span>
+                          {isLevelLocked && (
+                            <span className={styles.topicLockBadge}>
+                              <Lock size={10} /> Khóa
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Topic Title */}
+                      <h3 className={styles.topicTitle}>{topic.titleVi}</h3>
+                      <div className={styles.topicSubtitle}>{topic.titleEn}</div>
+
+                      {/* Topic Summary */}
+                      <p className={styles.topicSummary}>{topic.summary}</p>
+
+                      {/* Key Knowledge Box */}
+                      {topic.coreKnowledge && topic.coreKnowledge.length > 0 && (
+                        <div className={styles.keyPointsBox}>
+                          <div className={styles.keyPointsHeader}>
+                            <Sparkles size={12} /> Trọng tâm ghi nhớ:
+                          </div>
+                          <ul className={styles.keyPointsList}>
+                            {topic.coreKnowledge.slice(0, 2).map((item, idx) => (
+                              <li key={idx} className={styles.keyPointItem}>
+                                <CheckCircle2 size={12} />
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Common Trap Box */}
+                      {topic.commonTraps && topic.commonTraps.length > 0 && (
+                        <div className={styles.trapBox}>
+                          <AlertTriangle size={13} />
+                          <span><strong>Bẫy Part 5:</strong> {topic.commonTraps[0]}</span>
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className={styles.topicActions}>
+                        <Button
+                          variant={isLevelLocked ? 'outline' : 'primary'}
+                          size="sm"
+                          disabled={isLevelLocked}
+                          title={isLevelLocked ? levelStatus.reason : 'Bắt đầu học lý thuyết'}
+                          className={styles.topicActionBtn}
+                          onClick={() => navigate(`/learn/lesson/${topic.code}`)}
+                          rightIcon={isLevelLocked ? <Lock size={14} /> : <ArrowRight size={14} />}
+                        >
+                          {isLevelLocked ? 'Chưa mở' : 'Học lý thuyết'}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={isLevelLocked}
+                          title={isLevelLocked ? levelStatus.reason : 'Luyện bài tập'}
+                          className={styles.topicActionBtn}
+                          onClick={() => navigate(`/learn/quiz/quiz-${topic.code.toLowerCase()}`)}
+                          leftIcon={<HelpCircle size={14} />}
+                        >
+                          Luyện bài tập
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </section>
-          ))}
+
+                {/* Section Checkpoint Milestone Card */}
+                {section.checkpoint && (
+                  <div className={styles.checkpointCard}>
+                    <div className={styles.checkpointLeft}>
+                      <div className={styles.checkpointIconBox}>
+                        <ShieldCheck size={28} />
+                      </div>
+                      <div className={styles.checkpointMeta}>
+                        <div className={styles.checkpointTagRow}>
+                          <Badge variant={isCheckpointPassed ? 'success' : isLevelLocked ? 'warning' : 'primary'}>
+                            {isCheckpointPassed
+                              ? '✓ ĐÃ HOÀN THÀNH ĐẠT CHUẨN'
+                              : isLevelLocked
+                              ? 'CHƯA MỞ KHÓA'
+                              : 'MỐC KIỂM ĐỊNH NĂNG LỰC'}
+                          </Badge>
+                          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                            Đánh giá chuẩn hóa độc lập
+                          </span>
+                        </div>
+                        <h3 className={styles.checkpointTitle}>{section.checkpoint.title}</h3>
+                        <p className={styles.checkpointDesc}>{section.checkpoint.description}</p>
+                        <div className={styles.checkpointSpecs}>
+                          <span className={styles.checkpointSpecItem}>
+                            <BookOpen size={13} /> {section.checkpoint.questionCount} câu hỏi
+                          </span>
+                          <span className={styles.checkpointSpecItem}>
+                            <Clock size={13} /> {section.checkpoint.timeLimitMinutes} phút
+                          </span>
+                          <span className={styles.checkpointSpecItem}>
+                            <Award size={13} /> Ngưỡng đạt: {Math.round(section.checkpoint.passRate * 100)}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      className={styles.checkpointRight}
+                      style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}
+                    >
+                      <Button
+                        variant={isCheckpointPassed ? 'outline' : isLevelLocked ? 'outline' : 'primary'}
+                        size="md"
+                        disabled={isLevelLocked}
+                        title={isLevelLocked ? levelStatus.reason : undefined}
+                        onClick={() => navigate(`/learn/lesson/${section.checkpointCode}`)}
+                        rightIcon={isLevelLocked ? <Lock size={16} /> : <ArrowRight size={16} />}
+                      >
+                        {isCheckpointPassed
+                          ? `Luyện lại Checkpoint ${section.levelCode}`
+                          : isLevelLocked
+                          ? `Khóa Checkpoint ${section.levelCode}`
+                          : `Vào làm bài Checkpoint ${section.levelCode}`}
+                      </Button>
+
+                      {/* Simulation helper button for testing */}
+                      <button
+                        type="button"
+                        onClick={() => toggleCheckpointPass(section.checkpointCode)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          padding: 0,
+                          fontSize: '11px',
+                          color: isCheckpointPassed ? '#059669' : '#64748b',
+                          cursor: 'pointer',
+                          textDecoration: 'underline',
+                        }}
+                        title="Mô phỏng đỗ/trượt checkpoint để kiểm thử luồng mở khóa phân hệ tiếp theo"
+                      >
+                        {isCheckpointPassed
+                          ? '✓ Đã đạt (Bấm để hủy)'
+                          : '⚡ Mô phỏng đã đạt Checkpoint này'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </section>
+            );
+          })}
         </div>
       )}
     </div>

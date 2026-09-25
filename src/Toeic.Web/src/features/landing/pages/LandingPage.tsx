@@ -37,10 +37,10 @@ const coursesData: CoursePreview[] = [
   {
     id: 'toeic-reading-grammar-foundation',
     level: 'Toàn diện',
-    levelBadge: '350 → 800+',
-    title: 'TOEIC Reading: Lộ trình chuẩn hóa 31 tuần từ nền tảng đến bứt phá',
-    description: 'Bao quát trọn vẹn 35 chủ điểm ngữ pháp cốt lõi, 4 kỳ thi Checkpoint chuẩn hóa và quy trình remediation bù đắp lỗ hổng kiến thức.',
-    totalLessons: 35,
+    levelBadge: 'Toàn diện',
+    title: 'TOEIC Reading: Hệ thống kiến thức chuẩn hóa từ nền tảng đến chuyên sâu',
+    description: 'Bao quát trọn vẹn 40 chuyên đề ngữ pháp - từ vựng cốt lõi, 4 bài kiểm định Checkpoint chuẩn hóa và quy trình remediation bù đắp lỗ hổng kiến thức.',
+    totalLessons: 40,
     durationHours: 70,
     rating: 4.9,
     enrolledStudents: 12450,
@@ -91,7 +91,7 @@ const testimonials = [
     initialScore: 480,
     targetScore: 795,
     avatar: '👨‍🎓',
-    quote: 'Phương pháp lặp ngắt quãng Flashcard SRS và Sổ lỗi sai tự động giúp mình né được toàn bộ các bẫy từ loại và liên từ trong Part 5. Tăng hơn 300 điểm chỉ sau 8 tuần ôn luyện!',
+    quote: 'Phương pháp lặp ngắt quãng Flashcard SRS và Sổ lỗi sai tự động giúp mình né được toàn bộ các bẫy từ loại và liên từ trong Part 5. Accuracy tăng từ 55% lên 88% chỉ sau 8 tuần ôn luyện!',
   },
   {
     name: 'Lê Thanh Thảo',
@@ -186,7 +186,7 @@ export function LandingPage() {
               </h1>
 
               <p className={styles.heroSubtitle}>
-                Chương trình chuẩn hóa 31 tuần từ Level A đến D, tích hợp thuật toán Spaced Repetition (SRS) chống quên từ vựng, sổ lỗi sai tự động và ngân hàng đề thi bám sát cấu trúc ETS.
+                Hệ thống kiến thức 4 phân hệ từ Level A đến D, tích hợp thuật toán Spaced Repetition (SRS) chống quên từ vựng, sổ lỗi sai tự động và ngân hàng đề thi bám sát cấu trúc ETS.
               </p>
 
               <div className={styles.heroCtaGroup}>
@@ -217,7 +217,7 @@ export function LandingPage() {
                   <span className={styles.miniAvatar}>👩‍🎓</span>
                 </div>
                 <div className={styles.trustText}>
-                  <strong>25,000+ học viên</strong> đã đạt mục tiêu điểm 650–900+
+                  <strong>25,000+ học viên</strong> đã cải thiện kỹ năng TOEIC Reading
                 </div>
               </div>
             </div>
@@ -334,12 +334,12 @@ export function LandingPage() {
               <div className={`${styles.featureIconBox} ${styles.iconBoxOrange}`}>
                 <Repeat size={28} />
               </div>
-              <h3 className={styles.featureTitle}>Lộ Trình 31 Tuần & Flashcard SRS</h3>
+              <h3 className={styles.featureTitle}>Hệ Thống Kiến Thức & Flashcard SRS</h3>
               <p className={styles.featureText}>
-                Lộ trình từ Level A đến D (350 → 800+), phân bổ 35 chủ điểm bài học theo tuần và thuật toán lặp ngắt quãng 4 cấp độ ghi nhớ từ vựng vĩnh viễn.
+                4 phân hệ kiến thức từ Level A đến D, phân bổ 40 chuyên đề cốt lõi và thuật toán lặp ngắt quãng 4 cấp độ ghi nhớ từ vựng vĩnh viễn.
               </p>
               <Link to="/learn/roadmap" className={styles.featureLink}>
-                Xem lộ trình 31 tuần <ChevronRight size={16} />
+                Xem Hệ thống kiến thức <ChevronRight size={16} />
               </Link>
             </div>
 
@@ -603,7 +603,7 @@ export function LandingPage() {
               <h4 className={styles.footerColTitle}>Khóa học & Lộ trình</h4>
               <ul className={styles.footerLinks}>
                 <li><Link to="/learn/courses">Tất cả khóa học</Link></li>
-                <li><Link to="/learn/roadmap">Lộ trình 31 tuần</Link></li>
+                <li><Link to="/learn/roadmap">Hệ thống kiến thức</Link></li>
                 <li><Link to="/learn/courses/toeic-module-a">Level A (350-450)</Link></li>
                 <li><Link to="/learn/courses/toeic-module-b">Level B (500-650)</Link></li>
               </ul>

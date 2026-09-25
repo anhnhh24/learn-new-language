@@ -667,3 +667,63 @@
   margin: 0 0 var(--space-2);
   max-width: 440px;
 }
+
+/* BL-02 Prerequisite Gate & Lock Styling */
+.gateToggleBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 10px 16px;
+  margin-top: var(--space-3);
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.gateToggleLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.gateToggleRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.lockedSectionBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  color: #92400e;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.lockedTopicCard {
+  opacity: 0.65;
+  filter: grayscale(0.2);
+  position: relative;
+}
+
+.topicLockBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #b45309;
+  background: #fef3c7;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}

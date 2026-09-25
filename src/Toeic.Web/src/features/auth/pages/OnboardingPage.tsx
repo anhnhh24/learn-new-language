@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
-import { Target, Clock, Calendar, Compass, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Target, Clock, Calendar, Compass, ArrowRight, ArrowLeft, Info } from 'lucide-react';
 import styles from './Onboarding.module.css';
 
 export function OnboardingPage() {
@@ -106,6 +106,33 @@ export function OnboardingPage() {
               </label>
             ))}
           </div>
+
+          {targetScore === '800' && (
+            <div
+              style={{
+                display: 'flex',
+                gap: '12px',
+                padding: '12px 16px',
+                borderRadius: 'var(--radius-md, 10px)',
+                backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                border: '1px solid rgba(59, 130, 246, 0.25)',
+                fontSize: '13px',
+                lineHeight: 1.5,
+                color: 'var(--color-text-secondary, #475569)',
+                marginTop: '12px',
+              }}
+            >
+              <Info size={18} style={{ color: '#2563eb', flexShrink: 0, marginTop: '2px' }} />
+              <div>
+                <strong style={{ color: 'var(--color-text-primary, #0f172a)' }}>
+                  Lưu ý về Phân hệ Chuyên sâu Level D:
+                </strong>
+                <p style={{ margin: '4px 0 0 0' }}>
+                  Bài kiểm tra chẩn đoán năng lực ban đầu sẽ xếp lớp vào các phân hệ nền tảng (Level A, B hoặc C). Phân hệ Chuyên sâu Level D (Target 800–900+) mở khóa khi bạn hoàn thành đạt chuẩn bài thi Checkpoint C để đảm bảo vững toàn bộ ngữ pháp lõi trước khi luyện bẫy đề thi thực tế.
+                </p>
+              </div>
+            </div>
+          )}
 
           <div className={styles.buttonRow}>
             <div />

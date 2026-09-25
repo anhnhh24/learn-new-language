@@ -27,11 +27,11 @@ const officialCourses: CourseItem[] = [
   {
     id: 'toeic-reading-grammar-foundation',
     title: 'TOEIC Reading: Ngữ pháp và từ vựng từ nền tảng đến nâng cao',
-    targetLevel: 'Lộ trình chính thức 31 tuần (Level A → D)',
+    targetLevel: 'Hệ thống 4 phân hệ kiến thức (Level A → D)',
     levelBadge: 'Toàn diện',
-    totalLessons: 35,
+    totalLessons: 40,
     durationHours: 70,
-    description: 'Chương trình flagship bao quát 35 chủ điểm ngữ pháp cốt lõi, 4 bài thi Checkpoint chuẩn hóa và quy trình remediation chống hổng kiến thức.',
+    description: 'Chương trình flagship bao quát 40 chuyên đề ngữ pháp - từ vựng cốt lõi, 4 bài thi Checkpoint chuẩn hóa và quy trình remediation chống hổng kiến thức.',
     hasSampleLesson: true,
     isEnrolled: true,
   },
@@ -110,7 +110,7 @@ export function CourseCatalogPage() {
           <span className={styles.pretitle}>CHƯƠNG TRÌNH ĐÀO TẠO</span>
           <h1 className={styles.title}>Danh mục khóa học & Lộ trình</h1>
           <p className={styles.subtitle}>
-            Chương trình đào tạo chuẩn hóa từ Database: 31 tuần, 4 cấp độ và 35 chủ điểm bài học.
+            Chương trình đào tạo chuẩn hóa: 4 phân hệ kiến thức, 40 chuyên đề cốt lõi và 4 bài kiểm định Checkpoint.
           </p>
         </div>
 
@@ -128,7 +128,7 @@ export function CourseCatalogPage() {
       <div className={styles.filtersRow}>
         {[
           { key: 'all', label: 'Tất cả chương trình' },
-          { key: 'Toàn diện', label: 'Toàn diện 31 tuần' },
+          { key: 'Toàn diện', label: 'Toàn diện (40 chuyên đề)' },
           { key: 'Level A', label: 'Level A (Nền tảng)' },
           { key: 'Level B', label: 'Level B (Trung cấp)' },
           { key: 'Level C', label: 'Level C (Nâng cao)' },

@@ -211,6 +211,20 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
   - Bổ sung migration `db/009_update_curriculum_knowledge_system.sql` cập nhật các bảng `learning.course_versions`, `learning.curriculum_levels`, `learning.course_modules` đồng bộ với cấu trúc phân hệ kiến thức mới.
   - Đồng bộ `curriculumData.ts` ở Frontend phản ánh chính xác cấu trúc phân hệ từ Database.
 
+## M26 — Audit luồng nghiệp vụ Knowledge Architecture (Đã hoàn tất xử lý toàn bộ)
+
+- **Audit & Phát hiện:** Đã rà soát toàn diện luồng nghiệp vụ sau khi chuyển đổi Knowledge Architecture ở M25, phát hiện 8 điểm bất hợp lý (BL-01 đến BL-08) và 3 rủi ro kiến trúc (RISK-01 đến RISK-03).
+- **Kết quả xử lý trọn vẹn:**
+  - **BL-01 (Đã xong):** Cập nhật toàn bộ tham chiếu cũ "31 tuần" / "35 chủ điểm" thành "4 phân hệ" / "40 chuyên đề" trên 6 file frontend (`LessonPage.tsx`, `CourseDetailPage.tsx`, `CourseCatalogPage.tsx`, `LandingPage.tsx`, `curriculumData.ts`).
+  - **BL-02 & RISK-01 (Đã xong):** Triển khai cơ chế **Prerequisite Enforcement & Progression Gate** trực tiếp trên `RoadmapPage.tsx`: khóa phân hệ kế tiếp khi chưa đạt Checkpoint trước đó, hiển thị banner cảnh báo và khóa các nút hành động tương ứng. Tích hợp thanh điều khiển linh hoạt cho phép chuyển đổi giữa chế độ khóa tuần tự và chế độ khảo sát tự do (Audit Mode).
+  - **BL-03 (Đã xong):** Chuẩn hóa quy chế củng cố thích ứng (**Remediation Policy**) đồng bộ cho cả 4 mốc Checkpoint A, B, C, D trong `checkpointCatalog`: tự động đề xuất chủ điểm yếu vào Sổ lỗi sai, quy định số buổi ôn luyện và thời gian giãn cách tối thiểu trước khi làm lại bài.
+  - **BL-04 (Đã xong):** Tạo migration `db/010_fix_checkpoint_kind_constraint.sql` cập nhật check constraint của `learning.roadmap_weeks` bổ sung giá trị `'Remediation'` và cập nhật tuần 21 khớp với `roadmap_activities`.
+  - **BL-05 & RISK-03 (Đã xong):** Xác định rõ và ghi nhận hợp đồng kiến trúc (NOTE-27): `LessonProgress.Completed` chỉ ghi nhận hành động nộp bài và đọc tài liệu; việc xét điều kiện chuyển phân hệ (Progression Gate) và kết thúc khóa học `Enrollment.Complete()` bắt buộc do tầng Application Service kiểm soát chặt chẽ với điều kiện `!NeedsReview && accuracy >= passRate`.
+  - **BL-06 (Đã xong):** Bổ sung ghi chú thông tin hướng dẫn trên `OnboardingPage.tsx` khi người học chọn mục tiêu 800–900+, làm rõ rằng bài chẩn đoán ban đầu xếp lớp vào các phân hệ A, B, C và Phân hệ Chuyên sâu Level D sẽ mở khóa sau khi vượt qua Checkpoint C.
+  - **BL-07 (Đã xong):** Chỉnh sửa toàn bộ testimonial và số liệu trên `LandingPage.tsx`, loại bỏ các cam kết điểm số TOEIC cụ thể ("tăng hơn 300 điểm"), thay bằng chỉ số đo lường accuracy và sự thành thạo ngữ pháp theo đúng chính sách NOTE-23.
+  - **BL-08 (Đã xong):** Tách mảng `weeks[]` (415 dòng) sang file riêng `src/Toeic.Web/src/lib/api/legacyRoadmapWeeks.ts` phục vụ tương thích ngược; làm sạch hoàn toàn cấu trúc `curriculumData.ts` chỉ tập trung vào Knowledge Topics và Checkpoint Catalog.
+- Chi tiết đầy đủ tại [NOTE-26, NOTE-27](file:///d:/Study/New%20folder/docs/NOTES.md) và artifact [business_logic_audit.md](file:///C:/Users/nhhag/.gemini/antigravity-ide/brain/201d6d79-8174-4156-b7cc-4c6567040052/business_logic_audit.md).
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 2. Operations quality dashboard và công cụ kiểm soát quarantine.

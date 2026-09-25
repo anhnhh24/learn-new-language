@@ -73,7 +73,7 @@ export function LessonPage() {
             onClick={() => navigate('/learn/roadmap')}
             className={styles.backButton}
           >
-            <ArrowLeft size={16} /> Quay lại lộ trình 31 tuần
+            <ArrowLeft size={16} /> Quay lại Hệ thống kiến thức
           </button>
         </div>
 

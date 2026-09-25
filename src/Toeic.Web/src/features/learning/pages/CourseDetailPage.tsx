@@ -67,8 +67,8 @@ export function CourseDetailPage() {
           <p className={styles.courseSubtitle}>{course.summary}</p>
 
           <div className={styles.specsRow}>
-            <span><BookOpen size={16} /> 35 chủ điểm bài học</span>
-            <span><Clock size={16} /> 31 tuần lộ trình (~70 giờ)</span>
+            <span><BookOpen size={16} /> 40 chuyên đề cốt lõi</span>
+            <span><Clock size={16} /> 4 phân hệ kiến thức (~70 giờ)</span>
             <span><Layers size={16} /> 4 Cột mốc Checkpoint chuyển cấp</span>
             <span><FileCheck size={16} /> Part 5 & 6 Reading chuyên sâu</span>
           </div>
@@ -104,7 +104,7 @@ export function CourseDetailPage() {
               leftIcon={<MapPin size={16} />}
               style={{ width: '100%' }}
             >
-              Xem toàn bộ lộ trình 31 tuần
+              Xem Hệ thống kiến thức
             </Button>
           </div>
         </div>
