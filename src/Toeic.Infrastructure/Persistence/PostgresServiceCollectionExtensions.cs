@@ -53,6 +53,7 @@ public static class PostgresServiceCollectionExtensions
         services.AddScoped<IFlashcardReview, PostgresFlashcardReview>();
         services.AddScoped<IErrorNotebook, PostgresErrorNotebook>();
         services.AddScoped<ILearnerDashboard, PostgresLearnerDashboard>();
+        services.AddScoped<ILearnerNotifications, PostgresLearnerNotifications>();
         services.AddScoped<PostgresGenerationJobStore>();
         services.AddScoped<IAtomicGenerationJobStore>(provider =>
             provider.GetRequiredService<PostgresGenerationJobStore>());

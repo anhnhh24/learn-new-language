@@ -39,6 +39,8 @@ if (learnerApiEnabled)
 {
     builder.Services.AddSingleton<ILearnerSessions, PostgresLearnerSessions>();
     builder.Services.AddScoped<IAccountSecurity, PostgresAccountSecurity>();
+    if (builder.Configuration.GetValue("Workers:StudyRemindersEnabled", true))
+        builder.Services.AddHostedService<StudyReminderWorker>();
     if (betaServingEnabled && builder.Configuration.GetValue("Workers:QuizExpiryEnabled", true))
         builder.Services.AddHostedService<QuizExpiryWorker>();
     var mail = builder.Configuration.GetSection("AccountMail").Get<AccountMailOptions>() ?? new();
@@ -112,6 +114,7 @@ if (learnerApiEnabled)
     app.MapFlashcardEndpoints();
     app.MapErrorNotebookEndpoints();
     app.MapDashboardEndpoints();
+    app.MapNotificationEndpoints();
     if (betaServingEnabled) app.MapLessonQuizEndpoints();
 }
 app.MapHealthChecks("/health");
