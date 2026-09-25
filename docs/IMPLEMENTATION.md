@@ -237,6 +237,16 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
   - Hoàn thiện `LiveQuizPage.tsx` kết nối backend `/lessons/{id}/quiz-attempts`, đồng bộ đồng hồ server, lưu đáp án real-time qua `PUT /quiz-attempts/{id}/answer` và nộp bài chấm điểm `/submit`.
   - Tích hợp điều hướng trong `QuizRunnerPage.tsx`: tự động nhận diện quiz bài học/checkpoint để chạy `LiveQuizPage`, đồng thời giữ runner cho bài luyện tập chuyên đề tự do.
 
+## M27 — Danh mục điểm bất hợp lý & Kế hoạch tối ưu hóa (NOTE-28 đến NOTE-33)
+
+Đã rà soát toàn diện trải nghiệm người dùng, tính toàn vẹn giao diện và luồng tích hợp API giữa Frontend - Backend, ghi nhận 6 điểm bất hợp lý cần xử lý:
+1. **NOTE-28 (Trải nghiệm UI Flashcards & Dashboard bị thoái lui):** Việc thay thế component giao diện TOTC hoàn chỉnh bằng export trực tiếp các Live API stubs thô sơ (`LearnerLivePages`) làm mất hiệu ứng 3D lật thẻ, audio, streak và đồ thị hoạt động. Cần tái hợp nhất (merge) API call trực tiếp vào các component UI đẹp có sẵn kèm graceful fallback khi offline.
+2. **NOTE-29 (Hiển thị bài đọc Part 7 quá đơn giản):** Khối bài đọc `ExamRoomPage` đang render thẻ `<pre>` thô sơ, thiếu format Email/Invoice/Memo/Article chuẩn TOEIC, thiếu số thứ tự dòng (Line 5, 10, 15) và công cụ highlight/font scaler/resizable split-pane.
+3. **NOTE-30 (Crash / Trắng trang khi chưa có Token Auth):** `learnerRequest` ném lỗi 401 chặn đứng màn hình khi chưa có JWT trong `localStorage`. Cần cơ chế Guest / Demo Mode tự nạp dữ liệu trải nghiệm và hướng dẫn đăng nhập đồng bộ.
+4. **NOTE-31 (Thiếu Pacing Guide & Section Clock phòng thi):** Phòng thi TOEIC cần có gợi ý phân bổ thời gian từng câu (Part 5 ≤ 30s, Part 6 ≤ 1m, Part 7 ≤ 1.5m) và cảnh báo màu khi dừng quá lâu ở một câu khó.
+5. **NOTE-32 (Đồng bộ tiến độ Quiz sang Roadmap Client):** Kết quả làm bài và nộp quiz từ `LiveQuizPage` cần đồng bộ hai chiều vào cache `LessonProgress` để `RoadmapPage` cập nhật ngay trạng thái mở khóa phân hệ tiếp theo.
+6. **NOTE-33 (Bảng chọn câu hỏi Question Palette cho Quiz):** `QuizRunnerPage` cần bổ sung Question Grid Palette để người học kiểm soát các câu đã làm / bỏ qua nhanh chóng.
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 2. Operations quality dashboard và công cụ kiểm soát quarantine.
