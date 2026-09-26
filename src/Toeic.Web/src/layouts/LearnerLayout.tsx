@@ -67,12 +67,12 @@ export function LearnerLayout() {
             </Link>
 
             <Link
-              to="/admin/quality"
+              to="/admin/login"
               className={styles.adminLink}
-              title="Cổng quản trị chất lượng (Quality Ops)"
+              title="Cổng quản trị chất lượng (Đăng nhập quản trị)"
             >
               <ShieldCheck size={18} />
-              <span className={styles.adminLabel}>Quality Ops</span>
+              <span className={styles.adminLabel}>Đăng nhập quản trị</span>
             </Link>
 
             <Link
@@ -118,12 +118,12 @@ export function LearnerLayout() {
             ))}
             <div className={styles.mobileDivider} />
             <Link
-              to="/admin/quality"
+              to="/admin/login"
               onClick={() => setMobileMenuOpen(false)}
               className={styles.mobileNavLink}
             >
               <ShieldCheck size={18} />
-              <span>Quản trị Chất lượng (Quality Ops)</span>
+              <span>Quản trị Chất lượng (Đăng nhập quản trị)</span>
             </Link>
             <Link
               to="/learn/account"

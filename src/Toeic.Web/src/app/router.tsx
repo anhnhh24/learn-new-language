@@ -42,15 +42,7 @@ import { PaymentStatusPage } from '../features/billing/pages/PaymentStatusPage';
 import { BillingHistoryPage } from '../features/billing/pages/BillingHistoryPage';
 
 // Admin Pages
-import { QualityDashboardPage } from '../features/admin/pages/QualityDashboardPage';
-import { JobMonitorPage } from '../features/admin/pages/JobMonitorPage';
-import { QuarantineListPage } from '../features/admin/pages/QuarantineListPage';
-import { BlueprintsPage } from '../features/admin/pages/BlueprintsPage';
-import { CurriculumEditorPage } from '../features/admin/pages/CurriculumEditorPage';
-import { ItemBankPage } from '../features/admin/pages/ItemBankPage';
-import { ImportConsolePage } from '../features/admin/pages/ImportConsolePage';
-import { UserManagementPage } from '../features/admin/pages/UserManagementPage';
-import { AuditLogPage } from '../features/admin/pages/AuditLogPage';
+import { AdminLoginPage, AdminOverviewPage, AdminListPage, AdminImportPage } from '../features/admin/AdminWorkspace';
 // Landing Page (TOTC Inspired)
 import { LandingPage } from '../features/landing/pages/LandingPage';
 
@@ -105,19 +97,25 @@ export const router = createBrowserRouter([
     element: <ExamRoomPage />,
   },
   {
+    path: '/admin/login',
+    element: <AdminLoginPage />,
+  },
+  {
     path: '/admin',
     element: <AdminLayout />,
     children: [
-      { path: '', element: <Navigate to="/admin/quality" replace /> },
-      { path: 'quality', element: <QualityDashboardPage /> },
-      { path: 'jobs', element: <JobMonitorPage /> },
-      { path: 'quarantine', element: <QuarantineListPage /> },
-      { path: 'blueprints', element: <BlueprintsPage /> },
-      { path: 'curriculum', element: <CurriculumEditorPage /> },
-      { path: 'items', element: <ItemBankPage /> },
-      { path: 'import', element: <ImportConsolePage /> },
-      { path: 'users', element: <UserManagementPage /> },
-      { path: 'audit', element: <AuditLogPage /> },
+      { path: '', element: <Navigate to="/admin/overview" replace /> },
+      { path: 'overview', element: <AdminOverviewPage /> },
+      { path: 'quality', element: <Navigate to="/admin/overview" replace /> },
+      { path: 'support', element: <AdminListPage key="support" kind="support" /> },
+      { path: 'jobs', element: <AdminListPage key="jobs" kind="jobs" /> },
+      { path: 'quarantine', element: <AdminListPage key="quarantine" kind="quarantine" /> },
+      { path: 'blueprints', element: <AdminListPage key="blueprints" kind="blueprints" /> },
+      { path: 'curriculum', element: <AdminListPage key="curriculum" kind="curriculum" /> },
+      { path: 'items', element: <AdminListPage key="items" kind="items" /> },
+      { path: 'import', element: <AdminImportPage /> },
+      { path: 'users', element: <AdminListPage key="users" kind="users" /> },
+      { path: 'audit', element: <AdminListPage key="audit" kind="audit" /> },
     ],
   },
   {
