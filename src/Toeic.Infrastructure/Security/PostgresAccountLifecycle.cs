@@ -125,6 +125,7 @@ public sealed class PostgresAccountLifecycle(
             where user_id = @user;
             update identity_data.learner_sessions set revoked_at = coalesce(revoked_at,@now)
             where user_id = @user;
+            update identity_data.admin_sessions set revoked_at=coalesce(revoked_at,@now) where user_id=@user;
             update identity_data.sessions set revoked_at = coalesce(revoked_at,@now)
             where user_id = @user;
             update identity_data.account_mail_outbox m

@@ -15,6 +15,8 @@ var betaServingRequested = builder.Configuration.GetValue<bool>("Features:BetaSe
 var analyticsPseudonymConfigured = !string.IsNullOrWhiteSpace(pseudonymKey);
 var persistenceConfigured = !string.IsNullOrWhiteSpace(connectionString);
 var learnerApiEnabled = builder.Configuration.GetValue<bool>("Features:LearnerApiEnabled");
+var adminApiEnabled = builder.Configuration.GetValue<bool>("Features:AdminApiEnabled");
+if (adminApiEnabled && !persistenceConfigured) throw new InvalidOperationException("Admin API requires PostgreSQL.");
 if (learnerApiEnabled && !persistenceConfigured)
     throw new InvalidOperationException("Learner API requires PostgreSQL.");
 var betaServingEnabled = betaServingRequested && persistenceConfigured && analyticsPseudonymConfigured;
@@ -35,18 +37,18 @@ if (persistenceConfigured)
 
 if (analyticsPseudonymConfigured)
     builder.Services.AddToeicAnalyticsPseudonymizer(pseudonymKey!);
-if (learnerApiEnabled)
+if (learnerApiEnabled || adminApiEnabled)
 {
     builder.Services.AddSingleton<ILearnerSessions, PostgresLearnerSessions>();
     builder.Services.AddScoped<IAccountSecurity, PostgresAccountSecurity>();
-    if (builder.Configuration.GetValue("Workers:StudyRemindersEnabled", true))
+    if (learnerApiEnabled && builder.Configuration.GetValue("Workers:StudyRemindersEnabled", true))
         builder.Services.AddHostedService<StudyReminderWorker>();
-    if (betaServingEnabled && builder.Configuration.GetValue("Workers:QuizExpiryEnabled", true))
+    if (learnerApiEnabled && betaServingEnabled && builder.Configuration.GetValue("Workers:QuizExpiryEnabled", true))
         builder.Services.AddHostedService<QuizExpiryWorker>();
     var mail = builder.Configuration.GetSection("AccountMail").Get<AccountMailOptions>() ?? new();
     if (mail.Mode is not ("Disabled" or "Smtp" or "DevelopmentFile"))
         throw new InvalidOperationException("Unknown AccountMail mode.");
-    if (mail.Mode != "Disabled")
+    if (learnerApiEnabled && mail.Mode != "Disabled")
     {
         if (!Uri.TryCreate(mail.PublicWebUrl, UriKind.Absolute, out var webUrl) ||
             (!builder.Environment.IsDevelopment() && webUrl.Scheme != "https") ||
@@ -73,10 +75,20 @@ if (learnerApiEnabled)
     builder.Services.AddAuthentication(LearnerAuthentication.SchemeName)
         .AddScheme<AuthenticationSchemeOptions, LearnerAuthentication>(
             LearnerAuthentication.SchemeName, _ => { });
-    builder.Services.AddAuthorization();
+    if (adminApiEnabled)
+    {
+        builder.Services.AddSingleton<IAdminSessions, PostgresAdminSessions>();
+        builder.Services.AddScoped<IAdminConsole, PostgresAdminConsole>();
+        builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, AdminAuthentication>(AdminAuthentication.SchemeName, _ => { });
+    }
+    builder.Services.AddAuthorization(options => options.AddPolicy(AdminAuthentication.PolicyName, policy =>
+        policy.AddAuthenticationSchemes(AdminAuthentication.SchemeName).RequireAuthenticatedUser().RequireRole("Admin")));
     builder.Services.AddRateLimiter(options =>
     {
         options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+        options.AddPolicy("admin-login", context => RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ => new FixedWindowRateLimiterOptions
+            { PermitLimit = 5, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
         options.AddPolicy("login", context =>
             RateLimitPartition.GetFixedWindowLimiter(
                 context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
@@ -100,11 +112,15 @@ builder.Services.AddHealthChecks();
 var app = builder.Build();
 app.UseCors();
 app.UseToeicApiPipeline();
-if (learnerApiEnabled)
+if (learnerApiEnabled || adminApiEnabled)
 {
     app.UseRateLimiter();
     app.UseAuthentication();
     app.UseAuthorization();
+}
+if (adminApiEnabled) app.MapAdminEndpoints();
+if (learnerApiEnabled)
+{
     app.MapSessionEndpoints();
     app.MapAccountEndpoints();
     app.MapAccountSecurityEndpoints();

@@ -69,6 +69,7 @@ public sealed class PostgresAccountSecurity(IDbConnectionFactory connections, Ti
         await using var update = db.Query("""
             update identity_data.users set password_hash=@hash,failed_login_count=0,login_locked_until=null where id=@user;
             update identity_data.learner_sessions set revoked_at=coalesce(revoked_at,@now) where user_id=@user;
+            update identity_data.admin_sessions set revoked_at=coalesce(revoked_at,@now) where user_id=@user;
             update identity_data.sessions set revoked_at=coalesce(revoked_at,@now) where user_id=@user;
             update identity_data.account_tokens set consumed_at=coalesce(consumed_at,@now) where user_id=@user and purpose='ResetPassword';
             """, tx, ("hash", hasher.HashPassword(email, request.NewPassword)), ("user", user), ("now", now));
