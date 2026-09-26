@@ -8,6 +8,7 @@ public static class AdminEndpoints
     public sealed record Login(string Email,string Password);
     public static void MapAdminEndpoints(this IEndpointRouteBuilder endpoints)
     {
+        endpoints.MapQuestionDraftEndpoints();
         endpoints.MapPost("/api/v1/admin/auth/login",async(Login request,IAdminSessions sessions,HttpContext ctx,CancellationToken ct)=>
         {
             ctx.Response.Headers.CacheControl="no-store";
