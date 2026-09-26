@@ -49,7 +49,7 @@ Lease token chỉ giữ trong bộ nhớ; sau reload có thể phải đợi lea
 
 ## Những phần cần làm tiếp
 
-- Đã có quản lý ghép/xuất bản/ngừng phát hành đề từ nguồn đã kiểm định tại `/admin/exams` (xem `ADMIN_EXAMS.md`). Vẫn thiếu ngân hàng đề đầy đủ, CMS nhập/biên tập câu hỏi mới; dữ liệu Listening/audio, Part 6 và các dạng Part 7 ngoài direct evidence.
+- Đã có quản lý ghép/xuất bản/ngừng phát hành đề từ nguồn đã kiểm định tại `/admin/exams` (xem `ADMIN_EXAMS.md`). Đã có nhập/biên tập bản nháp Part 5 (`QUESTION_AUTHORING.md`). Vẫn thiếu ngân hàng đề đầy đủ, editor Part 7 và worker kiểm định nguồn nhập; dữ liệu Listening/audio, Part 6 và các dạng Part 7 ngoài direct evidence.
 - Thi thử full TOEIC, chẩn đoán đầu vào và quy đổi điểm 990 chưa được triển khai trong luồng này. Chỉ hiển thị điểm thô; thời gian lượt làm gồm cả thời gian rời trang, không phải thời gian học thực tế.
 - Telemetry câu trả lời đánh dấu không đủ điều kiện calibration vì chưa đo thời gian làm từng câu đáng tin cậy.
 - Dashboard học tập hiện thống kê quiz bài học riêng; lượt luyện đề xem trong lịch sử luyện đề, chưa cộng vào biểu đồ hoạt động dashboard.

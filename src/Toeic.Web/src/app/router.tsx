@@ -1,3 +1,4 @@
+import { QuestionDraftListPage, QuestionDraftEditorPage } from '../features/admin/QuestionDrafts';
 import { AdminExamListPage, AdminExamCreatePage, AdminExamDetailPage } from '../features/admin/AdminExams';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { LearnerLayout } from '../layouts/LearnerLayout';
@@ -114,6 +115,8 @@ export const router = createBrowserRouter([
       { path: 'blueprints', element: <AdminListPage key="blueprints" kind="blueprints" /> },
       { path: 'curriculum', element: <AdminListPage key="curriculum" kind="curriculum" /> },
       { path: 'items', element: <AdminListPage key="items" kind="items" /> },
+      { path: 'question-drafts', element: <QuestionDraftListPage /> },
+      { path: 'question-drafts/:draftId', element: <QuestionDraftEditorPage /> },
       { path: 'exams', element: <AdminExamListPage /> },
       { path: 'exams/new', element: <AdminExamCreatePage /> },
       { path: 'exams/:examId', element: <AdminExamDetailPage /> },

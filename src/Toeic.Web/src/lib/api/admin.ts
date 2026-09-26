@@ -28,6 +28,10 @@ export async function adminRequest<T>(path: string, init: RequestInit = {}): Pro
 export const adminError = (error: unknown) => error instanceof AdminApiError ? error.message : 'Không kết nối được máy chủ. Vui lòng thử lại.';
 
 const examErrors: Record<string, string> = {
+  DRAFT_REQUEST_INVALID: 'Kiểm tra độ dài câu hỏi, bốn đáp án và các trường nội dung.',
+  DRAFT_REVISION_CONFLICT: 'Bản nháp đã được cập nhật ở phiên khác. Xuất JSON để giữ nội dung đang sửa rồi tải bản máy chủ.',
+  DRAFT_ALREADY_SUBMITTED: 'Bản nháp đã tạo nguồn kiểm định và không thể sửa trực tiếp. Hãy tạo phiên bản sửa đổi.',
+  BLUEPRINT_NOT_PUBLISHED: 'Blueprint không còn được xuất bản hoặc không thuộc Part 5. Chọn blueprint hợp lệ để tạo bản nháp mới.',
   FORM_VERSION_CONFLICT: 'Tên phiên bản đề đã tồn tại. Hãy chọn tên khác hoặc mở đề trong danh sách.',
   FORM_STATE_CONFLICT: 'Trạng thái đề đã thay đổi. Tải lại trước khi thực hiện tiếp.',
   IDEMPOTENCY_CONFLICT: 'Yêu cầu đã được sử dụng với nội dung khác. Tải lại và kiểm tra danh sách đề.',
