@@ -54,7 +54,7 @@ Danh sách phân trang mặc định 20, tối đa 50; user list không trả em
 
 ## Phần chưa hoàn tất
 
-- Console hiện là **đọc dữ liệu vận hành**. Chưa có MFA, cấp/đổi role qua UI, chỉnh sửa/xuất bản CMS, xử lý ticket, import tài liệu hoặc điều khiển generation worker/provider. Các trang cũ chứa thao tác/mock data không còn nằm trong route console mới.
+- Console có quản lý đề luyện tập tại `/admin/exams`: xem nội dung, ghép/xuất bản từ nguồn đã kiểm định và ngừng phát hành có audit (xem `ADMIN_EXAMS.md`, migration 022). Chưa có MFA, cấp/đổi role qua UI, biên tập câu hỏi mới, xử lý ticket, import tài liệu hoặc điều khiển generation worker/provider. Các trang cũ chứa thao tác/mock data không còn nằm trong route console mới.
 - Trang import hiển thị chưa triển khai; không có nút upload giả hoặc thông báo nhập thành công khi chưa có backend.
 - Chưa có audit cho mọi lần đọc dữ liệu hoặc cho mọi thay đổi membership trực tiếp DB; không coi audit list là nhật ký đầy đủ mọi hành động.
 - Trước khi mở rộng các thao tác đặc quyền cần bổ sung MFA/step-up và kiểm tra permission tương ứng. Phiên dùng bearer phía trình duyệt nên vẫn cần bảo vệ XSS, HTTPS và cấu hình triển khai phù hợp.

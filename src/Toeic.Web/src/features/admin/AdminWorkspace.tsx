@@ -44,7 +44,7 @@ export function AdminWorkspace() {
   if (!identity) return <div className={s.loading}><p className={s.error} role="alert">{error}</p><Button onClick={() => setRetry(v => v + 1)}>Thử lại</Button> <Link to="/admin/login">Đăng nhập lại</Link></div>;
   const nav = [
     { path: 'overview', name: 'Tổng quan', icon: LayoutDashboard }, { path: 'curriculum', name: 'Khóa học', icon: BookOpen },
-    { path: 'items', name: 'Ngân hàng câu hỏi', icon: Layers }, { path: 'blueprints', name: 'Blueprint', icon: Database },
+    { path: 'exams', name: 'Đề luyện tập', icon: ClipboardList }, { path: 'items', name: 'Ngân hàng câu hỏi', icon: Layers }, { path: 'blueprints', name: 'Blueprint', icon: Database },
     { path: 'jobs', name: 'Tác vụ nội dung', icon: Workflow }, { path: 'quarantine', name: 'Nội dung cách ly', icon: ShieldCheck },
     { path: 'users', name: 'Người dùng', icon: Users }, { path: 'support', name: 'Hỗ trợ học viên', icon: LifeBuoy }, { path: 'audit', name: 'Nhật ký hoạt động', icon: ClipboardList },
   ];
@@ -58,8 +58,8 @@ export function AdminOverviewPage() {
   useEffect(() => { const abort = new AbortController(); setError(''); setData(null); adminRequest<Overview>('/overview', { signal: abort.signal }).then(setData).catch(e => { if (!abort.signal.aborted) setError(adminError(e)); }); return () => abort.abort(); }, [retry]);
   return <><header className={s.heading}><div><h1>Tổng quan vận hành</h1><p className={s.muted}>Tình trạng nội dung và các yêu cầu cần theo dõi.</p></div><Button variant="outline" onClick={() => setRetry(v => v + 1)}>Làm mới</Button></header>{error && <div className={s.error} role="alert">{error}</div>}{!data && !error && <p role="status">Đang tải tổng quan…</p>}{data && <div className={s.grid}>{[
     ['Tài khoản đang hoạt động', data.activeLearners, 'users'], ['Khóa học đã xuất bản', data.publishedCourses, 'curriculum'], ['Bài học đã xuất bản', data.publishedLessons, 'curriculum'],
-    ['Yêu cầu đang mở', data.openTickets, 'support'], ['Bộ đề đang hoạt động', data.activeForms, 'items'], ['Nguồn câu hỏi cách ly', data.quarantinedSources, 'quarantine'],
-  ].map(([label, value, path]) => <article className={s.metric} key={label}><span className={s.muted}>{label}</span><strong>{value}</strong><Link to={`/admin/${path}`}>Xem danh sách →</Link></article>)}</div>}<section className={s.panel}><h2>Trạng thái triển khai</h2><p className={s.muted}>Các danh sách hiển thị dữ liệu đã lưu trong hệ thống. Chức năng xuất bản, cấp quyền và nhập đề chưa mở trong giao diện này.</p><p className={s.muted}>Thanh toán đang chờ tích hợp.</p></section></>;
+    ['Yêu cầu đang mở', data.openTickets, 'support'], ['Bộ đề đang hoạt động', data.activeForms, 'exams'], ['Nguồn câu hỏi cách ly', data.quarantinedSources, 'quarantine'],
+  ].map(([label, value, path]) => <article className={s.metric} key={label}><span className={s.muted}>{label}</span><strong>{value}</strong><Link to={`/admin/${path}`}>Xem danh sách →</Link></article>)}</div>}<section className={s.panel}><h2>Trạng thái triển khai</h2><p className={s.muted}>Các danh sách hiển thị dữ liệu đã lưu trong hệ thống. Đã có quản lý và xuất bản đề luyện tập từ nguồn đã kiểm định. Cấp quyền và nhập nội dung mới chưa mở trong giao diện này.</p><p className={s.muted}>Thanh toán đang chờ tích hợp.</p></section></>;
 }
 
 type Row = { id: string; title?: string; displayName?: string; state?: string; status?: string; detail?: string; description?: string; resolutionReason?: string; emailVerified?: boolean; createdAt?: string; occurredAt?: string; action?: string; actorType?: string; targetType?: string; targetId?: string };

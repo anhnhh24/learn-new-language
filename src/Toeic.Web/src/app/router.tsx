@@ -1,3 +1,4 @@
+import { AdminExamListPage, AdminExamCreatePage, AdminExamDetailPage } from '../features/admin/AdminExams';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { LearnerLayout } from '../layouts/LearnerLayout';
 import { AuthLayout } from '../layouts/AuthLayout';
@@ -113,6 +114,9 @@ export const router = createBrowserRouter([
       { path: 'blueprints', element: <AdminListPage key="blueprints" kind="blueprints" /> },
       { path: 'curriculum', element: <AdminListPage key="curriculum" kind="curriculum" /> },
       { path: 'items', element: <AdminListPage key="items" kind="items" /> },
+      { path: 'exams', element: <AdminExamListPage /> },
+      { path: 'exams/new', element: <AdminExamCreatePage /> },
+      { path: 'exams/:examId', element: <AdminExamDetailPage /> },
       { path: 'import', element: <AdminImportPage /> },
       { path: 'users', element: <AdminListPage key="users" kind="users" /> },
       { path: 'audit', element: <AdminListPage key="audit" kind="audit" /> },
