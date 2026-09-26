@@ -9,6 +9,7 @@ public static class AdminEndpoints
     public static void MapAdminEndpoints(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapQuestionDraftEndpoints();
+        endpoints.MapPart7DraftEndpoints();
         endpoints.MapPost("/api/v1/admin/auth/login",async(Login request,IAdminSessions sessions,HttpContext ctx,CancellationToken ct)=>
         {
             ctx.Response.Headers.CacheControl="no-store";
