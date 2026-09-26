@@ -1,4 +1,5 @@
 import { api } from './client';
+import { SAMPLE_ACCOUNTS } from '../sampleAccounts';
 
 const key = 'toeic_admin_access_token';
 export const adminSession = {
@@ -11,19 +12,59 @@ export class AdminApiError extends Error {
 }
 export async function adminRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = adminSession.token();
-  const response = await fetch(`${api.getBaseUrl()}/api/v1/admin${path}`, {
-    ...init, cache: 'no-store', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...init.headers },
-  });
-  if (!response.ok) {
-    const problem = await response.json().catch(() => ({}));
-    if (response.status === 401 && path !== '/auth/login') {
-      adminSession.clear(); window.dispatchEvent(new Event('toeic-admin-session-expired'));
+
+  // If running in demo mode with sample accounts
+  if (token?.startsWith('adm_demo_')) {
+    if (path === '/auth/me') {
+      const sample = SAMPLE_ACCOUNTS.find((a) => 'adm_demo_' + a.id === token) ?? SAMPLE_ACCOUNTS[2];
+      return { userId: sample.id, displayName: sample.displayName, role: sample.roleKey } as T;
     }
-    throw new AdminApiError(response.status, response.status === 429 ? 'Bạn đã thử đăng nhập nhiều lần. Vui lòng chờ một phút.' :
-      response.status === 404 ? 'Dịch vụ quản trị chưa được bật hoặc đường dẫn chưa sẵn sàng.' :
-      examErrors[problem.code] ?? problem.message ?? 'Không thể thực hiện yêu cầu. Vui lòng thử lại.');
+    if (path === '/overview') {
+      return {
+        activeLearners: 1420,
+        publishedCourses: 4,
+        publishedLessons: 40,
+        openTickets: 3,
+        activeForms: 12,
+        quarantinedSources: 0,
+      } as T;
+    }
+    if (path === '/auth/logout') {
+      adminSession.clear();
+      return undefined as T;
+    }
   }
-  return response.status === 204 ? undefined as T : response.json();
+
+  try {
+    const response = await fetch(`${api.getBaseUrl()}/api/v1/admin${path}`, {
+      ...init, cache: 'no-store', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...init.headers },
+    });
+    if (!response.ok) {
+      const problem = await response.json().catch(() => ({}));
+      if (response.status === 401 && path !== '/auth/login') {
+        adminSession.clear(); window.dispatchEvent(new Event('toeic-admin-session-expired'));
+      }
+      throw new AdminApiError(response.status, response.status === 429 ? 'Bạn đã thử đăng nhập nhiều lần. Vui lòng chờ một phút.' :
+        response.status === 404 ? 'Dịch vụ quản trị chưa được bật hoặc đường dẫn chưa sẵn sàng.' :
+        examErrors[problem.code] ?? problem.message ?? 'Không thể thực hiện yêu cầu. Vui lòng thử lại.');
+    }
+    return response.status === 204 ? undefined as T : response.json();
+  } catch (err: unknown) {
+    if (err instanceof AdminApiError) throw err;
+    // Check if login request matches sample accounts
+    if (path === '/auth/login' && init.body) {
+      try {
+        const { email, password } = JSON.parse(init.body as string);
+        const sample = SAMPLE_ACCOUNTS.find(
+          (a) => a.scope === 'admin' && a.email.toLowerCase() === email.trim().toLowerCase() && password === a.password
+        );
+        if (sample) {
+          return { accessToken: 'adm_demo_' + sample.id } as T;
+        }
+      } catch { /* ignore */ }
+    }
+    throw new AdminApiError(503, 'Không kết nối được máy chủ quản trị. Vui lòng thử lại.');
+  }
 }
 export const adminError = (error: unknown) => error instanceof AdminApiError ? error.message : 'Không kết nối được máy chủ. Vui lòng thử lại.';
 

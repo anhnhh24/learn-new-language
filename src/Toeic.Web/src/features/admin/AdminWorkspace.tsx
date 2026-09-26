@@ -3,6 +3,8 @@ import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react
 import { BookOpen, ClipboardList, Database, Eye, EyeOff, Layers, LayoutDashboard, LifeBuoy, LogOut, ShieldCheck, Users, Workflow } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { AdminApiError, adminError, adminRequest, adminSession } from '../../lib/api/admin';
+import { SampleAccountsSelector } from '../../components/auth/SampleAccountsSelector';
+import { SampleAccount } from '../../lib/sampleAccounts';
 import s from './AdminConsole.module.css';
 
 interface Identity { userId: string; displayName: string; role: string }
@@ -19,11 +21,30 @@ export function AdminLoginPage() {
       navigate(from?.startsWith('/admin/') && !from.startsWith('/admin/login') ? from : '/admin/overview', { replace: true });
     } catch (e) { setError(adminError(e)); } finally { setBusy(false); lock.current = false; }
   }
+
+  const handleFill = (fillEmail: string, fillPass: string) => {
+    setEmail(fillEmail);
+    setPassword(fillPass);
+    setError('');
+  };
+
+  const handleDirect = async (acc: SampleAccount) => {
+    setEmail(acc.email);
+    setPassword(acc.password);
+    adminSession.save(`adm_demo_${acc.id}`);
+    const from = (location.state as { from?: string } | null)?.from;
+    navigate(from?.startsWith('/admin/') && !from.startsWith('/admin/login') ? from : acc.portalUrl, { replace: true });
+  };
+
   return <main className={s.login}><section className={s.intro}><div className={s.brand}><ShieldCheck size={24} /><span>TOEIC · Quản trị</span></div><div><h1>Chăm chút từng phần của trải nghiệm học.</h1><p>Không gian làm việc dành cho đội ngũ quản lý nội dung, hỗ trợ học viên và theo dõi vận hành.</p></div><footer><p>Tài khoản quản trị được cấp bởi người phụ trách hệ thống.</p></footer></section>
     <section className={s.loginSide}><form className={s.loginForm} onSubmit={login}><span className={s.eyebrow}>Cổng quản trị</span><h2>Đăng nhập</h2><p className={s.muted}>Sử dụng tài khoản đã được cấp quyền quản trị.</p>{error && <div className={s.error} role="alert">{error}</div>}
       <label className={s.field}>Email<input className={s.input} type="email" autoComplete="username" required maxLength={254} disabled={busy} value={email} onChange={e => setEmail(e.target.value)} /></label>
       <label className={s.field}>Mật khẩu<span className={s.password}><input className={s.input} type={visible ? 'text' : 'password'} autoComplete="current-password" required maxLength={1024} disabled={busy} value={password} onChange={e => setPassword(e.target.value)} /><Button type="button" variant="text" disabled={busy} aria-label={visible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'} aria-pressed={visible} onClick={() => setVisible(v => !v)}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</Button></span></label>
-      <Button type="submit" isLoading={busy} style={{ width: '100%' }}>Đăng nhập quản trị</Button><div className={s.actions}><Link to="/auth/forgot-password">Quên mật khẩu?</Link></div><p className={s.muted}>Bạn là học viên? <Link to="/auth/login">Đến trang đăng nhập học viên</Link></p></form></section></main>;
+      <Button type="submit" isLoading={busy} style={{ width: '100%' }}>Đăng nhập quản trị</Button><div className={s.actions}><Link to="/auth/forgot-password">Quên mật khẩu?</Link></div><p className={s.muted}>Bạn là học viên? <Link to="/auth/login">Đến trang đăng nhập học viên</Link></p></form>
+      <div style={{ maxWidth: '440px', width: '100%', margin: '0 auto' }}>
+        <SampleAccountsSelector onFillCredentials={handleFill} onDirectLogin={handleDirect} defaultScope="admin" />
+      </div>
+    </section></main>;
 }
 
 export function AdminWorkspace() {

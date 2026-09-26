@@ -9,3 +9,6 @@ TestResults/
 **/node_modules/
 **/dist/
 *.local
+run-all.bat
+dev.bat
+stop-all.bat

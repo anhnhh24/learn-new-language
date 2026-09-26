@@ -247,6 +247,20 @@ Theo yêu cầu ngày 2026-09-23, phần test mới được hoãn. M03 chỉ ch
 5. **NOTE-32 (Đồng bộ tiến độ Quiz sang Roadmap Client):** Kết quả làm bài và nộp quiz từ `LiveQuizPage` cần đồng bộ hai chiều vào cache `LessonProgress` để `RoadmapPage` cập nhật ngay trạng thái mở khóa phân hệ tiếp theo.
 6. **NOTE-33 (Bảng chọn câu hỏi Question Palette cho Quiz):** `QuizRunnerPage` cần bổ sung Question Grid Palette để người học kiểm soát các câu đã làm / bỏ qua nhanh chóng.
 
+## M28 — Tài khoản mẫu theo từng vai trò (SAMPLE_ACCOUNTS)
+
+Đã thiết lập hệ thống tài khoản mẫu chuẩn hóa cho tất cả 6 vai trò trong hệ sinh thái TOEIC với mật khẩu thống nhất `ToeicMaster@2026!`:
+1. **Learner (Học viên cơ bản):** `learner@toeic.vn` → Luyện tập Level A–B, làm bài kiểm tra quiz, luyện đề thi, ôn Flashcards SRS và Sổ lỗi sai.
+2. **Learner (Mục tiêu 850+):** `learner.advanced@toeic.vn` → Học viên nâng cao, hoàn thành bài chẩn đoán và các bài thi Checkpoint chuyên sâu.
+3. **SuperAdmin (Quản trị hệ thống):** `admin@toeic.vn` → Toàn quyền kiểm soát hệ thống, quản trị tài khoản, kiểm tra audit log và tác vụ worker.
+4. **ContentEditor (Biên tập viên / Giáo viên):** `editor@toeic.vn` → Soạn thảo câu hỏi Part 5, biên soạn bài đọc Part 7, quản lý giáo trình.
+5. **ContentReviewer (Kiểm định viên chất lượng):** `reviewer@toeic.vn` → Thẩm định đáp án, kiểm duyệt vùng cách ly (Quarantine), kiểm tra blueprint đề thi.
+6. **SupportStaff (Nhân viên hỗ trợ học viên):** `support@toeic.vn` → Tiếp nhận báo lỗi câu hỏi từ học viên, quản lý ticket hỗ trợ kỹ thuật và tài khoản.
+
+- **Cơ sở dữ liệu:** Tạo migration `db/025_seed_sample_role_accounts.sql` tự động tạo tài khoản, sinh hash chuẩn ASP.NET Core Identity PBKDF2, cấp quyền `identity_data.admin_accounts` và tạo hồ sơ `learning.learner_profiles`.
+- **Giao diện Web:** Xây dựng component `SampleAccountsSelector` tích hợp trên cả trang Đăng nhập học viên (`/auth/login`) và Đăng nhập quản trị (`/admin/login`) hỗ trợ tự động điền form và đăng nhập một chạm (one-click login).
+- **Tài liệu hướng dẫn:** Xem chi tiết tại [docs/SAMPLE_ACCOUNTS.md](file:///d:/Study/New%20folder/docs/SAMPLE_ACCOUNTS.md).
+
 ## Các mốc kế tiếp (chưa hoàn thành)
 1. Generation Worker và provider adapters thật; persistence cho invocation, quality run và cost.
 2. Operations quality dashboard và công cụ kiểm soát quarantine.

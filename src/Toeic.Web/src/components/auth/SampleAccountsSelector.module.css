@@ -1,0 +1,169 @@
+.container {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.filterTabs {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--color-surface-subtle);
+  padding: 3px;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+}
+
+.tabBtn {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tabBtnActive {
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.accountList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.accountCard {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.accountCard:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-subtle);
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.roleName {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+.accountDesc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.accountDetails {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface-subtle);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+}
+
+.emailText {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.passText {
+  color: var(--color-text-muted);
+}
+
+.cardActions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: 4px;
+}
+
+.fillBtn {
+  flex: 1;
+  font-size: var(--font-size-xs);
+  padding: 5px 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.fillBtn:hover {
+  background: var(--color-surface-subtle);
+}
+
+.loginNowBtn {
+  flex: 1;
+  font-size: var(--font-size-xs);
+  padding: 5px 8px;
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  color: var(--color-primary-contrast);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.loginNowBtn:hover {
+  background: var(--color-primary-hover);
+}
+
+.commonPassNote {
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--color-border);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+}
