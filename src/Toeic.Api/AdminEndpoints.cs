@@ -23,6 +23,16 @@ public static class AdminEndpoints
             return Results.NoContent();
         });
         group.MapGet("/resources/{kind}",async(string kind,int? page,int? pageSize,IAdminConsole admin,CancellationToken ct)=>Results.Ok(await admin.ResourcesAsync(kind,page??1,pageSize??20,ct)));
+        group.MapGet("/exams", async(int? page,string? state,IAdminExams exams,CancellationToken ct)=>Results.Ok(await exams.ListAsync(page??1,state,ct)));
+        group.MapGet("/exams/sources", async(int? page,string? policy,IAdminExams exams,CancellationToken ct)=>Results.Ok(await exams.SourcesAsync(page??1,policy,ct)));
+        group.MapGet("/exams/sources/{id:guid}", async(Guid id,IAdminExams exams,CancellationToken ct)=>Results.Ok(await exams.SourceAsync(id,ct)));
+        group.MapGet("/exams/{id:guid}", async(Guid id,IAdminExams exams,CancellationToken ct)=>Results.Ok(await exams.DetailAsync(id,ct)));
+        group.MapPost("/exams", async(PublishAdminExam request,HttpContext ctx,IAdminExams exams,CancellationToken ct)=>Results.Ok(new {id=await exams.PublishAsync(Guid.Parse(ctx.User.FindFirstValue(ClaimTypes.NameIdentifier)!),request,ct)}));
+        group.MapPost("/exams/{id:guid}/archive", async(Guid id,ArchiveAdminExam request,HttpContext ctx,IAdminExams exams,CancellationToken ct)=>
+        {
+            await exams.ArchiveAsync(Guid.Parse(ctx.User.FindFirstValue(ClaimTypes.NameIdentifier)!),id,request,ct);
+            return Results.NoContent();
+        });
         group.MapGet("/overview",async(IAdminConsole admin,CancellationToken ct)=>Results.Ok(await admin.OverviewAsync(ct)));
         group.MapGet("/users",async(int? page,int? pageSize,IAdminConsole admin,CancellationToken ct)=>Results.Ok(await admin.UsersAsync(page??1,pageSize??20,ct)));
         group.MapGet("/tickets",async(int? page,int? pageSize,string? state,IAdminConsole admin,CancellationToken ct)=>Results.Ok(await admin.TicketsAsync(page??1,pageSize??20,state,ct)));

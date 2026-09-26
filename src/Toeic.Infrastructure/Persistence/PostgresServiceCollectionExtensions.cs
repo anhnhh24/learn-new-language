@@ -81,6 +81,7 @@ public static class PostgresServiceCollectionExtensions
             services.AddScoped<LearnerIssueReportService>();
         }
         services.AddScoped<FormCompositionService>();
+        services.AddScoped<IAdminExams, PostgresAdminExams>();
         services.AddScoped<AutoQuarantineService>();
         services.AddHealthChecks()
             .AddCheck<PostgresHealthCheck>("postgres", tags: ["ready"]);

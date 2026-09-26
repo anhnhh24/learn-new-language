@@ -283,7 +283,7 @@ internal sealed class PostgresFormCandidateStore(IPostgresSession session) : IFo
                 from content.question_nodes qn
                 where qn.source_revision_id = qr.id
             ) nodes on true
-            where qr.id in ({string.Join(", ", parameters)});
+            where qr.id in ({string.Join(", ", parameters)}) order by qr.id for update of qr;
             """;
 
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);

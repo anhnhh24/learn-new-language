@@ -128,7 +128,7 @@ public static class BetaFormComposer
 
         var duplicateRequirement = requirements.GroupBy(item => item.Part)
             .Any(group => group.Count() > 1);
-        if (duplicateRequirement || requirements.Any(item => item.QuestionCount <= 0))
+        if (duplicateRequirement || requirements.Any(item => item.QuestionCount <= 0) || candidates.Any(item => !requirements.Any(requirement => requirement.Part == item.Part)))
             throw new DomainException("FORM_BLUEPRINT_INVALID");
         if (candidates.Any(item => item.RevisionId == Guid.Empty ||
             string.IsNullOrWhiteSpace(item.FamilyId) ||
