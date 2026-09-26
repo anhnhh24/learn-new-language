@@ -34,6 +34,9 @@ internal sealed class PostgresLessonQuizzes(IApplicationTransaction transaction,
                     }
                 if (old.HasValue) return View(await Read(user, old.Value, token));
             }
+            await using var usedOperation = Query("select 1 from assessment.start_attempt_receipts where learner_id=@user and client_operation_id=@op",
+                ("user", user), ("op", request.ClientOperationId));
+            if (await usedOperation.ExecuteScalarAsync(token) is not null) throw new DomainException("IDEMPOTENCY_CONFLICT");
             await RequireAccess(user, lesson, token);
             Guid form;
             bool checkpoint;

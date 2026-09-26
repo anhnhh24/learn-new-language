@@ -44,7 +44,10 @@ if (learnerApiEnabled || adminApiEnabled)
     if (learnerApiEnabled && builder.Configuration.GetValue("Workers:StudyRemindersEnabled", true))
         builder.Services.AddHostedService<StudyReminderWorker>();
     if (learnerApiEnabled && betaServingEnabled && builder.Configuration.GetValue("Workers:QuizExpiryEnabled", true))
+    {
         builder.Services.AddHostedService<QuizExpiryWorker>();
+        builder.Services.AddHostedService<PracticeExpiryWorker>();
+    }
     var mail = builder.Configuration.GetSection("AccountMail").Get<AccountMailOptions>() ?? new();
     if (mail.Mode is not ("Disabled" or "Smtp" or "DevelopmentFile"))
         throw new InvalidOperationException("Unknown AccountMail mode.");
@@ -131,7 +134,7 @@ if (learnerApiEnabled)
     app.MapErrorNotebookEndpoints();
     app.MapDashboardEndpoints();
     app.MapNotificationEndpoints();
-    if (betaServingEnabled) app.MapLessonQuizEndpoints();
+    if (betaServingEnabled) { app.MapLessonQuizEndpoints(); app.MapPracticeEndpoints(); }
 }
 app.MapHealthChecks("/health");
 app.MapPlatformStatus(persistenceConfigured, analyticsPseudonymConfigured, betaServingEnabled);

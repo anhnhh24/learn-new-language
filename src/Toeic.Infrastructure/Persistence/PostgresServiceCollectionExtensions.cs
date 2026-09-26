@@ -77,6 +77,7 @@ public static class PostgresServiceCollectionExtensions
         {
             services.AddScoped<BetaServingService>();
             services.AddScoped<ILessonQuizzes, PostgresLessonQuizzes>();
+            services.AddScoped<IPracticeExams, PostgresPracticeExams>();
             services.AddScoped<LearnerIssueReportService>();
         }
         services.AddScoped<FormCompositionService>();

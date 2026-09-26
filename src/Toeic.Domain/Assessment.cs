@@ -114,6 +114,20 @@ public sealed class Attempt
         items = snapshots.ToDictionary(item => item.QuestionRevisionId);
     }
 
+    internal string? LeaseTokenHash => leaseTokenHash;
+    internal DateTimeOffset? LeaseExpiresAt => leaseExpiresAt;
+    internal void RestoreActive(long revision, IEnumerable<SavedResponse> saved, string? tokenHash, DateTimeOffset? expiresAt)
+    {
+        if (revision < 0) throw new DomainException("ATTEMPT_REVISION_INVALID");
+        Revision = revision;
+        foreach (var response in saved)
+        {
+            if (!items.ContainsKey(response.QuestionRevisionId)) throw new DomainException("ATTEMPT_SNAPSHOT_INVALID");
+            responses.Add(response.QuestionRevisionId, response);
+        }
+        leaseTokenHash = tokenHash;
+        leaseExpiresAt = expiresAt;
+    }
     public string AcquireLease(string learnerId, string rawLeaseToken, DateTimeOffset receivedAt,
         bool allowTakeover)
     {
