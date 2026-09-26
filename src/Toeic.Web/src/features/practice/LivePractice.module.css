@@ -1,0 +1,13 @@
+.room { min-height: 100dvh; background: var(--color-bg); }
+.toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 28px; background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+.toolbar span { font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 650; }
+.body { max-width: 1440px; margin: auto; padding: 24px 28px 60px; }
+.columns { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 24px; align-items: start; }
+.passage { position: sticky; top: 90px; max-height: calc(100dvh - 120px); overflow: auto; }
+.question { font-size: 22px; line-height: 1.65; margin: 18px 0; white-space: pre-wrap; }
+.navigator { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0; }
+.navigator button { min-width: 42px; min-height: 42px; padding: 8px; border-radius: 7px; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); cursor: pointer; }
+.navigator button.answered { background: var(--color-primary-subtle); }
+.navigator button.current { border: 2px solid var(--color-primary); font-weight: 700; }
+.navigator button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+@media(max-width:800px) { .columns { grid-template-columns: 1fr; } .passage { position: static; max-height: none; } .toolbar { padding: 14px 16px; flex-wrap: wrap; } .body { padding: 20px 16px; } }
