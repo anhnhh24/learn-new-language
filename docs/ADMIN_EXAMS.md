@@ -38,7 +38,7 @@ Archive kiểm tra expectedState với trạng thái đã khóa. Nếu đã Arch
 
 ## Giới hạn còn lại
 
-- Đã có biên tập và nhập JSON từng câu Part 5 tại `/admin/question-drafts` (xem `QUESTION_AUTHORING.md`, migration 023). Chưa có editor Part 7, nhập hàng loạt, lưu nháp cấu hình ghép đề trên server, lập lịch phát hành hoặc khôi phục đề Archived.
+- Đã có biên tập Part 5 và Part7DirectEvidence tại `/admin/question-drafts` và `/admin/part7-drafts` (xem `QUESTION_AUTHORING.md`, `PART7_AUTHORING.md`). Chưa có nhập hàng loạt, lưu nháp cấu hình ghép đề trên server, lập lịch phát hành hoặc khôi phục đề Archived.
 - Phiên bản cấu hình bài thi là metadata theo hợp đồng composer hiện tại, chưa đối chiếu một danh mục exam profile riêng. Không dùng tên profile để suy ra đây là full TOEIC.
 - Chưa mở Listening, Part 6, full mock hoặc quy đổi 990. Chưa có workflow nhiều người duyệt hay MFA/step-up; API sử dụng quyền Admin hiện có.
 - Danh sách ứng viên phản ánh trạng thái nguồn, không bảo đảm mọi cách chọn đều qua gate: kết quả cuối cùng do transaction xuất bản quyết định.

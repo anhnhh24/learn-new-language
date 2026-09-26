@@ -44,7 +44,7 @@ export function AdminWorkspace() {
   if (!identity) return <div className={s.loading}><p className={s.error} role="alert">{error}</p><Button onClick={() => setRetry(v => v + 1)}>Thử lại</Button> <Link to="/admin/login">Đăng nhập lại</Link></div>;
   const nav = [
     { path: 'overview', name: 'Tổng quan', icon: LayoutDashboard }, { path: 'curriculum', name: 'Khóa học', icon: BookOpen },
-    { path: 'question-drafts', name: 'Biên tập Part 5', icon: BookOpen }, { path: 'exams', name: 'Đề luyện tập', icon: ClipboardList }, { path: 'items', name: 'Ngân hàng câu hỏi', icon: Layers }, { path: 'blueprints', name: 'Blueprint', icon: Database },
+    { path: 'question-drafts', name: 'Biên tập Part 5', icon: BookOpen }, { path: 'part7-drafts', name: 'Biên tập Part 7', icon: BookOpen }, { path: 'exams', name: 'Đề luyện tập', icon: ClipboardList }, { path: 'items', name: 'Ngân hàng câu hỏi', icon: Layers }, { path: 'blueprints', name: 'Blueprint', icon: Database },
     { path: 'jobs', name: 'Tác vụ nội dung', icon: Workflow }, { path: 'quarantine', name: 'Nội dung cách ly', icon: ShieldCheck },
     { path: 'users', name: 'Người dùng', icon: Users }, { path: 'support', name: 'Hỗ trợ học viên', icon: LifeBuoy }, { path: 'audit', name: 'Nhật ký hoạt động', icon: ClipboardList },
   ];

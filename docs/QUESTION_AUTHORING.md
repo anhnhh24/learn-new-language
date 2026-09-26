@@ -61,7 +61,7 @@ Khi lưu chưa được xác nhận, editor giữ nguyên payload và khóa ch�
 
 ## Còn lại
 
-- Editor Part 7, nhập hàng loạt/PDF/Word, quản lý blueprint qua UI và worker kiểm định nguồn nhập.
+- Đã có editor JSON cho Part7DirectEvidence tại `/admin/part7-drafts` (xem `PART7_AUTHORING.md`, migration 024). Còn thiếu nhập hàng loạt/PDF/Word, quản lý blueprint qua UI và worker kiểm định nguồn nhập.
 - Chưa có workflow nhiều người phê duyệt, xóa/archive draft hoặc lịch sử diff từng lần lưu. Nguồn sau submit bất biến nhưng các phiên bản chỉnh sửa nháp trước đó không được lưu riêng.
 - Bộ kiểm tra Part 5 hiện chỉ chấp nhận exam profile `TOEIC-LR-R0A-v1`; blueprint profile khác sẽ nhận finding BLUEPRINT_INVALID.
 - Đã build .NET và TypeScript/Vite. Theo yêu cầu hoãn test, chưa chạy kiểm thử API/DB, áp dụng migration hoặc kiểm tra giao diện trên trình duyệt. Frontend có cảnh báo bundle lớn hơn 500 kB.
