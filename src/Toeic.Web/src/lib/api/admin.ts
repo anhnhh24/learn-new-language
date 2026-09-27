@@ -84,4 +84,7 @@ const examErrors: Record<string, string> = {
   FORM_CONTENT_CORRUPT: 'Nội dung nguồn không khớp phiên bản đã kiểm định. Cần xử lý nguồn trước khi xuất bản.',
   FORM_REQUEST_INVALID: 'Kiểm tra tên phiên bản, policy, cấu hình, thời lượng và số câu (tối đa 200).',
   FORM_ITEM_NOT_FOUND: 'Không tìm thấy nguồn câu hỏi đã chọn.',
+  EXAM_PROFILE_NOT_FOUND: 'Cấu trúc đề không tồn tại hoặc đã thay đổi. Hãy tải lại danh sách.',
+  EXAM_PROFILE_NOT_SUPPORTED: 'Cấu trúc đề này chưa đủ module để phát hành.',
+  EXAM_PROFILE_STRUCTURE_INVALID: 'Số câu hoặc thời lượng chưa khớp cấu trúc đề đã chọn.',
 };
