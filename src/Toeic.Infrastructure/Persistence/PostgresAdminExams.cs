@@ -30,6 +30,14 @@ internal sealed class PostgresAdminExams(IApplicationTransaction transaction, IP
         return new AdminPage<AdminExam>(rows.Take(20).ToArray(), page, 20, rows.Count > 20);
     }, ct);
 
+    public Task<IReadOnlyList<ExamProfileView>> ProfilesAsync(CancellationToken ct) => transaction.ExecuteAsync<IReadOnlyList<ExamProfileView>>(async token =>
+    {
+        await using var query = Query("select version,title,kind,publication_enabled,duration_seconds,total_questions,exact_structure,structure_json::text from content.exam_profiles order by kind,title");
+        var rows = new List<ExamProfileView>();
+        await using var reader = await query.ExecuteReaderAsync(token);
+        while (await reader.ReadAsync(token)) rows.Add(new(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetBoolean(3), reader.GetInt32(4), reader.GetInt32(5), reader.GetBoolean(6), JsonSerializer.Deserialize<JsonElement>(reader.GetString(7))));
+        return rows;
+    }, ct);
     public Task<AdminPage<AdminExamSource>> SourcesAsync(int page, string? policy, CancellationToken ct) => transaction.ExecuteAsync(async token =>
     {
         ValidatePage(page);
@@ -92,6 +100,7 @@ internal sealed class PostgresAdminExams(IApplicationTransaction transaction, IP
                 return reader.GetGuid(1);
             }
         }
+        await ValidateProfile(request, token);
         var requirements = ImmutableArray.CreateBuilder<FormRequirement>();
         if (request.Part5Count > 0) requirements.Add(new(ToeicPart.Part5, request.Part5Count));
         if (request.Part7Count > 0) requirements.Add(new(ToeicPart.Part7DirectEvidence, request.Part7Count));
@@ -137,6 +146,23 @@ internal sealed class PostgresAdminExams(IApplicationTransaction transaction, IP
             """, ("id", admin));
         if (await query.ExecuteScalarAsync(ct) is null) throw new DomainException("FORBIDDEN");
     }
+    private async Task ValidateProfile(PublishAdminExam request, CancellationToken ct)
+    {
+        await using var query = Query("select publication_enabled,duration_seconds,total_questions,exact_structure,structure_json::text from content.exam_profiles where version=@version for share", ("version", request.ExamProfileVersion));
+        await using var reader = await query.ExecuteReaderAsync(ct);
+        if (!await reader.ReadAsync(ct)) throw new DomainException("EXAM_PROFILE_NOT_FOUND");
+        if (!reader.GetBoolean(0)) throw new DomainException("EXAM_PROFILE_NOT_SUPPORTED");
+        var total = request.Part5Count + request.Part7Count;
+        if (!reader.GetBoolean(3)) return;
+        if (request.DurationSeconds != reader.GetInt32(1) || total != reader.GetInt32(2))
+            throw new DomainException("EXAM_PROFILE_STRUCTURE_INVALID");
+        var structure = JsonSerializer.Deserialize<JsonElement>(reader.GetString(4));
+        if (request.Part5Count != Count(structure, "Part5") || request.Part7Count != Count(structure, "Part7DirectEvidence"))
+            throw new DomainException("EXAM_PROFILE_STRUCTURE_INVALID");
+    }
+    private static int Count(JsonElement structure, string part) => structure.EnumerateArray()
+        .Where(item => item.GetProperty("part").GetString() == part)
+        .Select(item => item.TryGetProperty("count", out var count) ? count.GetInt32() : 0).SingleOrDefault();
     private static bool ValidText(string text) => !string.IsNullOrWhiteSpace(text) && text.Length <= 120;
     private static void ValidatePage(int page) { if (page is < 1 or > 10000) throw new DomainException("PAGINATION_INVALID"); }
     private static AdminExam Map(DbDataReader r) => new(r.GetGuid(0), r.GetString(1), r.GetString(2), r.GetString(3), r.GetString(4), r.GetString(5), r.GetInt32(6), r.GetInt32(7), r.GetFieldValue<DateTimeOffset>(8));

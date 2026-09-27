@@ -26,6 +26,7 @@ public static class AdminEndpoints
         });
         group.MapGet("/resources/{kind}",async(string kind,int? page,int? pageSize,IAdminConsole admin,CancellationToken ct)=>Results.Ok(await admin.ResourcesAsync(kind,page??1,pageSize??20,ct)));
         group.MapGet("/exams", async(int? page,string? state,IAdminExams exams,CancellationToken ct)=>Results.Ok(await exams.ListAsync(page??1,state,ct)));
+        group.MapGet("/exams/profiles", async(IAdminExams exams,CancellationToken ct)=>Results.Ok(await exams.ProfilesAsync(ct)));
         group.MapGet("/exams/sources", async(int? page,string? policy,IAdminExams exams,CancellationToken ct)=>Results.Ok(await exams.SourcesAsync(page??1,policy,ct)));
         group.MapGet("/exams/sources/{id:guid}", async(Guid id,IAdminExams exams,CancellationToken ct)=>Results.Ok(await exams.SourceAsync(id,ct)));
         group.MapGet("/exams/{id:guid}", async(Guid id,IAdminExams exams,CancellationToken ct)=>Results.Ok(await exams.DetailAsync(id,ct)));
