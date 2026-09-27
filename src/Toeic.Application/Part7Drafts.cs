@@ -5,7 +5,7 @@ namespace Toeic.Application;
 public sealed record Part7DraftQuestion(string StableId, string Prompt, IReadOnlyList<Option> Options,
     string ProposedKey, string Rationale, string EvidenceQuote);
 public sealed record Part7DraftBody(string Stimulus, IReadOnlyList<Part7DraftQuestion> Questions,
-    string RightsReference);
+    string RightsReference, Part7PassageKind PassageKind = Part7PassageKind.Single);
 public sealed record CreatePart7Draft(Guid Id, Guid BlueprintId, Guid? PreviousRevisionId);
 public sealed record SavePart7Draft(long ExpectedRevision, string Title, Part7DraftBody Body);
 public sealed record Part7Draft(Guid Id, Guid BlueprintId, Guid? PreviousRevisionId, string FamilyId,

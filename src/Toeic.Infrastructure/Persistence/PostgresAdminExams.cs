@@ -44,7 +44,8 @@ internal sealed class PostgresAdminExams(IApplicationTransaction transaction, IP
         if (policy?.Length > 120) throw new DomainException("FORM_FILTER_INVALID");
         await using var query = Query("""
             select r.id,r.family_id,r.part,r.state,r.tier,r.provenance_json->>'policyVersion',
-              (select count(*)::int from content.question_nodes n where n.source_revision_id=r.id)
+              (select count(*)::int from content.question_nodes n where n.source_revision_id=r.id),
+              case when r.part='Part7DirectEvidence' then coalesce(r.content_json->>'passageKind','Single') end
             from content.question_revisions r
             where ((r.state='BetaReady' and r.tier='AutoValidated') or (r.state='DataValidatedPractice' and r.tier='DataValidatedPractice'))
               and r.part in ('Part5','Part6','Part7DirectEvidence')
@@ -53,7 +54,7 @@ internal sealed class PostgresAdminExams(IApplicationTransaction transaction, IP
             """, ("policy", policy), ("skip", (page - 1) * 20));
         var rows = new List<AdminExamSource>();
         await using var reader = await query.ExecuteReaderAsync(token);
-        while (await reader.ReadAsync(token)) rows.Add(new(reader.GetGuid(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4), reader.IsDBNull(5) ? "" : reader.GetString(5), reader.GetInt32(6)));
+        while (await reader.ReadAsync(token)) rows.Add(new(reader.GetGuid(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4), reader.IsDBNull(5) ? "" : reader.GetString(5), reader.GetInt32(6), reader.IsDBNull(7) ? null : reader.GetString(7)));
         return new AdminPage<AdminExamSource>(rows.Take(20).ToArray(), page, 20, rows.Count > 20);
     }, ct);
 
@@ -149,16 +150,43 @@ internal sealed class PostgresAdminExams(IApplicationTransaction transaction, IP
     }
     private async Task ValidateProfile(PublishAdminExam request, CancellationToken ct)
     {
-        await using var query = Query("select publication_enabled,duration_seconds,total_questions,exact_structure,structure_json::text from content.exam_profiles where version=@version for share", ("version", request.ExamProfileVersion));
-        await using var reader = await query.ExecuteReaderAsync(ct);
-        if (!await reader.ReadAsync(ct)) throw new DomainException("EXAM_PROFILE_NOT_FOUND");
-        if (!reader.GetBoolean(0)) throw new DomainException("EXAM_PROFILE_NOT_SUPPORTED");
+        bool enabled, exact;
+        int duration, totalQuestions;
+        JsonElement structure;
+        await using (var query = Query("select publication_enabled,duration_seconds,total_questions,exact_structure,structure_json::text from content.exam_profiles where version=@version for share", ("version", request.ExamProfileVersion)))
+        {
+            await using var reader = await query.ExecuteReaderAsync(ct);
+            if (!await reader.ReadAsync(ct)) throw new DomainException("EXAM_PROFILE_NOT_FOUND");
+            enabled = reader.GetBoolean(0); duration = reader.GetInt32(1); totalQuestions = reader.GetInt32(2);
+            exact = reader.GetBoolean(3); structure = JsonSerializer.Deserialize<JsonElement>(reader.GetString(4));
+        }
+        if (!enabled) throw new DomainException("EXAM_PROFILE_NOT_SUPPORTED");
+        if (!exact) return;
         var total = request.Part5Count + request.Part6Count + request.Part7Count;
-        if (!reader.GetBoolean(3)) return;
-        if (request.DurationSeconds != reader.GetInt32(1) || total != reader.GetInt32(2))
+        var expectedSingle = Count(structure, "Part7Single");
+        var expectedMultiple = Count(structure, "Part7Multiple");
+        var expectedPart7 = Count(structure, "Part7DirectEvidence") + expectedSingle + expectedMultiple;
+        if (request.DurationSeconds != duration || total != totalQuestions ||
+            request.Part5Count != Count(structure, "Part5") || request.Part6Count != Count(structure, "Part6") ||
+            request.Part7Count != expectedPart7)
             throw new DomainException("EXAM_PROFILE_STRUCTURE_INVALID");
-        var structure = JsonSerializer.Deserialize<JsonElement>(reader.GetString(4));
-        if (request.Part5Count != Count(structure, "Part5") || request.Part6Count != Count(structure, "Part6") || request.Part7Count != Count(structure, "Part7DirectEvidence"))
+        if (expectedSingle == 0 && expectedMultiple == 0) return;
+        await using var kinds = Query("""
+            select coalesce(r.content_json->>'passageKind','Single'),count(n.id)::int
+            from content.question_revisions r join content.question_nodes n on n.source_revision_id=r.id
+            where r.id=any(@ids) and r.part='Part7DirectEvidence'
+            group by coalesce(r.content_json->>'passageKind','Single')
+            """, ("ids", request.SourceIds));
+        var single = 0; var multiple = 0;
+        await using var kindReader = await kinds.ExecuteReaderAsync(ct);
+        while (await kindReader.ReadAsync(ct))
+        {
+            var kind = kindReader.GetString(0); var count = kindReader.GetInt32(1);
+            if (kind == "Single") single += count;
+            else if (kind is "Double" or "Triple") multiple += count;
+            else throw new DomainException("EXAM_PROFILE_STRUCTURE_INVALID");
+        }
+        if (single != expectedSingle || multiple != expectedMultiple)
             throw new DomainException("EXAM_PROFILE_STRUCTURE_INVALID");
     }
     private static int Count(JsonElement structure, string part) => structure.EnumerateArray()

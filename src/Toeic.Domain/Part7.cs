@@ -19,10 +19,12 @@ public sealed class StimulusVersion
 }
 
 public sealed record EvidenceSpan(int Start, int Length, string Quote, string SourceHash);
+public enum Part7PassageKind { Single, Double, Triple }
 public sealed record Part7Question(string StableId, string Prompt, ImmutableArray<Option> Options,
     string ProposedKey, string Rationale, ImmutableArray<EvidenceSpan> Evidence);
 public sealed record Part7GroupContent(StimulusVersion Stimulus,
-    ImmutableArray<Part7Question> Questions, string FamilyId, Provenance Provenance);
+    ImmutableArray<Part7Question> Questions, string FamilyId, Provenance Provenance,
+    Part7PassageKind PassageKind = Part7PassageKind.Single);
 
 public static class Part7Validator
 {
@@ -39,6 +41,11 @@ public static class Part7Validator
             "BLUEPRINT_PART_MISMATCH", "blueprint.part");
         Require(group.Stimulus is not null, "STIMULUS_REQUIRED", "stimulus");
         var questions = group.Questions.IsDefault ? [] : group.Questions;
+        Require(Enum.IsDefined(group.PassageKind), "PASSAGE_KIND_INVALID", "passageKind");
+        Require(group.PassageKind == Part7PassageKind.Single
+                ? questions.Length is >= 2 and <= 4
+                : questions.Length == 5,
+            "PASSAGE_QUESTION_COUNT_INVALID", "questions");
         Require(questions.Length == blueprint.Constraints.GroupSize,
             "GROUP_SIZE_INVALID", "questions");
         Require(!string.IsNullOrWhiteSpace(group.FamilyId), "FAMILY_REQUIRED", "familyId");

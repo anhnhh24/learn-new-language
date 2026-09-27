@@ -5,7 +5,7 @@ namespace Toeic.Application;
 public sealed record AdminExam(Guid Id, string Version, string State, string Tier, string PolicyVersion,
     string ExamProfileVersion, int DurationSeconds, int QuestionCount, DateTimeOffset CreatedAt);
 public sealed record AdminExamSource(Guid Id, string FamilyId, string Part, string State, string Tier,
-    string PolicyVersion, int QuestionCount);
+    string PolicyVersion, int QuestionCount, string? PassageKind);
 public sealed record AdminExamContent(Guid Id, string Part, JsonElement Content);
 public sealed record ExamProfileView(string Version, string Title, string Kind, bool PublicationEnabled,
     int DurationSeconds, int TotalQuestions, bool ExactStructure, JsonElement Structure);
