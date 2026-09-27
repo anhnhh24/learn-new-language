@@ -16,7 +16,7 @@
 
 Bật `Features:LearnerApiEnabled`, `Features:BetaServingEnabled`, cấu hình PostgreSQL và `Analytics:PseudonymKeyBase64` theo cấu hình hiện có. `Workers:QuizExpiryEnabled` điều khiển cả worker quiz và luyện đề. Worker quét mỗi 30 giây, tối đa 50 lượt; lỗi riêng từng lượt được lùi 15 phút để thử lại.
 
-Form phải Active, tier BetaPractice/DataValidatedPractice, có nội dung Part5/Part7DirectEvidence đã qua quality pipeline. Form đã gắn bài học không xuất hiện trong danh sách luyện đề độc lập. Start vẫn kiểm tra đầy đủ bằng BetaServingService; không bỏ qua quality gate. Tài khoản phải Active và xác minh email; tối đa 10 lượt bắt đầu mỗi giờ. Lượt đang Active của cùng đề cần được mở lại từ lịch sử.
+Form phải Active, tier BetaPractice/DataValidatedPractice, có nội dung Part5/Part6/Part7DirectEvidence đã qua quality pipeline. Form đã gắn bài học không xuất hiện trong danh sách luyện đề độc lập. Start vẫn kiểm tra đầy đủ bằng BetaServingService; không bỏ qua quality gate. Tài khoản phải Active và xác minh email; tối đa 10 lượt bắt đầu mỗi giờ. Lượt đang Active của cùng đề cần được mở lại từ lịch sử.
 
 Migration không seed hoặc tự xuất bản ngân hàng câu hỏi. Danh sách có thể rỗng nếu chưa có form hợp lệ. Không đổi form Draft thành Active chỉ để lấp giao diện.
 

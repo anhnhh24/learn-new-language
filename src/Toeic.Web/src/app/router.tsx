@@ -1,5 +1,6 @@
 import { QuestionDraftListPage, QuestionDraftEditorPage } from '../features/admin/QuestionDrafts';
 import { Part7DraftListPage, Part7DraftEditorPage } from '../features/admin/Part7Drafts';
+import { Part6DraftListPage, Part6DraftEditorPage } from '../features/admin/Part6Drafts';
 import { AdminExamListPage, AdminExamCreatePage, AdminExamDetailPage } from '../features/admin/AdminExams';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { LearnerLayout } from '../layouts/LearnerLayout';
@@ -118,6 +119,8 @@ export const router = createBrowserRouter([
       { path: 'items', element: <AdminListPage key="items" kind="items" /> },
       { path: 'question-drafts', element: <QuestionDraftListPage /> },
       { path: 'question-drafts/:draftId', element: <QuestionDraftEditorPage /> },
+      { path: 'part6-drafts', element: <Part6DraftListPage /> },
+      { path: 'part6-drafts/:draftId', element: <Part6DraftEditorPage /> },
       { path: 'part7-drafts', element: <Part7DraftListPage /> },
       { path: 'part7-drafts/:draftId', element: <Part7DraftEditorPage /> },
       { path: 'exams', element: <AdminExamListPage /> },

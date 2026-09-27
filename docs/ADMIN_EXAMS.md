@@ -8,7 +8,7 @@ Các trang `/admin/exams`, `/admin/exams/new`, `/admin/exams/:examId` dùng Admi
 
 ## Quy trình
 
-1. Đưa nguồn câu hỏi qua quality pipeline hiện có. Màn hình chọn nguồn chỉ liệt kê Part5/Part7DirectEvidence ở BetaReady + AutoValidated hoặc DataValidatedPractice.
+1. Đưa nguồn câu hỏi qua quality pipeline hiện có. Màn hình chọn nguồn chỉ liệt kê Part5/Part6/Part7DirectEvidence ở BetaReady + AutoValidated hoặc DataValidatedPractice.
 2. Xem trước nội dung, chọn nguồn, sắp xếp thứ tự. Nhóm Part 7 không tách lẻ. Nguồn được giữ theo thứ tự chọn giữa các trang; có thể đưa lên/xuống hoặc bỏ khỏi đề.
 3. Nhập tên phiên bản duy nhất, policy khớp nguồn, phiên bản cấu hình bài thi, thời lượng 1–240 phút, mức phát hành và ngưỡng tiếp xúc. Tổng số câu 1–200.
 4. Nhấn kiểm tra và xuất bản. Backend dùng FormCompositionService: quyền sử dụng, policy, family trùng/khóa được truyền vào composer, số câu theo Part, tier và lượt tiếp xúc đều được kiểm tra. Luồng admin hiện truyền tập family khóa rỗng, chưa có quản lý family cấm toàn hệ thống. Nguồn BetaReady trở thành BetaActive trong cùng transaction.
