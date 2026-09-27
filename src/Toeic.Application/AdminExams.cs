@@ -12,7 +12,7 @@ public sealed record ExamProfileView(string Version, string Title, string Kind, 
 public sealed record AdminExamDetail(AdminExam Form, IReadOnlyList<AdminExamContent> Sources);
 public sealed record PublishAdminExam(Guid OperationId, string Version, string PolicyVersion,
     string ExamProfileVersion, int DurationSeconds, string Tier, Guid[] SourceIds,
-    int Part5Count, int Part7Count, int MaximumPriorExposure);
+    int Part5Count, int Part6Count, int Part7Count, int MaximumPriorExposure);
 public sealed record ArchiveAdminExam(string ExpectedState, string Reason);
 public interface IAdminExams
 {

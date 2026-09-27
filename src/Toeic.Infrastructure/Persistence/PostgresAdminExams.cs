@@ -47,7 +47,7 @@ internal sealed class PostgresAdminExams(IApplicationTransaction transaction, IP
               (select count(*)::int from content.question_nodes n where n.source_revision_id=r.id)
             from content.question_revisions r
             where ((r.state='BetaReady' and r.tier='AutoValidated') or (r.state='DataValidatedPractice' and r.tier='DataValidatedPractice'))
-              and r.part in ('Part5','Part7DirectEvidence')
+              and r.part in ('Part5','Part6','Part7DirectEvidence')
               and (cast(@policy as text) is null or r.provenance_json->>'policyVersion'=@policy)
             order by r.created_at desc,r.id limit 21 offset @skip
             """, ("policy", policy), ("skip", (page - 1) * 20));
@@ -86,8 +86,8 @@ internal sealed class PostgresAdminExams(IApplicationTransaction transaction, IP
         if (request.OperationId == Guid.Empty || request.SourceIds is null || request.SourceIds.Length is < 1 or > 200 ||
             request.SourceIds.Any(id => id == Guid.Empty) || request.SourceIds.Distinct().Count() != request.SourceIds.Length ||
             !ValidText(request.Version) || !ValidText(request.PolicyVersion) || !ValidText(request.ExamProfileVersion) ||
-            request.DurationSeconds is < 60 or > 14400 || request.Part5Count is < 0 or > 200 || request.Part7Count is < 0 or > 200 ||
-            request.Part5Count + request.Part7Count is < 1 or > 200 || request.MaximumPriorExposure is < 0 or > 100000 ||
+            request.DurationSeconds is < 60 or > 14400 || request.Part5Count is < 0 or > 200 || request.Part6Count is < 0 or > 200 || request.Part7Count is < 0 or > 200 ||
+            request.Part5Count + request.Part6Count + request.Part7Count is < 1 or > 200 || request.MaximumPriorExposure is < 0 or > 100000 ||
             request.Tier is not ("BetaPractice" or "DataValidatedPractice")) throw new DomainException("FORM_REQUEST_INVALID");
         await LockAdmin(admin, token);
         var hash = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(request, Json)));
@@ -103,6 +103,7 @@ internal sealed class PostgresAdminExams(IApplicationTransaction transaction, IP
         await ValidateProfile(request, token);
         var requirements = ImmutableArray.CreateBuilder<FormRequirement>();
         if (request.Part5Count > 0) requirements.Add(new(ToeicPart.Part5, request.Part5Count));
+        if (request.Part6Count > 0) requirements.Add(new(ToeicPart.Part6, request.Part6Count));
         if (request.Part7Count > 0) requirements.Add(new(ToeicPart.Part7DirectEvidence, request.Part7Count));
         // The caller is an admin; only the trusted composition service performs the automated gate transition.
         var form = await composer.ComposeAsync(new(request.Version, request.PolicyVersion, request.ExamProfileVersion,
@@ -152,12 +153,12 @@ internal sealed class PostgresAdminExams(IApplicationTransaction transaction, IP
         await using var reader = await query.ExecuteReaderAsync(ct);
         if (!await reader.ReadAsync(ct)) throw new DomainException("EXAM_PROFILE_NOT_FOUND");
         if (!reader.GetBoolean(0)) throw new DomainException("EXAM_PROFILE_NOT_SUPPORTED");
-        var total = request.Part5Count + request.Part7Count;
+        var total = request.Part5Count + request.Part6Count + request.Part7Count;
         if (!reader.GetBoolean(3)) return;
         if (request.DurationSeconds != reader.GetInt32(1) || total != reader.GetInt32(2))
             throw new DomainException("EXAM_PROFILE_STRUCTURE_INVALID");
         var structure = JsonSerializer.Deserialize<JsonElement>(reader.GetString(4));
-        if (request.Part5Count != Count(structure, "Part5") || request.Part7Count != Count(structure, "Part7DirectEvidence"))
+        if (request.Part5Count != Count(structure, "Part5") || request.Part6Count != Count(structure, "Part6") || request.Part7Count != Count(structure, "Part7DirectEvidence"))
             throw new DomainException("EXAM_PROFILE_STRUCTURE_INVALID");
     }
     private static int Count(JsonElement structure, string part) => structure.EnumerateArray()

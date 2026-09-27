@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 
 namespace Toeic.Domain.Content;
 
-public enum ToeicPart { Part5, Part7DirectEvidence }
+public enum ToeicPart { Part5, Part6, Part7DirectEvidence }
 public enum BlueprintState { Draft, Published, Archived }
 
 public sealed record BudgetLimit(decimal Amount, string Currency)
@@ -120,6 +120,8 @@ public sealed class ContentBlueprintVersion
             throw new DomainException("VOCABULARY_POLICY_INVALID");
         if (part == ToeicPart.Part5 && (constraints.GroupSize != 1 || constraints.OptionCount != 4))
             throw new DomainException("PART5_PROFILE_INVALID");
+        if (part == ToeicPart.Part6 && (constraints.GroupSize != 4 || constraints.OptionCount != 4))
+            throw new DomainException("PART6_PROFILE_INVALID");
         if (part == ToeicPart.Part7DirectEvidence &&
             (constraints.GroupSize is < 2 or > 5 || constraints.OptionCount != 4))
             throw new DomainException("PART7_PROFILE_INVALID");

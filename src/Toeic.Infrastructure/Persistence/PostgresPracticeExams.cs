@@ -20,7 +20,7 @@ internal sealed class PostgresPracticeExams(IApplicationTransaction transaction,
         and exists(select 1 from content.form_questions fq where fq.form_version_id=f.id)
         and not exists(select 1 from content.form_questions fq join content.question_nodes n on n.id=fq.question_revision_id
             join content.question_revisions r on r.id=n.source_revision_id where fq.form_version_id=f.id
-            and (r.state not in ('BetaActive','DataValidatedPractice') or r.part not in ('Part5','Part7DirectEvidence')))
+            and (r.state not in ('BetaActive','DataValidatedPractice') or r.part not in ('Part5','Part6','Part7DirectEvidence')))
         """;
     public Task<PracticePage<PracticeForm>> CatalogAsync(Guid user,int page,int pageSize,CancellationToken ct)=>transaction.ExecuteAsync(async token=>
     {
@@ -199,6 +199,12 @@ internal sealed class PostgresPracticeExams(IApplicationTransaction transaction,
             {
                 var content=JsonSerializer.Deserialize<Part5Content>(reader.GetString(3),Json)!;
                 help.Add(reader.GetGuid(0),new(content.RuleId,content.AnswerDerivation+"\n"+string.Join("\n",content.Options.Select(o=>$"{o.Text}: {o.Justification}")),null));
+            }
+            else if(reader.GetString(2)=="Part6")
+            {
+                var content=JsonSerializer.Deserialize<Part6GroupContent>(reader.GetString(3),Json)!;
+                var item=content.Questions.Single(q=>q.StableId==reader.GetString(1));
+                help.Add(reader.GetGuid(0),new("Part6",item.Rationale,null));
             }
             else
             {

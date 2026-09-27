@@ -154,7 +154,19 @@ internal sealed class PostgresFormVersionStore(IPostgresSession session)
                         "Part5", content.Stem, options, [content.ProposedKey], 1m));
                     break;
                 }
-                case ToeicPart.Part7DirectEvidence:
+                case ToeicPart.Part6:
+                {
+                    var content = JsonSerializer.Deserialize<Part6GroupContent>(contentJson, JsonOptions)
+                        ?? throw new DomainException("FORM_CONTENT_CORRUPT");
+                    EnsureContentIdentity(content.FamilyId, familyId, content, contentHash);
+                    var stableId = itemReader.GetString(6);
+                    var matches = content.Questions.Where(question => string.Equals(question.StableId, stableId, StringComparison.Ordinal)).ToArray();
+                    if (matches.Length != 1) throw new DomainException("FORM_CONTENT_CORRUPT");
+                    var question = matches[0];
+                    var options = question.Options.Select(option => new AttemptOption(option.StableId, option.Text)).ToImmutableArray();
+                    items.Add(new AttemptItemSnapshot(questionNodeId, StableFamilyId(familyId), "Part6", question.Prompt, options, [question.ProposedKey], 1m, content.Stimulus.Text));
+                    break;
+                }                case ToeicPart.Part7DirectEvidence:
                 {
                     var content = JsonSerializer.Deserialize<Part7GroupContent>(
                         contentJson, JsonOptions) ?? throw new DomainException("FORM_CONTENT_CORRUPT");
